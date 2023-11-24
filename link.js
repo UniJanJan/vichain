@@ -1,22 +1,36 @@
 const LinkStatus = {
     VIRTUAL: 0,
-    ESTABLISHED: 1
+    HALFESTABLISHED: 1,
+    ESTABLISHED: 2
 };
 
 const LinkStatusColor = {};
 LinkStatusColor[LinkStatus.VIRTUAL] = 'grey';
+LinkStatusColor[LinkStatus.HALFESTABLISHED] = 'orange';
 LinkStatusColor[LinkStatus.ESTABLISHED] = 'red';
 
 class Link {
-    constructor(node1, node2) {
+    constructor(network, node1, node2) {
+        this.network = network;
+
         this.node1 = node1;
         this.node2 = node2;
+
         this.status = LinkStatus.VIRTUAL;
+        this.confirmationsByNode = {};
+        // this.confirmedByNode1 = false;
+        // this.confirmedByNode2 = false;
 
         this.node1.linkedNodes[node2] = this;
         this.node2.linkedNodes[node1] = this;
 
         this.calculateProperties();
+
+        // this.drawOrder = 1;
+    }
+
+    transmitMessageTo(nodeTo, message) {
+        this.network.eventProcessor.transmitMessage(this.getSecondNode(nodeTo), nodeTo, message);
     }
 
     getSecondNode(firstNode) {

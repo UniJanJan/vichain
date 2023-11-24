@@ -86,8 +86,6 @@ canvas.addEventListener('mouseup', event => {
         const endNode = network.getNode(linkDraft.endX, linkDraft.endY);
         if (endNode !== null) {
             network.addLink(linkDraft.startNode, endNode);
-
-            linkDraft.startNode.sendMessage(endNode, new VersionMessage("1.0"));
         }
     }
 
