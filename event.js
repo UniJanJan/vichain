@@ -31,19 +31,12 @@ class VerAckMessage {
 }
 
 class MessageSendingEvent extends Event {
-    constructor(nodeFrom, nodeTo, message) {
-        const link = nodeFrom.linkedNodes[nodeTo];
-        if (link === undefined) {
-            throw new Error('MessageSendingEvent creation: Link between nodes does not exist!');
-        }
+    constructor(nodeFrom, nodesTo, message) {
         // super(1000); // TODO
         super(30);
-        this.link = link;
         this.nodeFrom = nodeFrom;
-        this.nodeTo = nodeTo;
+        this.nodesTo = nodesTo;
         this.message = message;
-
-        this.drawOnTop = true;
     }
 
     update() {
@@ -109,7 +102,7 @@ class MessageReceivingEvent extends Event {
     constructor(nodeFrom, nodeTo, message) {
         const link = nodeFrom.linkedNodes[nodeTo];
         if (link === undefined) {
-            throw new Error('MessageSendingEvent creation: Link between nodes does not exist!');
+            throw new Error('MessageReceivingEvent creation: Link between nodes does not exist!');
         }
         // super(1000); // TODO
         super(30);
