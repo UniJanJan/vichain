@@ -3,12 +3,10 @@ class Node {
 
     static brakingFactor = 0.95;
 
-    constructor(x, y, eventProcessor) {
+    constructor(x, y) {
         this.id = Node.nextId++;
 
-        this.eventProcessor = eventProcessor;
-        this.pendingEvents = [];
-        this.currentProcessedEvent = null;
+        this.eventProcessor = new EventProcessor(1, this.onProcessed.bind(this));
 
         this.linkedNodes = {};
 
@@ -25,24 +23,22 @@ class Node {
 
         this.targetX = null;
         this.targetY = null;
-
-        // this.drawOrder = 2;
     }
 
     sendMessage(nodeTo, message) {
-        this.eventProcessor.sendMessage(this, nodeTo, message);
+        if (this.isLinkedWith(nodeTo)) {
+            this.eventProcessor.enqueueExecution(new MessageSendingEvent(this, nodeTo, message));
+        }
     }
 
-    // orderMessageSending(nodeTo, message) {
-    //     if (this.isLinkedWith(nodeTo)) {
-    //         this.pendingEvents.push(new MessageSendingEvent(this, nodeTo, message));
-    //     }
-    // }
+    receiveMessage(nodeFrom, message) {
+        if (nodeFrom.isLinkedWith(this)) {
+            this.eventProcessor.enqueueExecution(new MessageReceivingEvent(nodeFrom, this, message));
+        }
+    }
 
     dispatchMessage(event) {
-        // console.log(`[${this}]: Received message: ${event.message}`);
         if (event.message instanceof VersionMessage) {
-            // console.log("Received version message: " + event.message);
             if (event.link.status === LinkStatus.VIRTUAL) {
                 //TODO make prioritized
                 this.sendMessage(event.nodeFrom, new VerAckMessage());
@@ -60,13 +56,6 @@ class Node {
             } else {
                 event.link.status = LinkStatus.VIRTUAL;
             }
-
-            // if (event.link.status === LinkStatus.VIRTUAL) {
-            // event.link.status = LinkStatus.HALFESTABLISHED
-            // this.sendMessage(event.nodeFrom, new VerAckMessage());
-            // } else if (event.link.status == LinkStatus.HALFESTABLISHED) {
-            // event.link.status = LinkStatus.ESTABLISHED;
-            // }
         }
     }
 
@@ -103,21 +92,19 @@ class Node {
         }
     }
 
+    onProcessed(processedEvent) {
+        if (processedEvent instanceof MessageSendingEvent) {
+            // TODO what if link has been destroyed?
+            processedEvent.link.transmitMessageTo(processedEvent.nodeTo, processedEvent.message);
+        } else if (processedEvent instanceof MessageReceivingEvent) {
+            this.dispatchMessage(processedEvent);
+        }
+    }
+
     update() {
         this.updateVelocity();
         this.updatePosition();
-
-        if (this.currentProcessedEvent === null && this.pendingEvents.length > 0) {
-            this.currentProcessedEvent = this.pendingEvents.splice(0, 1)[0];
-            this.eventProcessor.startExecution(this.currentProcessedEvent);
-        } else if (this.currentProcessedEvent !== null && this.currentProcessedEvent.status === EventStatus.PROCESSED) {
-            if (this.pendingEvents.length > 0) {
-                this.currentProcessedEvent = this.pendingEvents.splice(0, 1)[0];
-                this.eventProcessor.startExecution(this.currentProcessedEvent);
-            } else {
-                this.currentProcessedEvent = null;
-            }
-        }
+        this.eventProcessor.update();
     }
 
     draw(graphics) {
@@ -128,6 +115,8 @@ class Node {
         graphics.strokeStyle = 'black';
         graphics.lineWidth = 3;
         graphics.stroke();
+
+        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics));
     }
 
     updateTargetPoint(targetX, targetY) {

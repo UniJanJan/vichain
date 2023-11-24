@@ -10,8 +10,8 @@ LinkStatusColor[LinkStatus.HALFESTABLISHED] = 'orange';
 LinkStatusColor[LinkStatus.ESTABLISHED] = 'red';
 
 class Link {
-    constructor(network, node1, node2) {
-        this.network = network;
+    constructor(node1, node2) {
+        this.eventProcessor = new EventProcessor(Infinity, this.onProcessed.bind(this));
 
         this.node1 = node1;
         this.node2 = node2;
@@ -29,8 +29,15 @@ class Link {
         // this.drawOrder = 1;
     }
 
+    onProcessed(processedEvent) {
+        if (processedEvent instanceof MessageTransmissionEvent) {
+            // TODO what if link has been destroyed?
+            processedEvent.nodeTo.receiveMessage(processedEvent.nodeFrom, processedEvent.message);
+        }
+    }
+
     transmitMessageTo(nodeTo, message) {
-        this.network.eventProcessor.transmitMessage(this.getSecondNode(nodeTo), nodeTo, message);
+        this.eventProcessor.enqueueExecution(new MessageTransmissionEvent(this.getSecondNode(nodeTo), nodeTo, message));
     }
 
     getSecondNode(firstNode) {
@@ -56,6 +63,10 @@ class Link {
         this.calculateWidth();
     }
 
+    update() {
+        this.eventProcessor.update();
+    }
+
     draw(graphics) {
         graphics.beginPath();
         graphics.moveTo(this.node1.x, this.node1.y);
@@ -64,5 +75,7 @@ class Link {
         graphics.lineCap = 'round';
         graphics.lineWidth = this.width;
         graphics.stroke();
+
+        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics));
     }
 }

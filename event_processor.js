@@ -1,37 +1,53 @@
 class EventProcessor {
-    constructor() {
-        this.events = [];
+    constructor(maxLoad, onProcessed) {
+        this.maxLoad = maxLoad;
+        this.currentLoad = 0;
+
+        this.processableEvents = [];
+        this.processingEvents = [];
+        this.processedEvents = [];
+
+        // callbacks
+        this.onProcessed = onProcessed;
     }
 
-    sendMessage(nodeFrom, nodeTo, message) {
-        if (nodeFrom.isLinkedWith(nodeTo)) {
-            // this.events.push(new MessageSendingEvent(nodeFrom, nodeTo, message));
-            nodeFrom.pendingEvents.push(new MessageSendingEvent(nodeFrom, nodeTo, message));
-            // console.log("New event sending!", this.events);
-        }
+    isEventLoadable(event) {
+        return this.currentLoad + event.loadSize <= this.maxLoad;
     }
 
-    transmitMessage(nodeFrom, nodeTo, message) {
-        if (nodeFrom.isLinkedWith(nodeTo)) {
-            this.events.push(new MessageTransmissionEvent(nodeFrom, nodeTo, message));
-            // console.log("New event transmission!", this.events);
+    enqueueExecution(event) {
+        if (event.status === EventStatus.PROCESSABLE) {
+            this.processableEvents.push(event);
+        } else {
+            throw new Error("Event isn't PROCESSABLE. Cannot enqueue its execution!", event);
         }
     }
 
     startExecution(event) {
-        if (event.status === EventStatus.PROCESSABLE) {
+        if (event.status === EventStatus.PROCESSABLE && this.isEventLoadable(event)) {
             event.status = EventStatus.PROCESSING;
-            this.events.push(event);
+            this.currentLoad += event.loadSize;
+            this.processingEvents.push(event);
         } else {
-            throw new Error("Event is UNPROCESSABLE. Cannot start its execution!", event);
+            throw new Error("Event isn't PROCESSABLE or max load size exceeded. Cannot start its execution!", event);
         }
     }
 
-    process() {
-        this.events.forEach((event, index) => {
+    update() {
+        while (this.processableEvents.length > 0 && this.isEventLoadable(this.processableEvents[0])) {
+            var processableEvent = this.processableEvents.splice(0, 1)[0];
+            this.startExecution(processableEvent);
+        }
+
+        this.processingEvents.forEach((event, index) => {
             event.update();
             if (event.status === EventStatus.PROCESSED) {
-                this.events.splice(index, 1);
+                var processedEvent = this.processingEvents.splice(index, 1)[0];
+                this.currentLoad -= processedEvent.loadSize;
+                this.processedEvents.push(processedEvent);
+                if (this.onProcessed !== null) {
+                    this.onProcessed(processedEvent);
+                }
             }
         });
     }

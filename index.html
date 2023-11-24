@@ -76,11 +76,11 @@
             // events: {
             //     cache: false,
             //     get() {
-
+            //         return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processedEvents : [];
             //     }
             // }
             events() {
-                return this.network.eventProcessor.events;
+                return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processedEvents : [];
             }
         }
     });
