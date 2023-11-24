@@ -10,9 +10,10 @@
 
 <body>
     <div class="container-fluid text-center d-flex flex-column" style="height: 100vh">
-        <div class="row">
+        <div class="row" style="text-align: initial;">
             <div class="col-12">
-                <h2>Blockchain simulator</h2>
+                <h2 style="margin-bottom: 0;">Vichain</h2>
+                <span>Visual blockchain</span>
             </div>
         </div>
         <div class="row bg-light align-items-center justify-content-top" style="flex: 1 1 auto; height: 100%;">
@@ -21,7 +22,81 @@
             </div>
             <div id="app" class="col-3">
                 <div v-if="network.selectedNode">
-                    Node {{ network.selectedNode.id }}
+                    <h2>Node {{ network.selectedNode.id }}</h2>
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-events-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-events" type="button" role="tab" aria-controls="nav-home"
+                                aria-selected="true">Events</button>
+                            <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
+                                aria-selected="false">Profile</button>
+                            <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact"
+                                aria-selected="false">Contact</button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-events" role="tabpanel"
+                            aria-labelledby="nav-events-tab">
+
+                            Processable events
+                            <div v-if="processableEvents.length > 0">
+                                <ul class="list-group" v-for="event in processableEvents">
+                                    <li class="list-group-item"
+                                        style="font-size: small; padding: 0; background-color: chartreuse;">
+                                        {{translateEventClassName(event)}}</li>
+                                </ul>
+                            </div>
+                            <div v-else>
+                                <ul class="list-group">
+                                    <li class="list-group-item" style="font-size: small; padding: 0;">Nothing in queue
+                                    </li>
+                                </ul>
+                            </div>
+
+                            Processing events
+                            <div v-if="processingEvents.length > 0">
+                                <ul class="list-group" v-for="event in processingEvents">
+                                    <li class="list-group-item"
+                                        style="font-size: small; padding: 0; background-color: tomato;">
+                                        {{translateEventClassName(event)}}</li>
+                                </ul>
+                            </div>
+                            <div v-else>
+                                <ul class="list-group">
+                                    <li class="list-group-item" style="font-size: small; padding: 0;">Nothing is
+                                        processed</li>
+                                </ul>
+                            </div>
+
+                            Processed events
+                            <div v-if="processedEvents.length > 0">
+                                <ul class="list-group" v-for="event in processedEvents">
+                                    <li class="list-group-item"
+                                        style="font-size: small; padding: 0; background-color: cyan;">
+                                        {{translateEventClassName(event)}}</li>
+                                </ul>
+                            </div>
+                            <div v-else>
+                                <ul class="list-group">
+                                    <li class="list-group-item" style="font-size: small; padding: 0;">Nothing's
+                                        processed yet</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                            ...</div>
+                        <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                            ...</div>
+                    </div>
+
+
+
+
+
+
                     <!-- <div v-if="network.selectedNode.eventProcessor.events.length > 0">
                     {{ network.selectedNode.eventProcessor.events[0] }}
                     </div> -->
@@ -31,12 +106,7 @@
                         Ctrl + left click = new node
                     </p>
                 </div>
-                <div v-if="events.length > 0">
-                    Events
-                    <li v-for="event in events">
-                        <pre>{{ JSON.stringify(event.message) }}</pre>
-                    </li>
-                </div>
+
             </div>
         </div>
         <div class="row">
@@ -47,6 +117,8 @@
     </div>
 </body>
 
+<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+    integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
@@ -69,18 +141,27 @@
     const app = createApp({
         data() {
             return {
-                network: ref(new Network())
+                network: ref(new Network()),
+                eventClassNameTranslation: {
+                    'MessageSendingEvent': 'Message sending',
+                    'MessageReceivingEvent': 'Message receiving'
+                }
             }
         },
         computed: {
-            // events: {
-            //     cache: false,
-            //     get() {
-            //         return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processedEvents : [];
-            //     }
-            // }
-            events() {
+            processableEvents() {
+                return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processableEvents : [];
+            },
+            processingEvents() {
+                return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processingEvents : [];
+            },
+            processedEvents() {
                 return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processedEvents : [];
+            }
+        },
+        methods: {
+            translateEventClassName(event) {
+                return this.eventClassNameTranslation[event.constructor.name];
             }
         }
     });

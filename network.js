@@ -20,7 +20,7 @@ class Network {
     }
 
     addLink(node1, node2) {
-        if (!node1.isLinkedWith(node2)) {
+        if (node1 !== node2 && !node1.isLinkedWith(node2)) {
             this.links.push(new Link(node1, node2));
             node2.sendMessage(node1, new VersionMessage(node2.version));
         }
