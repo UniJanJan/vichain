@@ -2,14 +2,14 @@ class Network {
     constructor() {
         this.nodes = [];
         this.links = [];
-        this.eventProcessor = new EventProcessor();
+        // this.eventProcessor = new EventProcessor();
         // this.nodePositionsMap = {};
         this.selectedNode = null;
         this.informativeNodes = [];
     }
 
     addNode(x, y) {
-        var node = new Node(x, y, this.eventProcessor);
+        var node = new Node(x, y);
         this.nodes.push(node);
 
         if (this.informativeNodes.length === 0) {
@@ -21,7 +21,7 @@ class Network {
 
     addLink(node1, node2) {
         if (!node1.isLinkedWith(node2)) {
-            this.links.push(new Link(this, node1, node2));
+            this.links.push(new Link(node1, node2));
             node2.sendMessage(node1, new VersionMessage(node2.version));
         }
     }
@@ -46,6 +46,7 @@ class Network {
 
     update() {
         this.nodes.forEach(node => node.update());
+        this.links.forEach(link => link.update());
 
         // this.nodes.forEach(node => {
         //     // console.log(Math.random())
@@ -60,13 +61,13 @@ class Network {
         // });
 
 
-        this.eventProcessor.process();
+        // this.eventProcessor.process();
     }
 
     draw(graphics) {
         this.links.forEach(link => link.draw(graphics));
-        this.eventProcessor.events.filter(event => !event.drawOnTop).forEach(event => event.draw(graphics));
+        // this.eventProcessor.processingEvents.filter(event => !event.drawOnTop).forEach(event => event.draw(graphics));
         this.nodes.forEach(node => node.draw(graphics));
-        this.eventProcessor.events.filter(event => event.drawOnTop).forEach(event => event.draw(graphics));
+        // this.eventProcessor.processingEvents.filter(event => event.drawOnTop).forEach(event => event.draw(graphics));
     }
 }
