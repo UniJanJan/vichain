@@ -1,6 +1,4 @@
-// const network = new Network();
-// console.log(app._instance.ctx.network._value.nodes);
-const network = app._instance.ctx.network._value;
+import { app } from './app.js';
 
 const canvas = document.querySelector('#visualisation-canvas');
 
@@ -22,6 +20,10 @@ const positionResolver = {
         };
     }
 };
+
+
+
+const network = app._instance.ctx.network._value;
 
 const linkDraft = {
     isActive: false,

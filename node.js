@@ -1,4 +1,8 @@
-class Node {
+import { LinkStatus } from './link.js';
+import { EventProcessor } from './event_processor.js';
+import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage } from './event.js';
+
+export class Node {
     static nextId = 1;
 
     static brakingFactor = 0.95;

@@ -1,4 +1,6 @@
-class EventProcessor {
+import { EventStatus } from './event.js';
+
+export class EventProcessor {
     constructor(maxLoad, onProcessed) {
         this.maxLoad = maxLoad;
         this.currentLoad = 0;
