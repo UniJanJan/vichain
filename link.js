@@ -41,9 +41,9 @@ class Link {
     }
 
     getSecondNode(firstNode) {
-        if (firstNode === this.node1) {
+        if (firstNode.id === this.node1.id) {
             return this.node2;
-        } else if (firstNode === this.node2) {
+        } else if (firstNode.id === this.node2.id) {
             return this.node1;
         } else {
             throw new Error('getSecondNode: Given node is not part of the link!');

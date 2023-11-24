@@ -44,7 +44,7 @@ class EventProcessor {
             if (event.status === EventStatus.PROCESSED) {
                 var processedEvent = this.processingEvents.splice(index, 1)[0];
                 this.currentLoad -= processedEvent.loadSize;
-                this.processedEvents.push(processedEvent);
+                this.processedEvents.unshift(processedEvent);
                 if (this.onProcessed !== null) {
                     this.onProcessed(processedEvent);
                 }

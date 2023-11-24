@@ -9,6 +9,7 @@ class Node {
         this.eventProcessor = new EventProcessor(1, this.onProcessed.bind(this));
 
         this.linkedNodes = {};
+        // this.linkedNodes = new Map();
 
         this.version = 1;
 
@@ -25,10 +26,16 @@ class Node {
         this.targetY = null;
     }
 
+    sendMessages(nodesTo, message) {
+        this.eventProcessor.enqueueExecution(new MessageSendingEvent(this, nodesTo, message));
+    }
+
     sendMessage(nodeTo, message) {
-        if (this.isLinkedWith(nodeTo)) {
-            this.eventProcessor.enqueueExecution(new MessageSendingEvent(this, nodeTo, message));
-        }
+        this.sendMessages([nodeTo], message);
+    }
+
+    broadcastMessage(message) {
+        this.sendMessages(this.getAllEstablishedLinkedNodes(), message);
     }
 
     receiveMessage(nodeFrom, message) {
@@ -67,6 +74,12 @@ class Node {
         return this.linkedNodes[node];
     }
 
+    getAllEstablishedLinkedNodes() {
+        return Object.values(this.linkedNodes)
+            .filter(link => link.status === LinkStatus.ESTABLISHED)
+            .map(link => link.getSecondNode(this));
+    }
+
     // linkWith(node) {
     //     if (!this.isLinkedWith(node)) {
     //         this.links.push(new Link(this, node1, node2));
@@ -95,7 +108,13 @@ class Node {
     onProcessed(processedEvent) {
         if (processedEvent instanceof MessageSendingEvent) {
             // TODO what if link has been destroyed?
-            processedEvent.link.transmitMessageTo(processedEvent.nodeTo, processedEvent.message);
+            processedEvent.nodesTo.forEach(nodeTo => {
+                var link = this.getLinkWith(nodeTo);
+                if (link) {
+                    link.transmitMessageTo(nodeTo, processedEvent.message);
+                }
+            });
+
         } else if (processedEvent instanceof MessageReceivingEvent) {
             this.dispatchMessage(processedEvent);
         }

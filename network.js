@@ -20,7 +20,7 @@ class Network {
     }
 
     addLink(node1, node2) {
-        if (node1 !== node2 && !node1.isLinkedWith(node2)) {
+        if (node1.id !== node2.id && !node1.isLinkedWith(node2)) {
             this.links.push(new Link(node1, node2));
             node2.sendMessage(node1, new VersionMessage(node2.version));
         }
@@ -60,14 +60,15 @@ class Network {
         //     }
         // });
 
+        if (this.informativeNodes.length > 0 && Math.random() < 0.001) {
+            this.informativeNodes[0].broadcastMessage({ text: 'broadcast test' });
+        }
 
         // this.eventProcessor.process();
     }
 
     draw(graphics) {
         this.links.forEach(link => link.draw(graphics));
-        // this.eventProcessor.processingEvents.filter(event => !event.drawOnTop).forEach(event => event.draw(graphics));
         this.nodes.forEach(node => node.draw(graphics));
-        // this.eventProcessor.processingEvents.filter(event => event.drawOnTop).forEach(event => event.draw(graphics));
     }
 }
