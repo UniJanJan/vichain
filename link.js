@@ -1,4 +1,8 @@
-const LinkStatus = {
+import { Utils } from './common.js';
+import { EventProcessor } from './event_processor.js';
+import { MessageTransmissionEvent } from './event.js';
+
+export const LinkStatus = {
     VIRTUAL: 0,
     HALFESTABLISHED: 1,
     ESTABLISHED: 2
@@ -9,7 +13,7 @@ LinkStatusColor[LinkStatus.VIRTUAL] = 'grey';
 LinkStatusColor[LinkStatus.HALFESTABLISHED] = 'orange';
 LinkStatusColor[LinkStatus.ESTABLISHED] = 'red';
 
-class Link {
+export class Link {
     constructor(node1, node2) {
         this.eventProcessor = new EventProcessor(Infinity, this.onProcessed.bind(this));
 

@@ -1,4 +1,9 @@
-class Network {
+import { Node } from './node.js';
+import { Link } from './link.js';
+import { Utils } from './common.js';
+import { VersionMessage } from './event.js';
+
+export class Network {
     constructor() {
         this.nodes = [];
         this.links = [];

@@ -125,53 +125,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
-
-<script src="./common.js"></script>
-<script src="./node.js"></script>
-<script src="./link.js"></script>
-<script src="./event.js"></script>
-<script src="./event_processor.js"></script>
-<script src="./network.js"></script>
-
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://unpkg.com/vuex@4.0.0/dist/vuex.global.js"></script>
-
-<script>
-    const { createApp, ref } = Vue
-    // const { mapState } = Vuex
-    // const network = new Network();
-
-    const app = createApp({
-        data() {
-            return {
-                network: ref(new Network()),
-                eventClassNameTranslation: {
-                    'MessageSendingEvent': 'Message sending',
-                    'MessageReceivingEvent': 'Message receiving'
-                }
-            }
-        },
-        computed: {
-            processableEvents() {
-                return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processableEvents : [];
-            },
-            processingEvents() {
-                return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processingEvents : [];
-            },
-            processedEvents() {
-                return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processedEvents : [];
-            }
-        },
-        methods: {
-            translateEventClassName(event) {
-                return this.eventClassNameTranslation[event.constructor.name];
-            }
-        }
-    });
-
-    app.mount('#app');
-</script>
-
-<script src="./index.js"></script>
+<script type="module" src="./index.js"></script>
 
 </html>

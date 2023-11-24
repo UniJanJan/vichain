@@ -1,10 +1,10 @@
-const EventStatus = {
+export const EventStatus = {
     PROCESSABLE: 0,
     PROCESSING: 1,
     PROCESSED: 2
 };
 
-class Event {
+export class Event {
     constructor(duration) {
         this.duration = duration;
         this.progress = 0;
@@ -16,7 +16,7 @@ class Event {
     }
 }
 
-class VersionMessage {
+export class VersionMessage {
     constructor(version, block) {
         this.version = version;
         this.block = block; //TODO
@@ -24,13 +24,13 @@ class VersionMessage {
     }
 }
 
-class VerAckMessage {
+export class VerAckMessage {
     constructor() {
         // type of message without payload
     }
 }
 
-class MessageSendingEvent extends Event {
+export class MessageSendingEvent extends Event {
     constructor(nodeFrom, nodesTo, message) {
         // super(1000); // TODO
         super(30);
@@ -62,7 +62,7 @@ class MessageSendingEvent extends Event {
     }
 }
 
-class MessageTransmissionEvent extends Event {
+export class MessageTransmissionEvent extends Event {
     constructor(nodeFrom, nodeTo, message) {
         const link = nodeFrom.linkedNodes[nodeTo];
         if (link === undefined) {
@@ -98,7 +98,7 @@ class MessageTransmissionEvent extends Event {
     }
 }
 
-class MessageReceivingEvent extends Event {
+export class MessageReceivingEvent extends Event {
     constructor(nodeFrom, nodeTo, message) {
         const link = nodeFrom.linkedNodes[nodeTo];
         if (link === undefined) {
