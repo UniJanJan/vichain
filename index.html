@@ -17,11 +17,11 @@
                 <span>Visual blockchain</span>
             </div>
         </div>
-        <div class="row bg-light align-items-center justify-content-top" style="flex: 1 1 auto; height: 100%;">
+        <div class="row bg-light align-items-center justify-content-top" style="flex: 1 1 auto; min-height: 0; height: 100%;">
             <div class="col-9" id="visualisation-div" style="height: 100%; margin: 0;">
                 <canvas id="visualisation-canvas" style="border-style: double; height: 100%; width: 100%;"></canvas>
             </div>
-            <div class="col-3" style="align-self: start;">
+            <div class="col-3" style="align-self: start; max-height: 100%; overflow: scroll;">
                 <div v-if="network.selectedNode">
                     <h2>Node {{ network.selectedNode.id }}</h2>
                     <nav>
@@ -38,7 +38,7 @@
                         </div>
                     </nav>
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active" id="nav-events" role="tabpanel"
+                        <div class="tab-pane fade show active overflow-scroll" style="max-height: fit-content;" id="nav-events" role="tabpanel"
                             aria-labelledby="nav-events-tab">
 
                             Processable events
