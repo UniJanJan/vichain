@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div class="container-fluid text-center d-flex flex-column" style="height: 100vh">
+    <div id="app" class="container-fluid text-center d-flex flex-column" style="height: 100vh">
         <div class="row" style="text-align: initial;">
             <div class="col-12">
                 <h2 style="margin-bottom: 0;">Vichain</h2>
@@ -21,7 +21,7 @@
             <div class="col-9" id="visualisation-div" style="height: 100%; margin: 0;">
                 <canvas id="visualisation-canvas" style="border-style: double; height: 100%; width: 100%;"></canvas>
             </div>
-            <div id="app" class="col-3" style="align-self: start;">
+            <div class="col-3" style="align-self: start;">
                 <div v-if="network.selectedNode">
                     <h2>Node {{ network.selectedNode.id }}</h2>
                     <nav>
@@ -114,7 +114,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <h3>footer</h2>
+                <h3>{{ (network.currentTimestamp/1000).toFixed(1) }}s</h2>
             </div>
         </div>
     </div>

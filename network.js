@@ -11,6 +11,7 @@ export class Network {
         // this.nodePositionsMap = {};
         this.selectedNode = null;
         this.informativeNodes = [];
+        this.currentTimestamp = 0;
     }
 
     addNode(x, y) {
@@ -49,9 +50,11 @@ export class Network {
         node.isSelected = true;
     }
 
-    update() {
-        this.nodes.forEach(node => node.update());
-        this.links.forEach(link => link.update());
+    update(tFrame = 0) {
+        var elapsedTime = tFrame - this.currentTimestamp;
+        this.currentTimestamp = tFrame;
+        this.nodes.forEach(node => node.update(elapsedTime));
+        this.links.forEach(link => link.update(elapsedTime));
 
         // this.nodes.forEach(node => {
         //     // console.log(Math.random())

@@ -67,8 +67,8 @@ export class Link {
         this.calculateWidth();
     }
 
-    update() {
-        this.eventProcessor.update();
+    update(elapsedTime) {
+        this.eventProcessor.update(elapsedTime);
     }
 
     draw(graphics) {

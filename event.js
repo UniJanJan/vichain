@@ -39,8 +39,8 @@ export class MessageSendingEvent extends Event {
         this.message = message;
     }
 
-    update() {
-        this.progress += 1;
+    update(elapsedTime) {
+        this.progress += elapsedTime/16;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
             // TODO what if link has been destroyed?
@@ -78,8 +78,8 @@ export class MessageTransmissionEvent extends Event {
         this.status = EventStatus.PROCESSABLE;
     }
 
-    update() {
-        this.progress += 1;
+    update(elapsedTime) {
+        this.progress += elapsedTime/16;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
             // this.nodeTo.dispatchMessage(this);
@@ -114,8 +114,8 @@ export class MessageReceivingEvent extends Event {
         this.drawOnTop = true;
     }
 
-    update() {
-        this.progress += 1;
+    update(elapsedTime) {
+        this.progress += elapsedTime/16;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
         }
