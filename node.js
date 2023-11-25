@@ -90,19 +90,19 @@ export class Node {
     //     }
     // }
 
-    updateVelocity() {
+    updateVelocity(elapsedTime) {
         if (this.targetX !== null && this.targetY !== null) {
-            this.velocityX = (this.targetX - this.x) / 10;
-            this.velocityY = (this.targetY - this.y) / 10;
+            this.velocityX = (this.targetX - this.x) / 10 * elapsedTime / 16;
+            this.velocityY = (this.targetY - this.y) / 10 * elapsedTime / 16;
         } else {
-            this.velocityX *= Node.brakingFactor;
-            this.velocityY *= Node.brakingFactor;
+            this.velocityX *= Node.brakingFactor * elapsedTime / 16;
+            this.velocityY *= Node.brakingFactor * elapsedTime / 16;
         }
     }
 
-    updatePosition() {
-        this.x += this.velocityX;
-        this.y += this.velocityY;
+    updatePosition(elapsedTime) {
+        this.x += this.velocityX * elapsedTime / 16;
+        this.y += this.velocityY * elapsedTime / 16;
 
         if (this.velocityX !== 0 || this.velocityY !== 0) {
             Object.values(this.linkedNodes).forEach(link => link.calculateProperties());
@@ -124,10 +124,10 @@ export class Node {
         }
     }
 
-    update() {
-        this.updateVelocity();
-        this.updatePosition();
-        this.eventProcessor.update();
+    update(elapsedTime) {
+        this.updateVelocity(elapsedTime);
+        this.updatePosition(elapsedTime);
+        this.eventProcessor.update(elapsedTime);
     }
 
     draw(graphics) {

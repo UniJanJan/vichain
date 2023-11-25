@@ -35,14 +35,14 @@ export class EventProcessor {
         }
     }
 
-    update() {
+    update(elapsedTime) {
         while (this.processableEvents.length > 0 && this.isEventLoadable(this.processableEvents[0])) {
             var processableEvent = this.processableEvents.splice(0, 1)[0];
             this.startExecution(processableEvent);
         }
 
         this.processingEvents.forEach((event, index) => {
-            event.update();
+            event.update(elapsedTime);
             if (event.status === EventStatus.PROCESSED) {
                 var processedEvent = this.processingEvents.splice(index, 1)[0];
                 this.currentLoad -= processedEvent.loadSize;

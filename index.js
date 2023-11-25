@@ -101,12 +101,12 @@ canvas.addEventListener('mouseup', event => {
 
 
 
-function simulate() {
+function simulate(tFrame) {
+    window.requestAnimationFrame(simulate);
     graphics.clearRect(0, 0, canvas.width, canvas.height);
-    network.update();
+    network.update(tFrame);
     linkDraft.draw(graphics);
     network.draw(graphics);
-    window.requestAnimationFrame(simulate);
 }
 
 simulate();
