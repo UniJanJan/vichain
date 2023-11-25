@@ -30,7 +30,13 @@ export class Link {
 
         this.calculateProperties();
 
-        // this.drawOrder = 1;
+        this.timer = null;
+    }
+
+    withTimer(timer) {
+        this.timer = timer;
+        this.eventProcessor.timer = timer;
+        return this;
     }
 
     onProcessed(processedEvent) {

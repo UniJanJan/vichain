@@ -28,6 +28,14 @@ export class Node {
 
         this.targetX = null;
         this.targetY = null;
+
+        this.timer = null;
+    }
+
+    withTimer(timer) {
+        this.timer = timer;
+        this.eventProcessor.timer = timer;
+        return this;
     }
 
     sendMessages(nodesTo, message) {

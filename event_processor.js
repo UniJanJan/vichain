@@ -11,6 +11,8 @@ export class EventProcessor {
 
         // callbacks
         this.onProcessed = onProcessed;
+
+        this.timer = null;
     }
 
     isEventLoadable(event) {
@@ -19,6 +21,7 @@ export class EventProcessor {
 
     enqueueExecution(event) {
         if (event.status === EventStatus.PROCESSABLE) {
+            event.enqueuingTimestamp = this.timer.currentTimestamp;
             this.processableEvents.push(event);
         } else {
             throw new Error("Event isn't PROCESSABLE. Cannot enqueue its execution!", event);
@@ -29,6 +32,7 @@ export class EventProcessor {
         if (event.status === EventStatus.PROCESSABLE && this.isEventLoadable(event)) {
             event.status = EventStatus.PROCESSING;
             this.currentLoad += event.loadSize;
+            event.processingStartTimestamp = this.timer.currentTimestamp;
             this.processingEvents.push(event);
         } else {
             throw new Error("Event isn't PROCESSABLE or max load size exceeded. Cannot start its execution!", event);
@@ -46,6 +50,7 @@ export class EventProcessor {
             if (event.status === EventStatus.PROCESSED) {
                 var processedEvent = this.processingEvents.splice(index, 1)[0];
                 this.currentLoad -= processedEvent.loadSize;
+                processedEvent.processingEndTimestamp = this.timer.currentTimestamp;
                 this.processedEvents.unshift(processedEvent);
                 if (this.onProcessed !== null) {
                     this.onProcessed(processedEvent);
