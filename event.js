@@ -23,11 +23,48 @@ export class VersionMessage {
         this.block = block; //TODO
         this.timestamp = 0; // TODO
     }
+
+    clone() {
+        return new VersionMessage(this.version, this.block);
+    }
 }
 
 export class VerAckMessage {
     constructor() {
         // type of message without payload
+    }
+
+    clone() {
+        return new VerAckMessage();
+    }
+}
+
+export class AddrMessage {
+    constructor(linkedNodes) {
+        this.linkedNodes = linkedNodes;
+    }
+
+    clone() {
+        return new AddrMessage(this.linkedNodes.slice());
+    }
+}
+
+export class WaitingEvent extends Event {
+    constructor(name, timeInterval) {
+        super(timeInterval);
+        this.name = name;
+        this.loadSize = 0;
+    }
+
+    update(elapsedTime) {
+        this.progress += elapsedTime;
+        if (this.progress >= this.duration) {
+            this.status = EventStatus.PROCESSED;
+        }
+    }
+
+    draw(graphics) {
+        // nothing to draw
     }
 }
 
@@ -41,7 +78,7 @@ export class MessageSendingEvent extends Event {
     }
 
     update(elapsedTime) {
-        this.progress += elapsedTime/16;
+        this.progress += elapsedTime / 16;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
             // TODO what if link has been destroyed?
@@ -80,7 +117,7 @@ export class MessageTransmissionEvent extends Event {
     }
 
     update(elapsedTime) {
-        this.progress += elapsedTime/16;
+        this.progress += elapsedTime / 16;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
             // this.nodeTo.dispatchMessage(this);
@@ -116,7 +153,7 @@ export class MessageReceivingEvent extends Event {
     }
 
     update(elapsedTime) {
-        this.progress += elapsedTime/16;
+        this.progress += elapsedTime / 16;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
         }

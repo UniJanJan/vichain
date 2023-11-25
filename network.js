@@ -14,10 +14,14 @@ export class Network {
         this.informativeNodes = [];
         
         this.timer = new Timer();
+
+        this.settings = {
+            maxLinksPerNode: 3
+        }
     }
 
     addNode(x, y) {
-        var node = new Node(x, y).withTimer(this.timer);
+        var node = new Node(x, y).withNetwork(this);
         this.nodes.push(node);
 
         if (this.informativeNodes.length === 0) {
@@ -57,25 +61,6 @@ export class Network {
         var elapsedTime = this.timer.update(tFrame);
         this.nodes.forEach(node => node.update(elapsedTime));
         this.links.forEach(link => link.update(elapsedTime));
-
-        // this.nodes.forEach(node => {
-        //     // console.log(Math.random())
-        //     if (Object.keys(node.linkedNodes).length > 0 && Math.random() < 0.001) {
-        //         Object.values(node.linkedNodes)
-        //             .map(link => link.getSecondNode(node))
-        //             .forEach(nodeTo => {
-        //                 // console.log("Sending message from " + node + " to " + nodeTo);
-        //                 this.eventProcessor.sendMessage(node, nodeTo, 'Test message transfer')
-        //             });
-        //     }
-        // });
-
-        // for test purpose
-        if (this.informativeNodes.length > 0 && Math.random() < 0.001) {
-            this.informativeNodes[0].broadcastMessage({ text: 'broadcast test' });
-        }
-
-        // this.eventProcessor.process();
     }
 
     draw(graphics) {
