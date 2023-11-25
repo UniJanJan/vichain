@@ -11,8 +11,9 @@ export class Event {
         this.status = EventStatus.PROCESSABLE;
         this.loadSize = 1;
 
-        // this.drawLayer = 3;
-        this.drawOnTop = false;
+        this.enqueuingTimestamp = null;
+        this.processingStartTimestamp = null;
+        this.processingEndTimestamp = null;
     }
 }
 

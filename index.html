@@ -76,7 +76,7 @@
                                 <ul class="list-group" v-for="event in processedEvents">
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: cyan;">
-                                        {{translateEventClassName(event)}}</li>
+                                        <span style="float: left; margin-left: 10;">{{translateEventClassName(event)}}</span> <span class="badge bg-secondary" style="float: right; margin-right: 10;">{{event.processingEndTimestamp.toFixed(0)}}</span></li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -114,7 +114,8 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <h3>{{ (network.currentTimestamp/1000).toFixed(1) }}s</h2>
+                <!-- <h3 v-if="network.currentFps">{{ network.currentFps }} FPS</h3> -->
+                <h3>{{ (network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
             </div>
         </div>
     </div>

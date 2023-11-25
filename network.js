@@ -2,6 +2,7 @@ import { Node } from './node.js';
 import { Link } from './link.js';
 import { Utils } from './common.js';
 import { VersionMessage } from './event.js';
+import { Timer } from './timer.js';
 
 export class Network {
     constructor() {
@@ -11,11 +12,12 @@ export class Network {
         // this.nodePositionsMap = {};
         this.selectedNode = null;
         this.informativeNodes = [];
-        this.currentTimestamp = 0;
+        
+        this.timer = new Timer();
     }
 
     addNode(x, y) {
-        var node = new Node(x, y);
+        var node = new Node(x, y).withTimer(this.timer);
         this.nodes.push(node);
 
         if (this.informativeNodes.length === 0) {
@@ -27,7 +29,8 @@ export class Network {
 
     addLink(node1, node2) {
         if (node1.id !== node2.id && !node1.isLinkedWith(node2)) {
-            this.links.push(new Link(node1, node2));
+            var link = new Link(node1, node2).withTimer(this.timer);
+            this.links.push(link);
             node2.sendMessage(node1, new VersionMessage(node2.version));
         }
     }
@@ -51,8 +54,7 @@ export class Network {
     }
 
     update(tFrame = 0) {
-        var elapsedTime = tFrame - this.currentTimestamp;
-        this.currentTimestamp = tFrame;
+        var elapsedTime = this.timer.update(tFrame);
         this.nodes.forEach(node => node.update(elapsedTime));
         this.links.forEach(link => link.update(elapsedTime));
 
@@ -68,6 +70,7 @@ export class Network {
         //     }
         // });
 
+        // for test purpose
         if (this.informativeNodes.length > 0 && Math.random() < 0.001) {
             this.informativeNodes[0].broadcastMessage({ text: 'broadcast test' });
         }
