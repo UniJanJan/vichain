@@ -1,6 +1,11 @@
 import { LinkStatus } from './link.js';
 import { EventProcessor } from './event_processor.js';
-import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage } from './event.js';
+import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage, WaitingEvent, AddrMessage } from './event.js';
+import { Utils } from './common.js';
+
+const CyclicEventsName = {
+    SENDING_ADDRESS: 'addr'
+}
 
 export class Node {
     static nextId = 1;
@@ -32,10 +37,16 @@ export class Node {
         this.timer = null;
     }
 
-    withTimer(timer) {
-        this.timer = timer;
-        this.eventProcessor.timer = timer;
+    withNetwork(network) {
+        this.network = network;
+        this.timer = network.timer;
+        this.eventProcessor.timer = this.timer;
+        this.wait(CyclicEventsName.SENDING_ADDRESS, 60000);
         return this;
+    }
+
+    wait(name, timeInterval) {
+        this.eventProcessor.enqueueExecution(new WaitingEvent(name, timeInterval));
     }
 
     sendMessages(nodesTo, message) {
@@ -53,6 +64,28 @@ export class Node {
     receiveMessage(nodeFrom, message) {
         if (nodeFrom.isLinkedWith(this)) {
             this.eventProcessor.enqueueExecution(new MessageReceivingEvent(nodeFrom, this, message));
+        }
+    }
+
+    onProcessed(processedEvent) {
+        if (processedEvent instanceof MessageSendingEvent) {
+            // TODO what if link has been destroyed?
+            processedEvent.nodesTo.forEach(nodeTo => {
+                var link = this.getLinkWith(nodeTo);
+                if (link) {
+                    link.transmitMessageTo(nodeTo, processedEvent.message.clone());
+                }
+            });
+
+        } else if (processedEvent instanceof MessageReceivingEvent) {
+            this.dispatchMessage(processedEvent);
+        } else if (processedEvent instanceof WaitingEvent) {
+            switch (processedEvent.name) {
+                case CyclicEventsName.SENDING_ADDRESS:
+                    this.broadcastMessage(new AddrMessage(this.getAllEstablishedLinkedNodes()));
+                    this.wait(CyclicEventsName.SENDING_ADDRESS, 60000);
+                    break;
+            }
         }
     }
 
@@ -75,6 +108,10 @@ export class Node {
             } else {
                 event.link.status = LinkStatus.VIRTUAL;
             }
+        } else if (event.message instanceof AddrMessage) {
+            var linkableNodes = event.message.linkedNodes.map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y)]);
+            linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
+            linkableNodes.slice(0, 3).map(node => node[0]).forEach(this.linkWith.bind(this));
         }
     }
 
@@ -86,25 +123,23 @@ export class Node {
         return this.linkedNodes[node];
     }
 
+    linkWith(node) {
+        this.network.addLink(this, node);
+    }
+
     getAllEstablishedLinkedNodes() {
         return Object.values(this.linkedNodes)
             .filter(link => link.status === LinkStatus.ESTABLISHED)
             .map(link => link.getSecondNode(this));
     }
 
-    // linkWith(node) {
-    //     if (!this.isLinkedWith(node)) {
-    //         this.links.push(new Link(this, node1, node2));
-    //     }
-    // }
-
     updateVelocity(elapsedTime) {
         if (this.targetX !== null && this.targetY !== null) {
-            this.velocityX = (this.targetX - this.x) / 10 * elapsedTime / 16;
-            this.velocityY = (this.targetY - this.y) / 10 * elapsedTime / 16;
+            this.velocityX = (this.targetX - this.x) / 10;
+            this.velocityY = (this.targetY - this.y) / 10;
         } else {
-            this.velocityX *= Node.brakingFactor * elapsedTime / 16;
-            this.velocityY *= Node.brakingFactor * elapsedTime / 16;
+            this.velocityX *= Node.brakingFactor;
+            this.velocityY *= Node.brakingFactor;
         }
     }
 
@@ -114,21 +149,6 @@ export class Node {
 
         if (this.velocityX !== 0 || this.velocityY !== 0) {
             Object.values(this.linkedNodes).forEach(link => link.calculateProperties());
-        }
-    }
-
-    onProcessed(processedEvent) {
-        if (processedEvent instanceof MessageSendingEvent) {
-            // TODO what if link has been destroyed?
-            processedEvent.nodesTo.forEach(nodeTo => {
-                var link = this.getLinkWith(nodeTo);
-                if (link) {
-                    link.transmitMessageTo(nodeTo, processedEvent.message);
-                }
-            });
-
-        } else if (processedEvent instanceof MessageReceivingEvent) {
-            this.dispatchMessage(processedEvent);
         }
     }
 

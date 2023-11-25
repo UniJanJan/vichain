@@ -1,4 +1,5 @@
 import { app } from './app.js';
+import { Utils } from './common.js';
 
 const canvas = document.querySelector('#visualisation-canvas');
 

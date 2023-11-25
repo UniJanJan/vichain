@@ -8,7 +8,8 @@ const app = createApp({
             network: ref(new Network()),
             eventClassNameTranslation: {
                 'MessageSendingEvent': 'Message sending',
-                'MessageReceivingEvent': 'Message receiving'
+                'MessageReceivingEvent': 'Message receiving',
+                'WaitingEvent': 'Waiting for '
             }
         }
     },
@@ -25,7 +26,7 @@ const app = createApp({
     },
     methods: {
         translateEventClassName(event) {
-            return this.eventClassNameTranslation[event.constructor.name];
+            return this.eventClassNameTranslation[event.constructor.name] + (event.name || '');
         }
     }
 });
