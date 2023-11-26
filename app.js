@@ -22,6 +22,9 @@ const app = createApp({
         },
         processedEvents() {
             return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processedEvents : [];
+        },
+        pooledTransactions() {
+            return this.network.selectedNode ? this.network.selectedNode.transactionPool.transactions : [];
         }
     },
     methods: {
