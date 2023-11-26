@@ -1,7 +1,9 @@
 import { LinkStatus } from './link.js';
 import { EventProcessor } from './event_processor.js';
-import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage, WaitingEvent, AddrMessage } from './event.js';
+import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage, WaitingEvent, AddrMessage, TrxMessage, GetAddrMessage } from './event.js';
 import { Utils } from './common.js';
+import { TransactionPool } from './transaction_pool.js';
+import { Transaction } from './transaction.js';
 
 const CyclicEventsName = {
     SENDING_ADDRESS: 'addr'
@@ -16,6 +18,7 @@ export class Node {
         this.id = Node.nextId++;
 
         this.eventProcessor = new EventProcessor(1, this.onProcessed.bind(this));
+        this.transactionPool = new TransactionPool();
 
         this.linkedNodes = {};
         // this.linkedNodes = new Map();
@@ -67,13 +70,17 @@ export class Node {
         }
     }
 
+    broadcastTransaction(transaction) {
+        this.broadcastMessage(new TrxMessage(transaction));
+    }
+
     onProcessed(processedEvent) {
         if (processedEvent instanceof MessageSendingEvent) {
             // TODO what if link has been destroyed?
             processedEvent.nodesTo.forEach(nodeTo => {
                 var link = this.getLinkWith(nodeTo);
                 if (link) {
-                    link.transmitMessageTo(nodeTo, processedEvent.message.clone());
+                    link.transmitMessageTo(nodeTo, Object.isFrozen(processedEvent.message) ? processedEvent.message : processedEvent.message.clone());
                 }
             });
 
@@ -83,7 +90,7 @@ export class Node {
             switch (processedEvent.name) {
                 case CyclicEventsName.SENDING_ADDRESS:
                     this.broadcastMessage(new AddrMessage(this.getAllEstablishedLinkedNodes()));
-                    this.wait(CyclicEventsName.SENDING_ADDRESS, 60000);
+                    this.wait(CyclicEventsName.SENDING_ADDRESS, 360000);
                     break;
             }
         }
@@ -112,6 +119,14 @@ export class Node {
             var linkableNodes = event.message.linkedNodes.map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y)]);
             linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
             linkableNodes.slice(0, 3).map(node => node[0]).forEach(this.linkWith.bind(this));
+        } else if (event.message instanceof TrxMessage) {
+            var transaction = event.message.transaction;
+            if (!this.transactionPool.contains(transaction)) {
+                this.transactionPool.put(transaction);
+                this.broadcastTransaction(transaction);
+            }
+        } else if (event.message instanceof GetAddrMessage) {
+            this.sendMessage(event.nodeFrom, new AddrMessage(this.getAllEstablishedLinkedNodes()));
         }
     }
 
@@ -156,6 +171,17 @@ export class Node {
         this.updateVelocity(elapsedTime);
         this.updatePosition(elapsedTime);
         this.eventProcessor.update(elapsedTime);
+
+        if (this.linkedNodes.length < this.network.settings.maxLinksPerNode && Math.random() < 0.01) {
+            this.broadcastMessage(new GetAddrMessage());
+        }
+
+        // for testing
+        if (Math.random() < 0.0001) {
+            var transaction = new Transaction("SOURCEADDR", "TARGETADDR", 10);
+            this.transactionPool.put(transaction);
+            this.broadcastTransaction(transaction);
+        }
     }
 
     draw(graphics) {

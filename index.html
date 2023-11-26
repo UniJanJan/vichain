@@ -88,7 +88,19 @@
 
                         </div>
                         <div class="tab-pane fade" id="nav-mempool" role="tabpanel" aria-labelledby="nav-mempool-tab">
-                            Mempool
+                            <div v-if="pooledTransactions.length > 0">
+                                <ul class="list-group" v-for="transaction in pooledTransactions">
+                                    <li class="list-group-item"
+                                        style="font-size: small; padding: 0; background-color: chartreuse;">
+                                        {{transaction.sourceAddress}} -> {{ transaction.amount }} -> {{transaction.targetAddress}}</li>
+                                </ul>
+                            </div>
+                            <div v-else>
+                                <ul class="list-group">
+                                    <li class="list-group-item" style="font-size: small; padding: 0;">Nothing in transaction pool
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="nav-blockchain" role="tabpanel"
                             aria-labelledby="nav-blockchain-tab">

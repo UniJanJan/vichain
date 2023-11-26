@@ -39,6 +39,17 @@ export class VerAckMessage {
     }
 }
 
+export class GetAddrMessage {
+    constructor() {
+        // type of message without payload
+        Object.freeze(this);
+    }
+
+    clone() {
+        return new GetAddrMessage();
+    }
+}
+
 export class AddrMessage {
     constructor(linkedNodes) {
         this.linkedNodes = linkedNodes;
@@ -48,6 +59,19 @@ export class AddrMessage {
         return new AddrMessage(this.linkedNodes.slice());
     }
 }
+
+export class TrxMessage {
+    constructor(transaction) {
+        this.transaction = transaction;
+
+        Object.freeze(this);
+    }
+
+    clone() {
+        return new TrxMessage(this.transaction.clone());
+    }
+}
+
 
 export class WaitingEvent extends Event {
     constructor(name, timeInterval) {
