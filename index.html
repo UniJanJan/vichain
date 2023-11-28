@@ -22,8 +22,8 @@
                 <canvas id="visualisation-canvas" style="border-style: double; height: 100%; width: 100%;"></canvas>
             </div>
             <div class="col-3" style="align-self: start; max-height: 100%; overflow: scroll;">
-                <div v-if="network.selectedNode">
-                    <h2>Node {{ network.selectedNode.id }}</h2>
+                <div v-if="networkManager.selectedNode">
+                    <h2>Node {{ networkManager.selectedNode.id }}</h2>
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                             <button class="nav-link active" id="nav-events-tab" data-bs-toggle="tab"
@@ -127,7 +127,7 @@
         <div class="row">
             <div class="col-12">
                 <!-- <h3 v-if="network.currentFps">{{ network.currentFps }} FPS</h3> -->
-                <h3>{{ (network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
+                <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
             </div>
         </div>
     </div>

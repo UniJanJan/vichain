@@ -1,9 +1,11 @@
 import { LinkStatus } from './link.js';
 import { EventProcessor } from './event_processor.js';
-import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage, WaitingEvent, AddrMessage, TrxMessage, GetAddrMessage } from './event.js';
+import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage, WaitingEvent, AddrMessage, TrxMessage, GetAddrMessage, TransactionCreatingEvent, TransactionVerifyingEvent, RejectMessage } from './event.js';
 import { Utils } from './common.js';
 import { TransactionPool } from './transaction_pool.js';
 import { Transaction } from './transaction.js';
+import { NetworkInterface } from './network_interface.js';
+import { EventManager } from './event_manager.js';
 
 const CyclicEventsName = {
     SENDING_ADDRESS: 'addr'
@@ -14,16 +16,17 @@ export class Node {
 
     static brakingFactor = 0.95;
 
-    constructor(x, y) {
+    constructor(network, x, y) {
         this.id = Node.nextId++;
-
-        this.eventProcessor = new EventProcessor(1, this.onProcessed.bind(this));
-        this.transactionPool = new TransactionPool();
-
-        this.linkedNodes = {};
-        // this.linkedNodes = new Map();
-
         this.version = 1;
+
+        this.network = network;
+        this.timer = network.timer;
+
+        this.transactionPool = new TransactionPool();
+        this.eventProcessor = new EventProcessor(this.timer, 1, this.onProcessed.bind(this));
+        this.networkInterface = new NetworkInterface(this, this.network, this.eventProcessor);
+        this.eventManager = new EventManager(this, this.eventProcessor, this.networkInterface);
 
         this.x = x;
         this.y = y;
@@ -37,51 +40,14 @@ export class Node {
         this.targetX = null;
         this.targetY = null;
 
-        this.timer = null;
-    }
-
-    withNetwork(network) {
-        this.network = network;
-        this.timer = network.timer;
-        this.eventProcessor.timer = this.timer;
-        this.wait(CyclicEventsName.SENDING_ADDRESS, 60000);
-        return this;
-    }
-
-    wait(name, timeInterval) {
-        this.eventProcessor.enqueueExecution(new WaitingEvent(name, timeInterval));
-    }
-
-    sendMessages(nodesTo, message) {
-        this.eventProcessor.enqueueExecution(new MessageSendingEvent(this, nodesTo, message));
-    }
-
-    sendMessage(nodeTo, message) {
-        this.sendMessages([nodeTo], message);
-    }
-
-    broadcastMessage(message) {
-        this.sendMessages(this.getAllEstablishedLinkedNodes(), message);
-    }
-
-    receiveMessage(nodeFrom, message) {
-        if (nodeFrom.isLinkedWith(this)) {
-            this.eventProcessor.enqueueExecution(new MessageReceivingEvent(nodeFrom, this, message));
-        }
-    }
-
-    broadcastTransaction(transaction) {
-        this.broadcastMessage(new TrxMessage(transaction));
+        this.eventManager.wait(CyclicEventsName.SENDING_ADDRESS, 60000);
     }
 
     onProcessed(processedEvent) {
         if (processedEvent instanceof MessageSendingEvent) {
             // TODO what if link has been destroyed?
             processedEvent.nodesTo.forEach(nodeTo => {
-                var link = this.getLinkWith(nodeTo);
-                if (link) {
-                    link.transmitMessageTo(nodeTo, Object.isFrozen(processedEvent.message) ? processedEvent.message : processedEvent.message.clone());
-                }
+                this.eventManager.transmitMessageTo(nodeTo, Object.isFrozen(processedEvent.message) ? processedEvent.message : processedEvent.message.clone());
             });
 
         } else if (processedEvent instanceof MessageReceivingEvent) {
@@ -89,63 +55,108 @@ export class Node {
         } else if (processedEvent instanceof WaitingEvent) {
             switch (processedEvent.name) {
                 case CyclicEventsName.SENDING_ADDRESS:
-                    this.broadcastMessage(new AddrMessage(this.getAllEstablishedLinkedNodes()));
-                    this.wait(CyclicEventsName.SENDING_ADDRESS, 360000);
+                    this.eventManager.broadcastMessage(new AddrMessage(this.networkInterface.getAllLinkableNodes()));
+                    this.eventManager.wait(CyclicEventsName.SENDING_ADDRESS, 360000);
                     break;
+            }
+        } else if (processedEvent instanceof TransactionCreatingEvent) {
+            var transaction = new Transaction(processedEvent.sourceAddress, processedEvent.targetAddress, processedEvent.amount);
+            this.transactionPool.put(transaction);
+            this.eventManager.broadcastTransaction(transaction);
+        } else if (processedEvent instanceof TransactionVerifyingEvent) {
+            var transaction = processedEvent.transaction;
+            if (!this.transactionPool.contains(transaction)) {
+                this.transactionPool.put(transaction);
+                this.eventManager.broadcastTransaction(transaction);
             }
         }
     }
 
     dispatchMessage(event) {
         if (event.message instanceof VersionMessage) {
-            if (event.link.status === LinkStatus.VIRTUAL) {
-                //TODO make prioritized
-                this.sendMessage(event.nodeFrom, new VerAckMessage());
-                this.sendMessage(event.nodeFrom, new VersionMessage(this.version));
-            } else if (event.link.status === LinkStatus.HALFESTABLISHED) {
-                this.sendMessage(event.nodeFrom, new VerAckMessage());
+            this.networkInterface.rememberNode(event.nodeFrom);
+
+            if (this.networkInterface.getLinksNumber() < this.network.settings.maxLinksPerNode) {
+                var link = this.networkInterface.getLinkWith(event.nodeFrom);
+                var shouldBePrioritized = this.networkInterface.shouldBePrioritized(event.nodeFrom);
+                if (link && link.status === LinkStatus.VIRTUAL) {
+                    //TODO make prioritized
+                    this.eventManager.sendMessage(event.nodeFrom, new VerAckMessage());
+                    this.eventManager.sendMessage(event.nodeFrom, new VersionMessage(this.version, shouldBePrioritized));
+                } else if (link && link.status === LinkStatus.HALF_ESTABLISHED) {
+                    link.prioritizationByNode[event.nodeFrom] = event.message.shouldBePrioritized;
+                    this.eventManager.sendMessage(event.nodeFrom, new VerAckMessage());
+                }
+            } else {
+                this.eventManager.sendMessage(event.nodeFrom, new RejectMessage());
             }
         } else if (event.message instanceof VerAckMessage) {
-            event.link.confirmationsByNode[event.nodeTo] = true;
-
-            if (event.link.confirmationsByNode[event.nodeTo] && event.link.confirmationsByNode[event.nodeFrom]) {
-                event.link.status = LinkStatus.ESTABLISHED;
-            } else if (event.link.confirmationsByNode[event.nodeTo] || event.link.confirmationsByNode[event.nodeFrom]) {
-                event.link.status = LinkStatus.HALFESTABLISHED;
-            } else {
-                event.link.status = LinkStatus.VIRTUAL;
-            }
+            this.networkInterface.confirmLinkWith(event.nodeFrom);
+        } else if (event.message instanceof RejectMessage) {
+            this.networkInterface.rejectLinkWith(event.nodeFrom);
         } else if (event.message instanceof AddrMessage) {
-            var linkableNodes = event.message.linkedNodes.map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y)]);
-            linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
-            linkableNodes.slice(0, 3).map(node => node[0]).forEach(this.linkWith.bind(this));
+            // this.networkInterface.rememberNodes.bind(this.networkInterface)(event.message.linkedNodes)
+            event.message.linkedNodes.forEach(this.networkInterface.rememberNode.bind(this.networkInterface));
+            this.updateLinks();
+            // var linksNumberToComplement = this.network.settings.minLinksPerNode - this.networkInterface.getLinksNumber();
+            // var linksNumberToReject = this.networkInterface.getLinksNumber() - this.network.settings.maxLinksPerNode;
+            // if (linksNumberToComplement > 0) {
+            //     // var linkedNodes = this.networkInterface.getAllEstablishedLinkedNodes().map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y), true]);
+            //     // // linkedNodes.sort((node1, node2) => node1[1] - node2[1]);
+
+            //     // var linkableNodes = event.message.linkedNodes.filter(nodeTo => nodeTo.id !== this.id).map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y), false]);
+            //     // // linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
+
+            //     // var sum = [...linkedNodes, ...linkableNodes];
+            //     // sum.sort((node1, node2) => node1[1] - node2[1]);
+            //     // sum.forEach((node, index) => {
+            //     //     if (index < this.network.settings.minLinksPerNode) {
+            //     //         if (!node[2]) {
+            //     //             this.networkInterface.linkWith.bind(this.networkInterface)(node[0]);
+            //     //         }
+            //     //     } else {
+            //     //         if (node[2]) {
+            //     //             this.networkInterface.rejectLinkWith(node[0]);
+            //     //             this.eventManager.sendMessage(node[0], new RejectMessage());
+            //     //         }
+            //     //     }
+            //     // })
+
+            //     var linkableNodes = event.message.linkedNodes.filter(nodeTo => nodeTo.id !== this.id).map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y)]);
+            //     linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
+            //     linkableNodes.slice(0, linksNumberToComplement).map(node => node[0]).forEach(this.networkInterface.linkWith.bind(this.networkInterface));
+            // } else if (linksNumberToReject > 0) {
+            //     var linkedNodes = this.networkInterface.getAllLinkedNodes().map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y)]);
+            //     linkedNodes.sort((node1, node2) => node2[1] - node1[1]);
+            //     linkedNodes.slice(0, linksNumberToReject).map(node => node[0]).forEach(node => {
+            //         this.networkInterface.rejectLinkWith(node[0]);
+            //         this.eventManager.sendMessage(node[0], new RejectMessage());
+            //     });
+            // }
         } else if (event.message instanceof TrxMessage) {
-            var transaction = event.message.transaction;
-            if (!this.transactionPool.contains(transaction)) {
-                this.transactionPool.put(transaction);
-                this.broadcastTransaction(transaction);
-            }
+            this.eventManager.verifyTransaction(event.message.transaction);
         } else if (event.message instanceof GetAddrMessage) {
-            this.sendMessage(event.nodeFrom, new AddrMessage(this.getAllEstablishedLinkedNodes()));
+            this.eventManager.sendMessage(event.nodeFrom, new AddrMessage(this.networkInterface.getAllLinkableNodes()));
         }
     }
 
-    isLinkedWith(node) {
-        return this.linkedNodes.hasOwnProperty(node);
-    }
+    updateLinks() {
+        var classification = this.networkInterface.getLinkableNodesClassification();
+        
+        classification.toLink.forEach(node => {
+            var link = this.networkInterface.getLinkWith(node);
+            if (link && !link.prioritizationByNode[this]) {
+                // TODO
+            } else if (!link) {
+                this.networkInterface.linkWith.bind(this.networkInterface)(node);
+            }
+        });
 
-    getLinkWith(node) {
-        return this.linkedNodes[node];
-    }
-
-    linkWith(node) {
-        this.network.addLink(this, node);
-    }
-
-    getAllEstablishedLinkedNodes() {
-        return Object.values(this.linkedNodes)
-            .filter(link => link.status === LinkStatus.ESTABLISHED)
-            .map(link => link.getSecondNode(this));
+        classification.toReject.forEach(node => {
+            var link = this.networkInterface.getLinkWith(node);
+            this.networkInterface.rejectLinkWith(node);
+            this.eventManager.sendMessage(node, new RejectMessage());
+        });
     }
 
     updateVelocity(elapsedTime) {
@@ -163,7 +174,7 @@ export class Node {
         this.y += this.velocityY * elapsedTime / 16;
 
         if (this.velocityX !== 0 || this.velocityY !== 0) {
-            Object.values(this.linkedNodes).forEach(link => link.calculateProperties());
+            Object.values(this.networkInterface.linkedNodes).forEach(link => link.calculateProperties());
         }
     }
 
@@ -172,16 +183,15 @@ export class Node {
         this.updatePosition(elapsedTime);
         this.eventProcessor.update(elapsedTime);
 
-        if (this.linkedNodes.length < this.network.settings.maxLinksPerNode && Math.random() < 0.01) {
-            this.broadcastMessage(new GetAddrMessage());
+        if (this.networkInterface.getLinksNumber() < this.network.settings.minLinksPerNode && Math.random() < 0.001) {
+            // console.log(this.network.settings.minLinksPerNode)
+            this.eventManager.broadcastMessage(new GetAddrMessage());
         }
 
-        // for testing
-        if (Math.random() < 0.0001) {
-            var transaction = new Transaction("SOURCEADDR", "TARGETADDR", 10);
-            this.transactionPool.put(transaction);
-            this.broadcastTransaction(transaction);
-        }
+        // // for testing
+        // if (this.id !== 1 && Math.random() < 0.0001) {
+        //     this.eventManager.createTransaction("SOURCEADDR", "TARGETADDR", 10);
+        // }
     }
 
     draw(graphics) {
@@ -193,7 +203,7 @@ export class Node {
         graphics.lineWidth = 3;
         graphics.stroke();
 
-        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics));
+        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics, this));
     }
 
     updateTargetPoint(targetX, targetY) {

@@ -1,30 +1,35 @@
-import { Network } from './network.js';
+import { NetworkManager } from './network_manager.js';
 
 const { createApp, ref } = Vue
 
 const app = createApp({
     data() {
         return {
-            network: ref(new Network()),
+            networkManager: ref(new NetworkManager()),
             eventClassNameTranslation: {
                 'MessageSendingEvent': 'Message sending',
                 'MessageReceivingEvent': 'Message receiving',
+                'TransactionCreatingEvent': 'Transaction creation',
+                'TransactionVerifyingEvent': 'Transaction verification',
                 'WaitingEvent': 'Waiting for '
             }
         }
     },
     computed: {
+        selectedNode() {
+            return Promise(() => this.networkManager.selectedNode);
+        },
         processableEvents() {
-            return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processableEvents : [];
+            return this.networkManager.selectedNode ? this.networkManager.selectedNode.eventProcessor.processableEvents : [];
         },
         processingEvents() {
-            return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processingEvents : [];
+            return this.networkManager.selectedNode ? this.networkManager.selectedNode.eventProcessor.processingEvents : [];
         },
         processedEvents() {
-            return this.network.selectedNode ? this.network.selectedNode.eventProcessor.processedEvents : [];
+            return this.networkManager.selectedNode ? this.networkManager.selectedNode.eventProcessor.processedEvents : [];
         },
         pooledTransactions() {
-            return this.network.selectedNode ? this.network.selectedNode.transactionPool.transactions : [];
+            return this.networkManager.selectedNode ? this.networkManager.selectedNode.transactionPool.transactions : [];
         }
     },
     methods: {

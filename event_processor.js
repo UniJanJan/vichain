@@ -1,7 +1,9 @@
 import { EventStatus } from './event.js';
 
 export class EventProcessor {
-    constructor(maxLoad, onProcessed) {
+    constructor(timer, maxLoad, onProcessed) {
+        this.timer = timer;
+
         this.maxLoad = maxLoad;
         this.currentLoad = 0;
 
@@ -11,8 +13,6 @@ export class EventProcessor {
 
         // callbacks
         this.onProcessed = onProcessed;
-
-        this.timer = null;
     }
 
     isEventLoadable(event) {

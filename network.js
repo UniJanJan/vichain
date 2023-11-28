@@ -1,7 +1,5 @@
-import { Node } from './node.js';
-import { Link } from './link.js';
-import { Utils } from './common.js';
 import { VersionMessage } from './event.js';
+import { Link } from './link.js';
 import { Timer } from './timer.js';
 
 export class Network {
@@ -9,62 +7,44 @@ export class Network {
         this.nodes = [];
         this.links = [];
         // this.eventProcessor = new EventProcessor();
-        // this.nodePositionsMap = {};
-        this.selectedNode = null;
         this.informativeNodes = [];
-        
+
         this.timer = new Timer();
 
         this.settings = {
-            maxLinksPerNode: 3
+            minLinksPerNode: 3,
+            maxLinksPerNode: 20
         }
     }
 
-    addNode(x, y) {
-        var node = new Node(x, y).withNetwork(this);
+    addNode(node) {
+        this.informativeNodes.forEach(informativeNode => node.networkInterface.rememberNode(informativeNode));
+        // node.networkInterface.rememberNodes(this.informativeNodes);
         this.nodes.push(node);
-
-        if (this.informativeNodes.length === 0) {
-            this.informativeNodes.push(node);
-        } else {
-            this.informativeNodes.forEach(informativeNode => this.addLink(informativeNode, node));
-        }
     }
 
-    addLink(node1, node2) {
-        if (node1.id !== node2.id && !node1.isLinkedWith(node2)) {
-            var link = new Link(node1, node2).withTimer(this.timer);
+    hasInformativeNode(node) {
+        return this.informativeNodes.length > 0;
+    }
+
+    addInformativeNode(node) {
+        this.informativeNodes.push(node);
+    }
+
+    addLink(initiatingNode, targetNode) {
+        if (initiatingNode.id !== targetNode.id && !initiatingNode.networkInterface.isLinkedWith(targetNode)) {
+            var link = new Link(this, initiatingNode, targetNode);
             this.links.push(link);
-            node2.sendMessage(node1, new VersionMessage(node2.version));
+
+            // TODO this logic shouldn't be here
+            var shouldBePrioritized = initiatingNode.networkInterface.shouldBePrioritized(targetNode);
+            link.prioritizationByNode[initiatingNode] = shouldBePrioritized;
+            initiatingNode.eventManager.sendMessage(targetNode, new VersionMessage(initiatingNode.version));
         }
     }
 
-    getNode(x, y) {
-        for (let index = 0; index < this.nodes.length; index++) {
-            const node = this.nodes[index];
-            const distance = Utils.distance(node.x, node.y, x, y);
-            if (distance <= node.radius) {
-                return node;
-            }
-        }
-        return null;
+    getNodesNumber() {
+        return this.nodes.length;
     }
 
-    setSelectedNode(node) {
-        if (this.selectedNode !== null)
-            this.selectedNode.isSelected = false;
-        this.selectedNode = node;
-        node.isSelected = true;
-    }
-
-    update(tFrame = 0) {
-        var elapsedTime = this.timer.update(tFrame);
-        this.nodes.forEach(node => node.update(elapsedTime));
-        this.links.forEach(link => link.update(elapsedTime));
-    }
-
-    draw(graphics) {
-        this.links.forEach(link => link.draw(graphics));
-        this.nodes.forEach(node => node.draw(graphics));
-    }
 }
