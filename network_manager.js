@@ -28,7 +28,7 @@ export class NetworkManager {
                 },
                 'WaitingEvent': {
                     isVisible: null,
-                    color: null
+                    color: 'rgb(165,42,42)'
                 }
             }
         }

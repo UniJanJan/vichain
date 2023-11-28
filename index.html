@@ -46,7 +46,7 @@
                             <div v-if="processableEvents.length > 0">
                                 <ul class="list-group" v-for="event in processableEvents">
                                     <li class="list-group-item"
-                                        style="font-size: small; padding: 0; background-color: chartreuse;">
+                                        :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
                                         {{translateEventClassName(event)}}</li>
                                 </ul>
                             </div>
@@ -61,7 +61,7 @@
                             <div v-if="processingEvents.length > 0">
                                 <ul class="list-group" v-for="event in processingEvents">
                                     <li class="list-group-item"
-                                        style="font-size: small; padding: 0; background-color: tomato;">
+                                        :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
                                         {{translateEventClassName(event)}}</li>
                                 </ul>
                             </div>
@@ -76,7 +76,7 @@
                             <div v-if="processedEvents.length > 0">
                                 <ul class="list-group" v-for="event in processedEvents">
                                     <li class="list-group-item"
-                                        style="font-size: small; padding: 0; background-color: cyan;">
+                                        :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white`">
                                         <span
                                             style="float: left; margin-left: 10;">{{translateEventClassName(event)}}</span>
                                         <span class="badge bg-secondary"
@@ -132,14 +132,15 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
-                <div class="btn-group dropup" style="float: left;">
+            <div class="col-4" style="align-self: center;">
+                <div class="btn-group dropup mx-auto" style="float: left;">
                     <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Visibility
                     </button>
                     <ul class="dropdown-menu">
-                        <li v-for="event in Object.keys(networkManager.settings.events).filter(event => networkManager.settings.events[event].isVisible !== null)">
+                        <li
+                            v-for="event in Object.keys(networkManager.settings.events).filter(event => networkManager.settings.events[event].isVisible !== null)">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault"
                                     v-model="networkManager.settings.events[event].isVisible">
@@ -149,9 +150,14 @@
                         </li>
                     </ul>
                 </div>
-
+            </div>
+            <div class="col-4">
                 <!-- <h3 v-if="network.currentFps">{{ network.currentFps }} FPS</h3> -->
                 <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
+            </div>
+            <div class="col-4" style="text-align: right;">
+                <p class="font-monospace" style="font-size: small; margin: 0;">created by Jan Jankowicz</p>
+                <a class="font-monospace" style="font-size: x-small;" href="https://github.com/UniJanJan/vichain">GitHub repository</a>
             </div>
         </div>
     </div>
