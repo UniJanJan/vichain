@@ -159,18 +159,13 @@ export class Node {
         this.updatePosition(elapsedTime);
         this.eventProcessor.update(elapsedTime);
 
-        if (this.networkInterface.getLinksNumber() < this.network.settings.minLinksPerNode && Math.random() < 0.001) {
-            // console.log(this.network.settings.minLinksPerNode)
-            this.eventManager.broadcastMessage(new GetAddrMessage());
-        }
-
         // // for testing
         // if (this.id !== 1 && Math.random() < 0.0001) {
         //     this.eventManager.createTransaction("SOURCEADDR", "TARGETADDR", 10);
         // }
     }
 
-    draw(graphics) {
+    draw(graphics, settings) {
         graphics.beginPath();
         graphics.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
         graphics.fillStyle = this.isSelected ? 'yellow' : 'blue';
@@ -179,7 +174,9 @@ export class Node {
         graphics.lineWidth = 3;
         graphics.stroke();
 
-        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics, this));
+        this.eventProcessor.processingEvents
+            .filter(event => settings.events[event.constructor.name].isVisible)
+            .forEach(event => event.draw(graphics, settings.events[event.constructor.name]));
     }
 
     updateTargetPoint(targetX, targetY) {

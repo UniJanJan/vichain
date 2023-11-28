@@ -17,7 +17,8 @@
                 <span>Visual blockchain</span>
             </div>
         </div>
-        <div class="row bg-light align-items-center justify-content-top" style="flex: 1 1 auto; min-height: 0; height: 100%;">
+        <div class="row bg-light align-items-center justify-content-top"
+            style="flex: 1 1 auto; min-height: 0; height: 100%;">
             <div class="col-9" id="visualisation-div" style="height: 100%; margin: 0;">
                 <canvas id="visualisation-canvas" style="border-style: double; height: 100%; width: 100%;"></canvas>
             </div>
@@ -38,8 +39,8 @@
                         </div>
                     </nav>
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active overflow-scroll" style="max-height: fit-content;" id="nav-events" role="tabpanel"
-                            aria-labelledby="nav-events-tab">
+                        <div class="tab-pane fade show active overflow-scroll" style="max-height: fit-content;"
+                            id="nav-events" role="tabpanel" aria-labelledby="nav-events-tab">
 
                             Processable events
                             <div v-if="processableEvents.length > 0">
@@ -76,7 +77,11 @@
                                 <ul class="list-group" v-for="event in processedEvents">
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: cyan;">
-                                        <span style="float: left; margin-left: 10;">{{translateEventClassName(event)}}</span> <span class="badge bg-secondary" style="float: right; margin-right: 10;">{{event.processingEndTimestamp.toFixed(0)}}</span></li>
+                                        <span
+                                            style="float: left; margin-left: 10;">{{translateEventClassName(event)}}</span>
+                                        <span class="badge bg-secondary"
+                                            style="float: right; margin-right: 10;">{{event.processingEndTimestamp.toFixed(0)}}</span>
+                                    </li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -92,12 +97,14 @@
                                 <ul class="list-group" v-for="transaction in pooledTransactions">
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
-                                        {{transaction.sourceAddress}} -> {{ transaction.amount }} -> {{transaction.targetAddress}}</li>
+                                        {{transaction.sourceAddress}} -> {{ transaction.amount }} ->
+                                        {{transaction.targetAddress}}</li>
                                 </ul>
                             </div>
                             <div v-else>
                                 <ul class="list-group">
-                                    <li class="list-group-item" style="font-size: small; padding: 0;">Nothing in transaction pool
+                                    <li class="list-group-item" style="font-size: small; padding: 0;">Nothing in
+                                        transaction pool
                                     </li>
                                 </ul>
                             </div>
@@ -126,6 +133,23 @@
         </div>
         <div class="row">
             <div class="col-12">
+                <div class="btn-group dropup" style="float: left;">
+                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Visibility
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li v-for="event in Object.keys(networkManager.settings.events).filter(event => networkManager.settings.events[event].isVisible !== null)">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault"
+                                    v-model="networkManager.settings.events[event].isVisible">
+                                <label class="form-check-label" for="flexSwitchCheckDefault"
+                                    style="font-size: x-small;">{{ getTranslation(event) }} events</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
                 <!-- <h3 v-if="network.currentFps">{{ network.currentFps }} FPS</h3> -->
                 <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
             </div>

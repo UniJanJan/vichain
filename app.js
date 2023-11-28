@@ -6,7 +6,7 @@ const app = createApp({
     data() {
         return {
             networkManager: ref(new NetworkManager()),
-            eventClassNameTranslation: {
+            translations: {
                 'MessageSendingEvent': 'Message sending',
                 'MessageReceivingEvent': 'Message receiving',
                 'TransactionCreatingEvent': 'Transaction creation',
@@ -33,8 +33,11 @@ const app = createApp({
         }
     },
     methods: {
+        getTranslation(text) {
+            return this.translations[text];
+        },
         translateEventClassName(event) {
-            return this.eventClassNameTranslation[event.constructor.name] + (event.name || '');
+            return this.getTranslation(event.constructor.name) + (event.name || '');
         }
     }
 });

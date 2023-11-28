@@ -8,6 +8,30 @@ export class NetworkManager {
         this.selectedNode = null;
 
         // this.nodePositionsMap = {};
+        this.settings = {
+            events: {
+                'MessageSendingEvent': {
+                    isVisible: true,
+                    color: 'rgb(0, 0, 128)'
+                },
+                'MessageReceivingEvent': {
+                    isVisible: true,
+                    color: 'rgb(0, 0, 64)'
+                },
+                'TransactionCreatingEvent': {
+                    isVisible: true,
+                    color: 'rgb(212,175,55)'
+                },
+                'TransactionVerifyingEvent': {
+                    isVisible: true,
+                    color: 'rgb(192,192,192)'
+                },
+                'WaitingEvent': {
+                    isVisible: null,
+                    color: null
+                }
+            }
+        }
     }
 
     addNode(x, y) {
@@ -55,6 +79,6 @@ export class NetworkManager {
 
     draw(graphics) { //TODO
         this.network.links.forEach(link => link.draw(graphics));
-        this.network.nodes.forEach(node => node.draw(graphics));
+        this.network.nodes.forEach(node => node.draw(graphics, this.settings));
     }
 }
