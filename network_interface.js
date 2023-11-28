@@ -63,7 +63,9 @@ export class NetworkInterface {
 
     confirmLinkWith(node) {
         var link = this.getLinkWith(node);
-        link.confirm(this.node);
+        if (link) { //TODO
+            link.confirm(this.node);
+        }
         // this.linkableNodes.add(node);
     }
 
@@ -92,6 +94,7 @@ export class NetworkInterface {
     getLinkableNodesClassification() {
         var classification = {
             toLink: [],
+            toDeprioritize: [],
             toReject: []
         }
 
@@ -102,6 +105,8 @@ export class NetworkInterface {
                 var link = this.getLinkWith(node);
                 if (link && !link.prioritizationByNode[node]) {
                     classification.toReject.push(node);
+                } else if (link) {
+                    classification.toDeprioritize.push(node);
                 }
             }
         });
