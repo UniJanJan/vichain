@@ -97,6 +97,9 @@ export class Node {
                 } else if (link && link.status === LinkStatus.HALF_ESTABLISHED) {
                     link.prioritizationByNode[event.nodeFrom] = event.message.shouldBePrioritized;
                     this.eventManager.sendMessage(event.nodeFrom, new VerAckMessage());
+                } else if (link && link.status === LinkStatus.ESTABLISHED) {
+                    link.prioritizationByNode[event.nodeFrom] = event.message.shouldBePrioritized;
+                    this.updateLinks();
                 }
             } else {
                 this.eventManager.sendMessage(event.nodeFrom, new RejectMessage());
@@ -122,10 +125,14 @@ export class Node {
         classification.toLink.forEach(node => {
             var link = this.networkInterface.getLinkWith(node);
             if (link && !link.prioritizationByNode[this]) {
-                // TODO
+                this.eventManager.sendMessage(node, new VersionMessage(this.version, true));
             } else if (!link) {
                 this.networkInterface.linkWith.bind(this.networkInterface)(node);
             }
+        });
+
+        classification.toDeprioritize.forEach(node => {
+            this.eventManager.sendMessage(node, new VersionMessage(this.version, false));
         });
 
         classification.toReject.forEach(node => {
