@@ -37,6 +37,7 @@ export class Network {
             this.links.push(link);
 
             // TODO this logic shouldn't be here
+            initiatingNode.networkInterface.rememberNode(targetNode);
             var shouldBePrioritized = initiatingNode.networkInterface.shouldBePrioritized(targetNode);
             link.prioritizationByNode[initiatingNode] = shouldBePrioritized;
             initiatingNode.eventManager.sendMessage(targetNode, new VersionMessage(initiatingNode.version));

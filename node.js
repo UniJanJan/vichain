@@ -76,7 +76,7 @@ export class Node {
         if (event.message instanceof VersionMessage) {
             this.networkInterface.rememberNode(event.nodeFrom);
 
-            if (this.networkInterface.getLinksNumber() < this.network.settings.maxLinksPerNode) {
+            if (this.networkInterface.getAtLeastHalfEstablishedLinkedNodes().length < this.network.settings.maxLinksPerNode) {
                 var link = this.networkInterface.getLinkWith(event.nodeFrom);
                 var shouldBePrioritized = this.networkInterface.shouldBePrioritized(event.nodeFrom);
                 if (link && link.status === LinkStatus.VIRTUAL) {
@@ -98,41 +98,6 @@ export class Node {
             // this.networkInterface.rememberNodes.bind(this.networkInterface)(event.message.linkedNodes)
             event.message.linkedNodes.forEach(this.networkInterface.rememberNode.bind(this.networkInterface));
             this.updateLinks();
-            // var linksNumberToComplement = this.network.settings.minLinksPerNode - this.networkInterface.getLinksNumber();
-            // var linksNumberToReject = this.networkInterface.getLinksNumber() - this.network.settings.maxLinksPerNode;
-            // if (linksNumberToComplement > 0) {
-            //     // var linkedNodes = this.networkInterface.getAllEstablishedLinkedNodes().map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y), true]);
-            //     // // linkedNodes.sort((node1, node2) => node1[1] - node2[1]);
-
-            //     // var linkableNodes = event.message.linkedNodes.filter(nodeTo => nodeTo.id !== this.id).map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y), false]);
-            //     // // linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
-
-            //     // var sum = [...linkedNodes, ...linkableNodes];
-            //     // sum.sort((node1, node2) => node1[1] - node2[1]);
-            //     // sum.forEach((node, index) => {
-            //     //     if (index < this.network.settings.minLinksPerNode) {
-            //     //         if (!node[2]) {
-            //     //             this.networkInterface.linkWith.bind(this.networkInterface)(node[0]);
-            //     //         }
-            //     //     } else {
-            //     //         if (node[2]) {
-            //     //             this.networkInterface.rejectLinkWith(node[0]);
-            //     //             this.eventManager.sendMessage(node[0], new RejectMessage());
-            //     //         }
-            //     //     }
-            //     // })
-
-            //     var linkableNodes = event.message.linkedNodes.filter(nodeTo => nodeTo.id !== this.id).map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y)]);
-            //     linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
-            //     linkableNodes.slice(0, linksNumberToComplement).map(node => node[0]).forEach(this.networkInterface.linkWith.bind(this.networkInterface));
-            // } else if (linksNumberToReject > 0) {
-            //     var linkedNodes = this.networkInterface.getAllLinkedNodes().map(nodeTo => [nodeTo, Utils.distance(this.x, this.y, nodeTo.x, nodeTo.y)]);
-            //     linkedNodes.sort((node1, node2) => node2[1] - node1[1]);
-            //     linkedNodes.slice(0, linksNumberToReject).map(node => node[0]).forEach(node => {
-            //         this.networkInterface.rejectLinkWith(node[0]);
-            //         this.eventManager.sendMessage(node[0], new RejectMessage());
-            //     });
-            // }
         } else if (event.message instanceof TrxMessage) {
             this.eventManager.verifyTransaction(event.message.transaction);
         } else if (event.message instanceof GetAddrMessage) {
