@@ -63,7 +63,10 @@ export class Node {
                 case CyclicEventsName.PEERS_DISCOVERY:
                     this.updateLinks();
                     this.eventManager.broadcastMessage(new GetAddrMessage());
-                    this.eventManager.wait(CyclicEventsName.PEERS_DISCOVERY, 60000 + ((Math.random() * 60000) - 30000));
+                    var waitTime = this.networkInterface.getLinksNumber() < this.network.settings.minLinksPerNode ?
+                        5000 + Math.random() * 10000 :
+                        50000 + Math.random() * 20000;
+                    this.eventManager.wait(CyclicEventsName.PEERS_DISCOVERY, waitTime);
                     break;
 
             }
