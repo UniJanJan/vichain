@@ -18,10 +18,12 @@ export class Event {
 }
 
 export class VersionMessage {
-    constructor(version, block) {
+    constructor(version, shouldBePrioritized, block) {
         this.version = version;
+        this.shouldBePrioritized = shouldBePrioritized;
         this.block = block; //TODO
         this.timestamp = 0; // TODO
+        Object.freeze(this);
     }
 
     clone() {
@@ -32,6 +34,8 @@ export class VersionMessage {
 export class VerAckMessage {
     constructor() {
         // type of message without payload
+
+        Object.freeze(this);
     }
 
     clone() {
@@ -39,9 +43,23 @@ export class VerAckMessage {
     }
 }
 
+/* message for link closing */
+export class RejectMessage {
+    constructor() {
+        // type of message without payload
+
+        Object.freeze(this);
+    }
+
+    clone() {
+        return new RejectMessage();
+    }
+}
+
 export class GetAddrMessage {
     constructor() {
         // type of message without payload
+
         Object.freeze(this);
     }
 
@@ -53,6 +71,8 @@ export class GetAddrMessage {
 export class AddrMessage {
     constructor(linkedNodes) {
         this.linkedNodes = linkedNodes;
+
+        Object.freeze(this);
     }
 
     clone() {
@@ -94,15 +114,14 @@ export class WaitingEvent extends Event {
 
 export class MessageSendingEvent extends Event {
     constructor(nodeFrom, nodesTo, message) {
-        // super(1000); // TODO
-        super(30);
+        super(500); // TODO
         this.nodeFrom = nodeFrom;
         this.nodesTo = nodesTo;
         this.message = message;
     }
 
     update(elapsedTime) {
-        this.progress += elapsedTime / 16;
+        this.progress += elapsedTime;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
             // TODO what if link has been destroyed?
@@ -126,12 +145,8 @@ export class MessageSendingEvent extends Event {
 
 export class MessageTransmissionEvent extends Event {
     constructor(nodeFrom, nodeTo, message) {
-        const link = nodeFrom.linkedNodes[nodeTo];
-        if (link === undefined) {
-            throw new Error('MessageTransmissionEvent creation: Link between nodes does not exist!');
-        }
-        // super(1000); // TODO
-        super(link.distance);
+        var link = nodeFrom.networkInterface.getLinkWith(nodeTo);
+        super(link.distance * 15); // TODO
         this.link = link;
         this.nodeFrom = nodeFrom;
         this.nodeTo = nodeTo;
@@ -141,10 +156,9 @@ export class MessageTransmissionEvent extends Event {
     }
 
     update(elapsedTime) {
-        this.progress += elapsedTime / 16;
+        this.progress += elapsedTime;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
-            // this.nodeTo.dispatchMessage(this);
         }
     }
 
@@ -162,22 +176,14 @@ export class MessageTransmissionEvent extends Event {
 
 export class MessageReceivingEvent extends Event {
     constructor(nodeFrom, nodeTo, message) {
-        const link = nodeFrom.linkedNodes[nodeTo];
-        if (link === undefined) {
-            throw new Error('MessageReceivingEvent creation: Link between nodes does not exist!');
-        }
-        // super(1000); // TODO
-        super(30);
-        this.link = link;
+        super(500); // TODO
         this.nodeFrom = nodeFrom;
         this.nodeTo = nodeTo;
         this.message = message;
-
-        this.drawOnTop = true;
     }
 
     update(elapsedTime) {
-        this.progress += elapsedTime / 16;
+        this.progress += elapsedTime;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
         }
@@ -189,6 +195,58 @@ export class MessageReceivingEvent extends Event {
         graphics.moveTo(this.nodeTo.x, this.nodeTo.y);
         graphics.arc(this.nodeTo.x, this.nodeTo.y, this.nodeTo.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * progressRatio, false);
         graphics.fillStyle = 'rgb(0, 0, 64)';
+        graphics.fill();
+    }
+}
+
+export class TransactionCreatingEvent extends Event {
+    constructor(processingNode, sourceAddress, targetAddress, amount) {
+        super(1000);
+        this.processingNode = processingNode;
+        this.sourceAddress = sourceAddress;
+        this.targetAddress = targetAddress;
+        this.amount = amount;
+    }
+
+
+    update(elapsedTime) {
+        this.progress += elapsedTime;
+        if (this.progress >= this.duration) {
+            this.status = EventStatus.PROCESSED;
+        }
+    }
+
+    draw(graphics) {
+        const progressRatio = this.progress / this.duration;
+        graphics.beginPath();
+        graphics.moveTo(this.processingNode.x, this.processingNode.y);
+        graphics.arc(this.processingNode.x, this.processingNode.y, this.processingNode.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * progressRatio, false);
+        graphics.fillStyle = 'rgb(212,175,55)';
+        graphics.fill();
+    }
+}
+
+export class TransactionVerifyingEvent extends Event {
+    constructor(processingNode, transaction) {
+        super(1000);
+        this.processingNode = processingNode;
+        this.transaction = transaction;
+    }
+
+
+    update(elapsedTime) {
+        this.progress += elapsedTime;
+        if (this.progress >= this.duration) {
+            this.status = EventStatus.PROCESSED;
+        }
+    }
+
+    draw(graphics) {
+        const progressRatio = this.progress / this.duration;
+        graphics.beginPath();
+        graphics.moveTo(this.processingNode.x, this.processingNode.y);
+        graphics.arc(this.processingNode.x, this.processingNode.y, this.processingNode.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * progressRatio, false);
+        graphics.fillStyle = 'rgb(192,192,192)';
         graphics.fill();
     }
 }

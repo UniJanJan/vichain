@@ -1,5 +1,6 @@
 import { app } from './app.js';
 import { Utils } from './common.js';
+import { NetworkManager } from './network_manager.js';
 
 const canvas = document.querySelector('#visualisation-canvas');
 
@@ -24,7 +25,7 @@ const positionResolver = {
 
 
 
-const network = app._instance.ctx.network._value;
+const networkManager = app._instance.ctx.networkManager._value;
 
 const linkDraft = {
     isActive: false,
@@ -53,7 +54,7 @@ var draggedNode = null;
 canvas.addEventListener('mousedown', event => {
     const { x, y } = positionResolver.resolveMousePostion(event);
 
-    const node = network.getNode(x, y);
+    const node = networkManager.getNode(x, y);
 
     if (event.shiftKey && node !== null) {
         linkDraft.isActive = true;
@@ -61,12 +62,12 @@ canvas.addEventListener('mousedown', event => {
         linkDraft.endX = x;
         linkDraft.endY = y;
     } else if (event.ctrlKey && node === null) {
-        network.addNode(x, y);
+        networkManager.addNode(x, y);
     } else if (node !== null) {
-        network.setSelectedNode(node);
+        networkManager.setSelectedNode(node);
         draggedNode = node;
     } else if (node === null) {
-
+        networkManager.unselectNode();
     }
 });
 
@@ -86,9 +87,9 @@ canvas.addEventListener('mousemove', event => {
 canvas.addEventListener('mouseup', event => {
     if (linkDraft.isActive) {
         linkDraft.isActive = false;
-        const endNode = network.getNode(linkDraft.endX, linkDraft.endY);
+        const endNode = networkManager.getNode(linkDraft.endX, linkDraft.endY);
         if (endNode !== null) {
-            network.addLink(linkDraft.startNode, endNode);
+            networkManager.addLink(linkDraft.startNode, endNode);
         }
     }
 
@@ -105,9 +106,9 @@ canvas.addEventListener('mouseup', event => {
 function simulate(tFrame) {
     window.requestAnimationFrame(simulate);
     graphics.clearRect(0, 0, canvas.width, canvas.height);
-    network.update(tFrame);
+    networkManager.update(tFrame);
     linkDraft.draw(graphics);
-    network.draw(graphics);
+    networkManager.draw(graphics);
 }
 
 simulate();

@@ -4,50 +4,69 @@ import { MessageTransmissionEvent } from './event.js';
 
 export const LinkStatus = {
     VIRTUAL: 0,
-    HALFESTABLISHED: 1,
+    HALF_ESTABLISHED: 1,
     ESTABLISHED: 2
 };
 
 const LinkStatusColor = {};
 LinkStatusColor[LinkStatus.VIRTUAL] = 'grey';
-LinkStatusColor[LinkStatus.HALFESTABLISHED] = 'orange';
+LinkStatusColor[LinkStatus.HALF_ESTABLISHED] = 'orange';
 LinkStatusColor[LinkStatus.ESTABLISHED] = 'red';
 
 export class Link {
-    constructor(node1, node2) {
-        this.eventProcessor = new EventProcessor(Infinity, this.onProcessed.bind(this));
+    constructor(network, node1, node2) {
+        this.network = network;
+        this.timer = network.timer;
+
+        this.eventProcessor = new EventProcessor(this.timer, Infinity, this.onProcessed.bind(this));
 
         this.node1 = node1;
         this.node2 = node2;
 
         this.status = LinkStatus.VIRTUAL;
         this.confirmationsByNode = {};
-        // this.confirmedByNode1 = false;
-        // this.confirmedByNode2 = false;
+        this.confirmationsByNode[this.node1] = false;
+        this.confirmationsByNode[this.node2] = false;
+        this.prioritizationByNode = {};
+        this.prioritizationByNode[this.node1] = false;
+        this.prioritizationByNode[this.node2] = false;
 
-        this.node1.linkedNodes[node2] = this;
-        this.node2.linkedNodes[node1] = this;
+        this.node1.networkInterface.linkedNodes[node2] = this;
+        this.node2.networkInterface.linkedNodes[node1] = this;
 
         this.calculateProperties();
-
-        this.timer = null;
-    }
-
-    withTimer(timer) {
-        this.timer = timer;
-        this.eventProcessor.timer = timer;
-        return this;
     }
 
     onProcessed(processedEvent) {
         if (processedEvent instanceof MessageTransmissionEvent) {
             // TODO what if link has been destroyed?
-            processedEvent.nodeTo.receiveMessage(processedEvent.nodeFrom, processedEvent.message);
+            processedEvent.nodeTo.eventManager.receiveMessage(processedEvent.nodeFrom, processedEvent.message);
         }
     }
 
     transmitMessageTo(nodeTo, message) {
         this.eventProcessor.enqueueExecution(new MessageTransmissionEvent(this.getSecondNode(nodeTo), nodeTo, message));
+    }
+
+    confirm(node) {
+        this.confirmationsByNode[node] = true;
+        this.updateLinkStatus();
+    }
+
+    reject(node) {
+        this.confirmationsByNode[node] = false;
+        this.prioritizationByNode[node] = false; // TODO always?
+        this.updateLinkStatus();
+    }
+
+    updateLinkStatus() {
+        if (this.confirmationsByNode[this.node1] && this.confirmationsByNode[this.node2]) {
+            this.status = LinkStatus.ESTABLISHED;
+        } else if (this.confirmationsByNode[this.node1] || this.confirmationsByNode[this.node2]) {
+            this.status = LinkStatus.HALF_ESTABLISHED;
+        } else {
+            this.status = LinkStatus.VIRTUAL;
+        }
     }
 
     getSecondNode(firstNode) {
@@ -86,6 +105,6 @@ export class Link {
         graphics.lineWidth = this.width;
         graphics.stroke();
 
-        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics));
+        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics, this));
     }
 }
