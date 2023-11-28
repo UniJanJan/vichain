@@ -16,8 +16,6 @@ export class NetworkManager {
 
         if (!this.network.hasInformativeNode()) {
             this.network.addInformativeNode(node);
-        } else {
-            this.network.informativeNodes.forEach(informativeNode => this.addLink(node, informativeNode));
         }
     }
 

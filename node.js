@@ -8,7 +8,8 @@ import { NetworkInterface } from './network_interface.js';
 import { EventManager } from './event_manager.js';
 
 const CyclicEventsName = {
-    SENDING_ADDRESS: 'addr'
+    SENDING_ADDRESS: 'addr',
+    PEERS_DISCOVERY: 'peers_discovery'
 }
 
 export class Node {
@@ -40,7 +41,8 @@ export class Node {
         this.targetX = null;
         this.targetY = null;
 
-        this.eventManager.wait(CyclicEventsName.SENDING_ADDRESS, 60000);
+        // this.eventManager.wait(CyclicEventsName.SENDING_ADDRESS, 60000);
+        this.eventManager.wait(CyclicEventsName.PEERS_DISCOVERY, 1000);
     }
 
     onProcessed(processedEvent) {
@@ -58,6 +60,12 @@ export class Node {
                     this.eventManager.broadcastMessage(new AddrMessage(this.networkInterface.getAllLinkableNodes()));
                     this.eventManager.wait(CyclicEventsName.SENDING_ADDRESS, 360000);
                     break;
+                case CyclicEventsName.PEERS_DISCOVERY:
+                    this.updateLinks();
+                    this.eventManager.broadcastMessage(new GetAddrMessage());
+                    this.eventManager.wait(CyclicEventsName.PEERS_DISCOVERY, 60000 + ((Math.random() * 60000) - 30000));
+                    break;
+
             }
         } else if (processedEvent instanceof TransactionCreatingEvent) {
             var transaction = new Transaction(processedEvent.sourceAddress, processedEvent.targetAddress, processedEvent.amount);
@@ -107,7 +115,7 @@ export class Node {
 
     updateLinks() {
         var classification = this.networkInterface.getLinkableNodesClassification();
-        
+
         classification.toLink.forEach(node => {
             var link = this.networkInterface.getLinkWith(node);
             if (link && !link.prioritizationByNode[this]) {
