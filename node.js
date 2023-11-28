@@ -65,7 +65,7 @@ export class Node {
                     this.eventManager.broadcastMessage(new GetAddrMessage());
                     var waitTime = this.networkInterface.getLinksNumber() < this.network.settings.minLinksPerNode ?
                         5000 + Math.random() * 10000 :
-                        50000 + Math.random() * 20000;
+                        300000 + Math.random() * 50000;
                     this.eventManager.wait(CyclicEventsName.PEERS_DISCOVERY, waitTime);
                     break;
 
