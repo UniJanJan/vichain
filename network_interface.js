@@ -39,6 +39,12 @@ export class NetworkInterface {
             .map(link => link.getSecondNode(this.node));
     }
 
+    getAtLeastHalfEstablishedLinkedNodes() {
+        return Object.values(this.linkedNodes)
+            .filter(link => link.status === LinkStatus.ESTABLISHED || link.status === LinkStatus.HALF_ESTABLISHED)
+            .map(link => link.getSecondNode(this.node));
+    }
+
     getAllLinkableNodes() {
         return [...this.linkableNodes];
     }
