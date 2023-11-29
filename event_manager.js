@@ -5,6 +5,7 @@ import { TransactionCreatingEvent } from "./model/events/transaction_creating_ev
 import { TransactionVerifyingEvent } from "./model/events/transaction_verifying_event.js";
 import { WaitingEvent } from "./model/events/waiting_event.js";
 import { RejectMessage } from "./model/messages/reject_message.js";
+import { TrxMessage } from "./model/messages/trx_message.js";
 import { VerAckMessage } from "./model/messages/verack_message.js";
 import { VersionMessage } from "./model/messages/version_message.js";
 
