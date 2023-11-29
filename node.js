@@ -1,11 +1,20 @@
 import { LinkStatus } from './link.js';
 import { EventProcessor } from './event_processor.js';
-import { MessageSendingEvent, MessageReceivingEvent, VersionMessage, VerAckMessage, WaitingEvent, AddrMessage, TrxMessage, GetAddrMessage, TransactionCreatingEvent, TransactionVerifyingEvent, RejectMessage } from './event.js';
-import { Utils } from './common.js';
 import { TransactionPool } from './transaction_pool.js';
 import { Transaction } from './transaction.js';
 import { NetworkInterface } from './network_interface.js';
 import { EventManager } from './event_manager.js';
+import { MessageSendingEvent } from './model/events/message_sending_event.js';
+import { MessageReceivingEvent } from './model/events/message_receiving_event.js';
+import { VersionMessage } from './model/messages/version_message.js';
+import { VerAckMessage } from './model/messages/verack_message.js';
+import { WaitingEvent } from './model/events/waiting_event.js';
+import { AddrMessage } from './model/messages/addr_message.js';
+import { TrxMessage } from './model/messages/trx_message.js';
+import { GetAddrMessage } from './model/messages/getaddr_message.js';
+import { TransactionCreatingEvent } from './model/events/transaction_creating_event.js';
+import { TransactionVerifyingEvent } from './model/events/transaction_verifying_event.js';
+import { RejectMessage } from './model/messages/reject_message.js';
 
 const CyclicEventsName = {
     SENDING_ADDRESS: 'addr',

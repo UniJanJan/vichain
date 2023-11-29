@@ -1,6 +1,6 @@
 import { Utils } from './common.js';
 import { EventProcessor } from './event_processor.js';
-import { MessageTransmissionEvent } from './event.js';
+import { MessageTransmissionEvent } from './model/events/message_transmission_event.js';
 
 export const LinkStatus = {
     VIRTUAL: 0,
