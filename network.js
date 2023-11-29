@@ -1,6 +1,6 @@
-import { VersionMessage } from './event.js';
 import { Link } from './link.js';
-import { Timer } from './timer.js';
+import { VersionMessage } from './model/messages/version_message.js';
+import { Timer } from './model/time/timer.js';
 
 export class Network {
     constructor() {

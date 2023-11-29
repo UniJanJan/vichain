@@ -1,5 +1,12 @@
-import { AddrMessage, MessageReceivingEvent, MessageSendingEvent, RejectMessage, TransactionCreatingEvent, TransactionVerifyingEvent, TrxMessage, VerAckMessage, VersionMessage, WaitingEvent } from "./event.js";
 import { LinkStatus } from "./link.js";
+import { MessageReceivingEvent } from "./model/events/message_receiving_event.js";
+import { MessageSendingEvent } from "./model/events/message_sending_event.js";
+import { TransactionCreatingEvent } from "./model/events/transaction_creating_event.js";
+import { TransactionVerifyingEvent } from "./model/events/transaction_verifying_event.js";
+import { WaitingEvent } from "./model/events/waiting_event.js";
+import { RejectMessage } from "./model/messages/reject_message.js";
+import { VerAckMessage } from "./model/messages/verack_message.js";
+import { VersionMessage } from "./model/messages/version_message.js";
 
 export class EventManager {
     constructor(node, eventProcessor, networkInterface) {
