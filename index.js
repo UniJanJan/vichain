@@ -1,6 +1,5 @@
 import { app } from './app.js';
 import { Utils } from './common.js';
-import { NetworkManager } from './network_manager.js';
 
 const canvas = document.querySelector('#visualisation-canvas');
 

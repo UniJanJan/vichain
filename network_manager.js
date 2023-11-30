@@ -1,10 +1,14 @@
 import { Utils } from "./common.js";
+import { EventMaster } from "./logic/event_master.js";
+import { EventFactory } from "./logic/factory/event_factory.js";
 import { Network } from "./network.js";
-import { Node } from "./node.js";
 
 export class NetworkManager {
     constructor(network) {
         this.network = network || new Network();
+        this.eventFactory = new EventFactory(this.network.settings);
+        this.eventMaster = new EventMaster(this.network, this.eventFactory);
+
         this.selectedNode = null;
 
         // this.nodePositionsMap = {};
@@ -35,16 +39,12 @@ export class NetworkManager {
     }
 
     addNode(x, y) {
-        var node = new Node(this.network, x, y);
-        this.network.addNode(node);
+        this.eventMaster.enqueueExecution(this.eventFactory.createNodeCreatingEvent(this.network, x, y));
 
-        if (!this.network.hasInformativeNode()) {
-            this.network.addInformativeNode(node);
-        }
     }
 
-    addLink(node1, node2) {
-        this.network.addLink(node1, node2);
+    addLink(initiatingNode, targetNode) {
+        this.eventMaster.enqueueExecution(this.eventFactory.createLinkCreatingEvent(this.network, initiatingNode, targetNode));
     }
 
     getNode(x, y) {
@@ -73,8 +73,8 @@ export class NetworkManager {
 
     update(tFrame = 0) { // TODO
         var elapsedTime = this.network.timer.update(tFrame);
-        this.network.nodes.forEach(node => node.update(elapsedTime));
-        this.network.links.forEach(link => link.update(elapsedTime));
+        this.network.update(elapsedTime);
+        this.eventMaster.update(elapsedTime);
     }
 
     draw(graphics) { //TODO

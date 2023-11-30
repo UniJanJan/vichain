@@ -1,5 +1,10 @@
 import { Event, EventStatus } from "./event.js";
 
+export const CyclicEventsName = {
+    SENDING_ADDRESS: 'addr',
+    PEERS_DISCOVERY: 'peers_discovery'
+}
+
 export class WaitingEvent extends Event {
     constructor(name, timeInterval) {
         super(timeInterval);

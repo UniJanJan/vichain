@@ -1,11 +1,12 @@
 import { Utils } from "./common.js";
 import { LinkStatus } from "./link.js";
 
+const { isProxy, toRaw } = Vue;
+
 export class NetworkInterface {
-    constructor(node, network, eventProcessor) {
+    constructor(node, network) {
         this.node = node;
         this.network = network;
-        this.eventProcessor = eventProcessor;
 
         this.linkedNodes = {}; // this.linkedNodes = new Map(); ?
         this.linkableNodes = new Set();
@@ -54,11 +55,11 @@ export class NetworkInterface {
     }
 
     rememberNodes(nodes) {
-        nodes.forEach(this.rememberNode);
+        nodes.forEach(this.rememberNode.bind(this));
     }
 
     rememberNode(node) {
-        this.linkableNodes.add(node);
+        this.linkableNodes.add(toRaw(node));
     }
 
     confirmLinkWith(node) {
@@ -89,29 +90,6 @@ export class NetworkInterface {
         var linkableNodes = [...this.linkableNodes].filter(nodeTo => nodeTo.id !== this.node.id).map(nodeTo => [nodeTo, Utils.distance(this.node.x, this.node.y, nodeTo.x, nodeTo.y)]);
         linkableNodes.sort((node1, node2) => node1[1] - node2[1]);
         return linkableNodes.map(node => node[0]);
-    }
-
-    getLinkableNodesClassification() {
-        var classification = {
-            toLink: [],
-            toDeprioritize: [],
-            toReject: []
-        }
-
-        this.getLinkableNodesSortedByDistance().forEach((node, index) => {
-            if (index < this.network.settings.minLinksPerNode) {
-                classification.toLink.push(node);
-            } else {
-                var link = this.getLinkWith(node);
-                if (link && !link.prioritizationByNode[node]) {
-                    classification.toReject.push(node);
-                } else if (link) {
-                    classification.toDeprioritize.push(node);
-                }
-            }
-        });
-
-        return classification;
     }
 
     shouldBePrioritized(node) {

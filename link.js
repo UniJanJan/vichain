@@ -1,5 +1,5 @@
 import { Utils } from './common.js';
-import { EventProcessor } from './event_processor.js';
+import { EventPool } from './model/events/event_pool.js';
 import { MessageTransmissionEvent } from './model/events/message_transmission_event.js';
 
 export const LinkStatus = {
@@ -18,10 +18,10 @@ export class Link {
         this.network = network;
         this.timer = network.timer;
 
-        this.eventProcessor = new EventProcessor(this.timer, Infinity, this.onProcessed.bind(this));
-
         this.node1 = node1;
         this.node2 = node2;
+
+        this.events = new EventPool();
 
         this.status = LinkStatus.VIRTUAL;
         this.confirmationsByNode = {};
@@ -35,17 +35,6 @@ export class Link {
         this.node2.networkInterface.linkedNodes[node1] = this;
 
         this.calculateProperties();
-    }
-
-    onProcessed(processedEvent) {
-        if (processedEvent instanceof MessageTransmissionEvent) {
-            // TODO what if link has been destroyed?
-            processedEvent.nodeTo.eventManager.receiveMessage(processedEvent.nodeFrom, processedEvent.message);
-        }
-    }
-
-    transmitMessageTo(nodeTo, message) {
-        this.eventProcessor.enqueueExecution(new MessageTransmissionEvent(this.getSecondNode(nodeTo), nodeTo, message));
     }
 
     confirm(node) {
@@ -93,7 +82,7 @@ export class Link {
     }
 
     update(elapsedTime) {
-        this.eventProcessor.update(elapsedTime);
+        // nothing to do
     }
 
     draw(graphics) {
@@ -105,6 +94,6 @@ export class Link {
         graphics.lineWidth = this.width;
         graphics.stroke();
 
-        this.eventProcessor.processingEvents.forEach(event => event.draw(graphics, this));
+        this.events.processingEvents.forEach(event => event.draw(graphics, this));
     }
 }
