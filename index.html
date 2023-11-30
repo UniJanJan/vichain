@@ -47,7 +47,7 @@
                                 <ul class="list-group" v-for="event in processableEvents">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
-                                        {{translateEventClassName(event)}}</li>
+                                        {{translateEventClassName(event)}} ({{ event.message ? event.message.constructor.name : '' }})</li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -62,7 +62,7 @@
                                 <ul class="list-group" v-for="event in processingEvents">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
-                                        {{translateEventClassName(event)}}</li>
+                                        {{translateEventClassName(event)}} ({{ event.message ? event.message.constructor.name : '' }})</li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -78,7 +78,7 @@
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white`">
                                         <span
-                                            style="float: left; margin-left: 10;">{{translateEventClassName(event)}}</span>
+                                            style="float: left; margin-left: 10;">{{translateEventClassName(event)}} ({{ event.message ? event.message.constructor.name : '' }})</span>
                                         <span class="badge bg-secondary"
                                             style="float: right; margin-right: 10;">{{event.processingEndTimestamp.toFixed(0)}}</span>
                                     </li>

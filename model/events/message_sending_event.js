@@ -12,12 +12,6 @@ export class MessageSendingEvent extends Event {
         this.progress += elapsedTime;
         if (this.progress >= this.duration) {
             this.status = EventStatus.PROCESSED;
-            // TODO what if link has been destroyed?
-            // var link = this.nodeFrom.getLinkWith(this.nodeTo);
-            // if (link === undefined) {
-            //     throw new Error('MessageSendingEvent creation: Link between nodes does not exist!');
-            // }
-            // this.link.transmitMessageTo(this.nodeTo, this.message);
         }
     }
 

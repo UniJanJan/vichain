@@ -1,0 +1,23 @@
+import { CyclicEventsName } from "../../model/events/waiting_event.js";
+import { Node } from "../../node.js";
+import { EventHandler } from "./event_handler.js";
+
+export class NodeCreatingEventHandler extends EventHandler {
+    constructor(network, eventFactory) {
+        super(network, eventFactory)
+    }
+
+    handle(processingNetwork, processedEvent) {
+        var node = new Node(processingNetwork, processedEvent.x, processedEvent.y);
+        node.networkInterface.rememberNodes(processingNetwork.informativeNodes);
+        processingNetwork.addNode(node);
+
+        if (!processingNetwork.hasInformativeNode()) {
+            processingNetwork.addInformativeNode(node);
+        }
+
+        return [
+            this.eventFactory.createWaitingEvent(node, CyclicEventsName.PEERS_DISCOVERY, 1000)
+        ];
+    }
+}

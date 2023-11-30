@@ -1,18 +1,25 @@
 import { EventStatus } from "./model/events/event.js";
 
 export class EventProcessor {
-    constructor(timer, maxLoad, onProcessed) {
+    constructor(timer, maxLoad, eventPool) {
         this.timer = timer;
 
         this.maxLoad = maxLoad;
         this.currentLoad = 0;
 
-        this.processableEvents = [];
-        this.processingEvents = [];
-        this.processedEvents = [];
+        this.events = eventPool;
+    }
 
-        // callbacks
-        this.onProcessed = onProcessed;
+    get processableEvents() {
+        return this.events.processableEvents;
+    }
+
+    get processingEvents() {
+        return this.events.processingEvents;
+    }
+
+    get processedEvents() {
+        return this.events.processedEvents;
     }
 
     isEventLoadable(event) {
@@ -39,12 +46,14 @@ export class EventProcessor {
         }
     }
 
+    /* updates events and returns newly processed events */
     update(elapsedTime) {
         while (this.processableEvents.length > 0 && this.isEventLoadable(this.processableEvents[0])) {
             var processableEvent = this.processableEvents.splice(0, 1)[0];
             this.startExecution(processableEvent);
         }
 
+        var newlyProcessedEvents = [];
         this.processingEvents.forEach((event, index) => {
             event.update(elapsedTime);
             if (event.status === EventStatus.PROCESSED) {
@@ -52,11 +61,11 @@ export class EventProcessor {
                 this.currentLoad -= processedEvent.loadSize;
                 processedEvent.processingEndTimestamp = this.timer.currentTimestamp;
                 this.processedEvents.unshift(processedEvent);
-                if (this.onProcessed !== null) {
-                    this.onProcessed(processedEvent);
-                }
+                newlyProcessedEvents.push(processedEvent);
             }
         });
+
+        return newlyProcessedEvents;
     }
 
 }
