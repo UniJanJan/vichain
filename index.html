@@ -47,7 +47,8 @@
                                 <ul class="list-group" v-for="event in processableEvents">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
-                                        {{translateEventClassName(event)}} ({{ event.message ? event.message.constructor.name : '' }})</li>
+                                        {{translateEventClassName(event)}} ({{ event.message ?
+                                        event.message.constructor.name : '' }})</li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -62,7 +63,8 @@
                                 <ul class="list-group" v-for="event in processingEvents">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
-                                        {{translateEventClassName(event)}} ({{ event.message ? event.message.constructor.name : '' }})</li>
+                                        {{translateEventClassName(event)}} ({{ event.message ?
+                                        event.message.constructor.name : '' }})</li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -77,8 +79,8 @@
                                 <ul class="list-group" v-for="event in processedEvents">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white`">
-                                        <span
-                                            style="float: left; margin-left: 10;">{{translateEventClassName(event)}} ({{ event.message ? event.message.constructor.name : '' }})</span>
+                                        <span style="float: left; margin-left: 10;">{{translateEventClassName(event)}}
+                                            ({{ event.message ? event.message.constructor.name : '' }})</span>
                                         <span class="badge bg-secondary"
                                             style="float: right; margin-right: 10;">{{event.processingEndTimestamp.toFixed(0)}}</span>
                                     </li>
@@ -124,8 +126,38 @@
                     </div> -->
                 </div>
                 <div v-else>
-                    <h5>
-                        Ctrl + left click = new node
+                    <h3 class="mt-4 mb-5">
+                        Welcome to Vichain!
+                    </h3>
+                    <div class="mt-4 mb-4">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-info disabled btn-sm">Left click</button> with <button
+                                type="button" class="btn btn-info disabled btn-sm">Ctrl</button> to create new
+                            node
+                        </h5>
+                        <div>
+                            or
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary btn-sm" @click="createRandomNode">Create random
+                                node</button>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-4">
+                        <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node with
+                        <button type="button" class="btn btn-info disabled btn-sm">Shift</button> holded and drag to
+                        another node to create link between the nodes manually (links are created also automatically)
+                    </h5>
+
+                    <h5 class="mt-4 mb-4">
+                        <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node to
+                        select it
+                    </h5>
+
+                    <h5 class="mt-4 mb-4">
+                        Hold <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node and
+                        drag to move it
                     </h5>
                 </div>
 
@@ -157,7 +189,8 @@
             </div>
             <div class="col-4" style="text-align: right;">
                 <p class="font-monospace" style="font-size: small; margin: 0;">created by Jan Jankowicz</p>
-                <a class="font-monospace" style="font-size: x-small;" href="https://github.com/UniJanJan/vichain">GitHub repository</a>
+                <a class="font-monospace" style="font-size: x-small;" href="https://github.com/UniJanJan/vichain">GitHub
+                    repository</a>
             </div>
         </div>
     </div>

@@ -8,6 +8,7 @@ export class NetworkManager {
         this.network = network || new Network();
         this.eventFactory = new EventFactory(this.network.settings);
         this.eventMaster = new EventMaster(this.network, this.eventFactory);
+        // this.canvas = canvas;
 
         this.selectedNode = null;
 
@@ -40,7 +41,6 @@ export class NetworkManager {
 
     addNode(x, y) {
         this.eventMaster.enqueueExecution(this.eventFactory.createNodeCreatingEvent(this.network, x, y));
-
     }
 
     addLink(initiatingNode, targetNode) {

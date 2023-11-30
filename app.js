@@ -38,6 +38,17 @@ const app = createApp({
         },
         translateEventClassName(event) {
             return this.getTranslation(event.constructor.name) + (event.name || '');
+        },
+        createRandomNode() {
+            if (this.networkManager.canvas) {
+                const randomValues = new Uint32Array(2);
+                window.crypto.getRandomValues(randomValues);
+                var randomX = randomValues[0];
+                var randomY = randomValues[1];
+                var x = randomX % (this.networkManager.canvas.width - 40) + 20;
+                var y = randomY % (this.networkManager.canvas.height - 40) + 20;
+                this.networkManager.addNode(x, y);
+            }
         }
     }
 });

@@ -2,9 +2,11 @@ import { app } from './app.js';
 import { Utils } from './common.js';
 
 const canvas = document.querySelector('#visualisation-canvas');
+const networkManager = app._instance.ctx.networkManager._value;
 
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
+networkManager.canvas = canvas;
 
 new ResizeObserver(() => {
     canvas.width = canvas.clientWidth;
@@ -23,8 +25,6 @@ const positionResolver = {
 };
 
 
-
-const networkManager = app._instance.ctx.networkManager._value;
 
 const linkDraft = {
     isActive: false,
