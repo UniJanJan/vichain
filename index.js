@@ -100,8 +100,6 @@ canvas.addEventListener('mouseup', event => {
 
 
 
-
-
 function simulate(tFrame) {
     window.requestAnimationFrame(simulate);
     graphics.clearRect(0, 0, canvas.width, canvas.height);
@@ -110,4 +108,7 @@ function simulate(tFrame) {
     networkManager.draw(graphics);
 }
 
-simulate();
+window.addEventListener('load', function () {
+    $('body').css('display', 'unset');
+    simulate();
+});
