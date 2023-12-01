@@ -1,18 +1,10 @@
-import { Event, EventStatus } from "./event.js";
+import { Event } from "./event.js";
 
 export class TransactionVerifyingEvent extends Event {
     constructor(processingNode, transaction) {
         super(1000);
         this.processingNode = processingNode;
         this.transaction = transaction;
-    }
-
-
-    update(elapsedTime) {
-        this.progress += elapsedTime;
-        if (this.progress >= this.duration) {
-            this.status = EventStatus.PROCESSED;
-        }
     }
 
     draw(graphics, settings) {

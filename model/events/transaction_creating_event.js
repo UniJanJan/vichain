@@ -1,4 +1,4 @@
-import { Event, EventStatus } from "./event.js";
+import { Event } from "./event.js";
 
 export class TransactionCreatingEvent extends Event {
     constructor(processingNode, sourceAddress, targetAddress, amount) {
@@ -7,14 +7,6 @@ export class TransactionCreatingEvent extends Event {
         this.sourceAddress = sourceAddress;
         this.targetAddress = targetAddress;
         this.amount = amount;
-    }
-
-
-    update(elapsedTime) {
-        this.progress += elapsedTime;
-        if (this.progress >= this.duration) {
-            this.status = EventStatus.PROCESSED;
-        }
     }
 
     draw(graphics, settings) {
