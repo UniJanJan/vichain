@@ -1,7 +1,7 @@
 import { Utils } from "./common.js";
 import { EventManager } from "./logic/event_manager.js";
 import { EventFactory } from "./logic/factory/event_factory.js";
-import { Network } from "./network.js";
+import { Network } from "./model/entity/network.js";
 
 export class NetworkManager {
     constructor(network) {

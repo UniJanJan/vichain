@@ -1,4 +1,4 @@
-import { LinkStatus } from "../../link.js";
+import { LinkStatus } from "../../model/entity/link.js";
 import { RejectMessage } from "../../model/message/reject_message.js";
 import { VerAckMessage } from "../../model/message/verack_message.js";
 import { VersionMessage } from "../../model/message/version_message.js";

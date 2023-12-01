@@ -1,6 +1,5 @@
 import { Utils } from "./common.js";
-import { LinkStatus } from "./link.js";
-
+import { LinkStatus } from "./model/entity/link.js";
 const { isProxy, toRaw } = Vue;
 
 export class NetworkInterface {

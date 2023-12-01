@@ -1,4 +1,4 @@
-import { LinkStatus } from "../../link.js";
+import { LinkStatus } from "../../model/entity/link.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
 import { RejectMessage } from "../../model/message/reject_message.js";

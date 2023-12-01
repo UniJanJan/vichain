@@ -1,5 +1,5 @@
-import { Utils } from './common.js';
-import { EventPool } from './model/event/event_pool.js';
+import { Utils } from '../../common.js';
+import { EventPool } from '../event/event_pool.js';
 
 export const LinkStatus = {
     VIRTUAL: 0,

@@ -1,5 +1,5 @@
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
-import { Node } from "../../node.js";
+import { Node } from "../../model/entity/node.js";
 import { EventHandler } from "./event_handler.js";
 
 export class NodeCreatingEventHandler extends EventHandler {
