@@ -1,6 +1,6 @@
 import { Link } from './link.js';
-import { EventPool } from './model/event/event_pool.js';
-import { Timer } from './model/time/timer.js';
+import { EventPool } from '../event/event_pool.js';
+import { Timer } from '../time/timer.js';
 
 export class Network {
     constructor() {

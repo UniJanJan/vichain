@@ -1,5 +1,5 @@
 import { EventProcessor } from "./event_processor.js";
-import { Link } from "../link.js";
+import { Link } from "../model/entity/link.js";
 import { LinkCreatingEvent } from "../model/event/link_creating_event.js";
 import { LinkRemovingEvent } from "../model/event/link_removing_event.js";
 import { MessageReceivingEvent } from "../model/event/message_receiving_event.js";
@@ -9,8 +9,8 @@ import { NodeCreatingEvent } from "../model/event/node_creating_event.js";
 import { TransactionCreatingEvent } from "../model/event/transaction_creating_event.js";
 import { TransactionVerifyingEvent } from "../model/event/transaction_verifying_event.js";
 import { WaitingEvent } from "../model/event/waiting_event.js";
-import { Network } from "../network.js";
-import { Node } from "../node.js";
+import { Network } from "../model/entity/network.js";
+import { Node } from "../model/entity/node.js";
 import { LinkCreatingEventHandler } from "./handler/link_creating_event_handler.js";
 import { LinkRemovingEventHandler } from "./handler/link_removing_event_handler.js";
 import { MessageReceivingEventHandler } from "./handler/message_receiving_event_handler.js";
