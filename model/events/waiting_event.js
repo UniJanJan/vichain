@@ -1,4 +1,4 @@
-import { Event, EventStatus } from "./event.js";
+import { Event } from "./event.js";
 
 export const CyclicEventsName = {
     SENDING_ADDRESS: 'addr',
@@ -10,13 +10,6 @@ export class WaitingEvent extends Event {
         super(timeInterval);
         this.name = name;
         this.loadSize = 0;
-    }
-
-    update(elapsedTime) {
-        this.progress += elapsedTime;
-        if (this.progress >= this.duration) {
-            this.status = EventStatus.PROCESSED;
-        }
     }
 
     draw(graphics) {

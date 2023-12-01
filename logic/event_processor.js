@@ -1,4 +1,4 @@
-import { EventStatus } from "./model/events/event.js";
+import { EventStatus } from "../model/events/event.js";
 
 export class EventProcessor {
     constructor(timer, maxLoad, eventPool) {
@@ -54,9 +54,9 @@ export class EventProcessor {
         }
 
         var newlyProcessedEvents = [];
-        this.processingEvents.forEach((event, index) => {
-            event.update(elapsedTime);
-            if (event.status === EventStatus.PROCESSED) {
+        this.processingEvents.forEach((processingEvent, index) => {
+            this.updateEvent(processingEvent, elapsedTime);
+            if (processingEvent.status === EventStatus.PROCESSED) {
                 var processedEvent = this.processingEvents.splice(index, 1)[0];
                 this.currentLoad -= processedEvent.loadSize;
                 processedEvent.processingEndTimestamp = this.timer.currentTimestamp;
@@ -66,6 +66,13 @@ export class EventProcessor {
         });
 
         return newlyProcessedEvents;
+    }
+
+    updateEvent(processingEvent, elapsedTime) {
+        processingEvent.progress += elapsedTime;
+        if (processingEvent.progress >= processingEvent.duration) {
+            processingEvent.status = EventStatus.PROCESSED;
+        }
     }
 
 }

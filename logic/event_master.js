@@ -1,4 +1,4 @@
-import { EventProcessor } from "../event_processor.js";
+import { EventProcessor } from "./event_processor.js";
 import { Link } from "../link.js";
 import { LinkCreatingEvent } from "../model/events/link_creating_event.js";
 import { LinkRemovingEvent } from "../model/events/link_removing_event.js";

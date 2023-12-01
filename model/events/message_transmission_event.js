@@ -1,4 +1,4 @@
-import { Event, EventStatus } from "./event.js";
+import { Event } from "./event.js";
 
 export class MessageTransmissionEvent extends Event {
     constructor(nodeFrom, nodeTo, message) {
@@ -8,15 +8,6 @@ export class MessageTransmissionEvent extends Event {
         this.nodeFrom = nodeFrom;
         this.nodeTo = nodeTo;
         this.message = message;
-
-        this.status = EventStatus.PROCESSABLE;
-    }
-
-    update(elapsedTime) {
-        this.progress += elapsedTime;
-        if (this.progress >= this.duration) {
-            this.status = EventStatus.PROCESSED;
-        }
     }
 
     draw(graphics) {
