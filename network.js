@@ -1,5 +1,5 @@
 import { Link } from './link.js';
-import { EventPool } from './model/events/event_pool.js';
+import { EventPool } from './model/event/event_pool.js';
 import { Timer } from './model/time/timer.js';
 
 export class Network {

@@ -1,15 +1,15 @@
-import { LinkCreatingEvent } from "../../model/events/link_creating_event.js";
-import { LinkRemovingEvent } from "../../model/events/link_removing_event.js";
-import { MessageReceivingEvent } from "../../model/events/message_receiving_event.js";
-import { MessageSendingEvent } from "../../model/events/message_sending_event.js";
-import { MessageTransmissionEvent } from "../../model/events/message_transmission_event.js";
-import { NodeCreatingEvent } from "../../model/events/node_creating_event.js";
-import { TransactionCreatingEvent } from "../../model/events/transaction_creating_event.js";
-import { TransactionVerifyingEvent } from "../../model/events/transaction_verifying_event.js";
-import { WaitingEvent } from "../../model/events/waiting_event.js";
-import { RejectMessage } from "../../model/messages/reject_message.js";
-import { TrxMessage } from "../../model/messages/trx_message.js"
-import { VersionMessage } from "../../model/messages/version_message.js";
+import { LinkCreatingEvent } from "../../model/event/link_creating_event.js";
+import { LinkRemovingEvent } from "../../model/event/link_removing_event.js";
+import { MessageReceivingEvent } from "../../model/event/message_receiving_event.js";
+import { MessageSendingEvent } from "../../model/event/message_sending_event.js";
+import { MessageTransmissionEvent } from "../../model/event/message_transmission_event.js";
+import { NodeCreatingEvent } from "../../model/event/node_creating_event.js";
+import { TransactionCreatingEvent } from "../../model/event/transaction_creating_event.js";
+import { TransactionVerifyingEvent } from "../../model/event/transaction_verifying_event.js";
+import { WaitingEvent } from "../../model/event/waiting_event.js";
+import { RejectMessage } from "../../model/message/reject_message.js";
+import { TrxMessage } from "../../model/message/trx_message.js"
+import { VersionMessage } from "../../model/message/version_message.js";
 
 export class EventFactory {
     constructor() {

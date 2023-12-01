@@ -1,25 +1,25 @@
 import { EventProcessor } from "./event_processor.js";
 import { Link } from "../link.js";
-import { LinkCreatingEvent } from "../model/events/link_creating_event.js";
-import { LinkRemovingEvent } from "../model/events/link_removing_event.js";
-import { MessageReceivingEvent } from "../model/events/message_receiving_event.js";
-import { MessageSendingEvent } from "../model/events/message_sending_event.js";
-import { MessageTransmissionEvent } from "../model/events/message_transmission_event.js";
-import { NodeCreatingEvent } from "../model/events/node_creating_event.js";
-import { TransactionCreatingEvent } from "../model/events/transaction_creating_event.js";
-import { TransactionVerifyingEvent } from "../model/events/transaction_verifying_event.js";
-import { WaitingEvent } from "../model/events/waiting_event.js";
+import { LinkCreatingEvent } from "../model/event/link_creating_event.js";
+import { LinkRemovingEvent } from "../model/event/link_removing_event.js";
+import { MessageReceivingEvent } from "../model/event/message_receiving_event.js";
+import { MessageSendingEvent } from "../model/event/message_sending_event.js";
+import { MessageTransmissionEvent } from "../model/event/message_transmission_event.js";
+import { NodeCreatingEvent } from "../model/event/node_creating_event.js";
+import { TransactionCreatingEvent } from "../model/event/transaction_creating_event.js";
+import { TransactionVerifyingEvent } from "../model/event/transaction_verifying_event.js";
+import { WaitingEvent } from "../model/event/waiting_event.js";
 import { Network } from "../network.js";
 import { Node } from "../node.js";
-import { LinkCreatingEventHandler } from "./handlers/link_creating_event_handler.js";
-import { LinkRemovingEventHandler } from "./handlers/link_removing_event_handler.js";
-import { MessageReceivingEventHandler } from "./handlers/message_receiving_event_handler.js";
-import { MessageSendingEventHandler } from "./handlers/message_sending_event_handler.js";
-import { MessageTransmissionEventHandler } from "./handlers/message_transmission_event_handler.js";
-import { NodeCreatingEventHandler } from "./handlers/node_creating_event_handler.js";
-import { TransactionCreatingEventHandler } from "./handlers/transaction_creating_event_handler.js";
-import { TransactionVerifyingEventHandler } from "./handlers/transaction_verifying_event_handler.js";
-import { WaitingEventHandler } from "./handlers/waiting_event_handler.js";
+import { LinkCreatingEventHandler } from "./handler/link_creating_event_handler.js";
+import { LinkRemovingEventHandler } from "./handler/link_removing_event_handler.js";
+import { MessageReceivingEventHandler } from "./handler/message_receiving_event_handler.js";
+import { MessageSendingEventHandler } from "./handler/message_sending_event_handler.js";
+import { MessageTransmissionEventHandler } from "./handler/message_transmission_event_handler.js";
+import { NodeCreatingEventHandler } from "./handler/node_creating_event_handler.js";
+import { TransactionCreatingEventHandler } from "./handler/transaction_creating_event_handler.js";
+import { TransactionVerifyingEventHandler } from "./handler/transaction_verifying_event_handler.js";
+import { WaitingEventHandler } from "./handler/waiting_event_handler.js";
 
 export class EventMaster {
     constructor(network, eventFactory) {

@@ -1,7 +1,7 @@
 import { LinkStatus } from "../../link.js";
-import { RejectMessage } from "../../model/messages/reject_message.js";
-import { VerAckMessage } from "../../model/messages/verack_message.js";
-import { VersionMessage } from "../../model/messages/version_message.js";
+import { RejectMessage } from "../../model/message/reject_message.js";
+import { VerAckMessage } from "../../model/message/verack_message.js";
+import { VersionMessage } from "../../model/message/version_message.js";
 import { EventHandler } from "./event_handler.js";
 
 export class MessageSendingEventHandler extends EventHandler {

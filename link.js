@@ -1,6 +1,5 @@
 import { Utils } from './common.js';
-import { EventPool } from './model/events/event_pool.js';
-import { MessageTransmissionEvent } from './model/events/message_transmission_event.js';
+import { EventPool } from './model/event/event_pool.js';
 
 export const LinkStatus = {
     VIRTUAL: 0,
