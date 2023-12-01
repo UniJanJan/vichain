@@ -21,7 +21,7 @@ import { TransactionCreatingEventHandler } from "./handler/transaction_creating_
 import { TransactionVerifyingEventHandler } from "./handler/transaction_verifying_event_handler.js";
 import { WaitingEventHandler } from "./handler/waiting_event_handler.js";
 
-export class EventMaster {
+export class EventManager {
     constructor(network, eventFactory) {
         this.network = network;
         this.timer = network.timer;

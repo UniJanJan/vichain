@@ -1,5 +1,5 @@
 import { Utils } from "./common.js";
-import { EventMaster } from "./logic/event_master.js";
+import { EventManager } from "./logic/event_manager.js";
 import { EventFactory } from "./logic/factory/event_factory.js";
 import { Network } from "./network.js";
 
@@ -7,7 +7,7 @@ export class NetworkManager {
     constructor(network) {
         this.network = network || new Network();
         this.eventFactory = new EventFactory(this.network.settings);
-        this.eventMaster = new EventMaster(this.network, this.eventFactory);
+        this.eventManager = new EventManager(this.network, this.eventFactory);
         // this.canvas = canvas;
 
         this.selectedNode = null;
@@ -40,11 +40,11 @@ export class NetworkManager {
     }
 
     addNode(x, y) {
-        this.eventMaster.enqueueExecution(this.eventFactory.createNodeCreatingEvent(this.network, x, y));
+        this.eventManager.enqueueExecution(this.eventFactory.createNodeCreatingEvent(this.network, x, y));
     }
 
     addLink(initiatingNode, targetNode) {
-        this.eventMaster.enqueueExecution(this.eventFactory.createLinkCreatingEvent(this.network, initiatingNode, targetNode));
+        this.eventManager.enqueueExecution(this.eventFactory.createLinkCreatingEvent(this.network, initiatingNode, targetNode));
     }
 
     getNode(x, y) {
@@ -74,7 +74,7 @@ export class NetworkManager {
     update(tFrame = 0) { // TODO
         var elapsedTime = this.network.timer.update(tFrame);
         this.network.update(elapsedTime);
-        this.eventMaster.update(elapsedTime);
+        this.eventManager.update(elapsedTime);
     }
 
     draw(graphics) { //TODO
