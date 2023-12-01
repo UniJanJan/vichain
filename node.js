@@ -54,11 +54,6 @@ export class Node {
     update(elapsedTime) {
         this.updateVelocity(elapsedTime);
         this.updatePosition(elapsedTime);
-
-        // // for testing
-        // if (this.id !== 1 && Math.random() < 0.0001) {
-        //     this.eventManager.createTransaction("SOURCEADDR", "TARGETADDR", 10);
-        // }
     }
 
     draw(graphics, settings) {
