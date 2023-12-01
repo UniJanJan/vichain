@@ -20,13 +20,13 @@ const app = createApp({
             return Promise(() => this.networkManager.selectedNode);
         },
         processableEvents() {
-            return this.networkManager.selectedNode ? this.networkManager.eventMaster.eventProcessors.get(this.networkManager.selectedNode).processableEvents : [];
+            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processableEvents : [];
         },
         processingEvents() {
-            return this.networkManager.selectedNode ? this.networkManager.eventMaster.eventProcessors.get(this.networkManager.selectedNode).processingEvents : [];
+            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processingEvents : [];
         },
         processedEvents() {
-            return this.networkManager.selectedNode ? this.networkManager.eventMaster.eventProcessors.get(this.networkManager.selectedNode).processedEvents : [];
+            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processedEvents : [];
         },
         pooledTransactions() {
             return this.networkManager.selectedNode ? this.networkManager.selectedNode.transactionPool.transactions : [];

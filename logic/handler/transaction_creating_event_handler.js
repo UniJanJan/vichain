@@ -1,4 +1,4 @@
-import { Transaction } from "../../transaction.js";
+import { Transaction } from "../../model/transaction/transaction.js";
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionCreatingEventHandler extends EventHandler {
