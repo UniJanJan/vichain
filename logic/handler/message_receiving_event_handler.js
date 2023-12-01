@@ -1,10 +1,10 @@
 import { LinkStatus } from "../../link.js";
-import { AddrMessage } from "../../model/messages/addr_message.js";
-import { GetAddrMessage } from "../../model/messages/getaddr_message.js";
-import { RejectMessage } from "../../model/messages/reject_message.js";
-import { TrxMessage } from "../../model/messages/trx_message.js";
-import { VerAckMessage } from "../../model/messages/verack_message.js";
-import { VersionMessage } from "../../model/messages/version_message.js";
+import { AddrMessage } from "../../model/message/addr_message.js";
+import { GetAddrMessage } from "../../model/message/getaddr_message.js";
+import { RejectMessage } from "../../model/message/reject_message.js";
+import { TrxMessage } from "../../model/message/trx_message.js";
+import { VerAckMessage } from "../../model/message/verack_message.js";
+import { VersionMessage } from "../../model/message/version_message.js";
 import { EventHandler } from "./event_handler.js";
 
 export class MessageReceivingEventHandler extends EventHandler {

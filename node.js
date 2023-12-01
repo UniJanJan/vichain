@@ -1,6 +1,6 @@
 import { TransactionPool } from './transaction_pool.js';
 import { NetworkInterface } from './network_interface.js';
-import { EventPool } from './model/events/event_pool.js';
+import { EventPool } from './model/event/event_pool.js';
 
 
 export class Node {

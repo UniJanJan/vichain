@@ -1,4 +1,4 @@
-import { EventStatus } from "../model/events/event.js";
+import { EventStatus } from "../model/event/event.js";
 
 export class EventProcessor {
     constructor(timer, maxLoad, eventPool) {

@@ -1,6 +1,6 @@
-import { CyclicEventsName } from "../../model/events/waiting_event.js";
-import { AddrMessage } from "../../model/messages/addr_message.js";
-import { GetAddrMessage } from "../../model/messages/getaddr_message.js";
+import { CyclicEventsName } from "../../model/event/waiting_event.js";
+import { AddrMessage } from "../../model/message/addr_message.js";
+import { GetAddrMessage } from "../../model/message/getaddr_message.js";
 import { EventHandler } from "./event_handler.js";
 
 export class WaitingEventHandler extends EventHandler {
