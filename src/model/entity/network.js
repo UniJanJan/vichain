@@ -1,17 +1,20 @@
 import { Link } from './link.js';
 import { EventPool } from '../event/event_pool.js';
 import { Timer } from '../time/timer.js';
+import { WalletPool } from '../wallet/wallet_pool.js';
 
 export class Network {
     constructor() {
         this.nodes = [];
         this.links = [];
-        
+
         this.informativeNodes = [];
 
         this.timer = new Timer();
 
         this.events = new EventPool();
+
+        this.walletPool = new WalletPool(10);
 
         this.settings = {
             minLinksPerNode: 3,

@@ -2,7 +2,8 @@ import { Event } from "./event.js";
 
 export const CyclicEventsName = {
     SENDING_ADDRESS: 'addr',
-    PEERS_DISCOVERY: 'peers_discovery'
+    PEERS_DISCOVERY: 'peers_discovery',
+    TRANSACTION_GENERATION: 'transaction_generation'
 }
 
 export class WaitingEvent extends Event {
