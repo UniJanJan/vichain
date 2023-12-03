@@ -9,6 +9,12 @@ export class NodeCreatingEventHandler extends EventHandler {
 
     handle(processingNetwork, processedEvent) {
         var node = new Node(processingNetwork, processedEvent.x, processedEvent.y);
+        // node.knownAddresses.add(processingNetwork.walletPool.getAllKnownAddress());
+        var wallet = processingNetwork.walletPool.pickFreeWallet();
+        if (wallet) {
+            node.knownWallets.push(wallet);
+        }
+
         node.networkInterface.rememberNodes(processingNetwork.informativeNodes);
         processingNetwork.addNode(node);
 
@@ -17,6 +23,7 @@ export class NodeCreatingEventHandler extends EventHandler {
         }
 
         return [
+            this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, 10000), // TODO
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.PEERS_DISCOVERY, 1000)
         ];
     }

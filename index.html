@@ -99,8 +99,9 @@
                                 <ul class="list-group" v-for="transaction in pooledTransactions">
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
-                                        {{transaction.sourceAddress}} -> {{ transaction.amount }} ->
-                                        {{transaction.targetAddress}}</li>
+                                        {{ transaction.amount }} from
+                                        {{transaction.sourceAddress.toString().slice(0,8)}}... to
+                                        {{transaction.targetAddress.toString().slice(0,8)}}...</li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -204,6 +205,10 @@
     crossorigin="anonymous"></script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://unpkg.com/vuex@4.0.0/dist/vuex.global.js"></script>
+<script src="https://peterolson.github.io/BigInteger.js/BigInteger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"
+    integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="module" src="./src/index.js"></script>
 
 </html>

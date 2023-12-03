@@ -1,3 +1,4 @@
+import { RSA } from "../../common/rsa.js";
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionVerifyingEventHandler extends EventHandler {
@@ -7,7 +8,7 @@ export class TransactionVerifyingEventHandler extends EventHandler {
 
     handle(processingNode, processedEvent) {
         var transaction = processedEvent.transaction;
-        if (!processingNode.transactionPool.contains(transaction)) {
+        if (!processingNode.transactionPool.contains(transaction) && this.isTransactionValid(transaction)) {
             processingNode.transactionPool.put(transaction);
             return [
                 this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction)
@@ -15,5 +16,10 @@ export class TransactionVerifyingEventHandler extends EventHandler {
         } else {
             return [];
         }
+    }
+
+    isTransactionValid(transaction) {
+        var transactionPayload = transaction.sourceAddress.toString() + transaction.targetAddress.toString() + transaction.amount;
+        return RSA.verifySignature(transactionPayload, transaction.signature, transaction.sourceAddress);
     }
 }

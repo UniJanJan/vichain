@@ -9,4 +9,9 @@ export class Utils {
         maxWidth = 0.75 * maxWidth;
         return Math.min(Math.max(1, distance), maxWidth);
     }
+
+    static getRandomElement = function (array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
 }

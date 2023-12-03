@@ -15,11 +15,11 @@ export class EventFactory {
     constructor() {
     }
 
-    createTransactionCreatingEvent(processingNode, sourceAddress, targetAddress, amount) {
+    createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount) {
         // needs validation (but not here?)
         return {
             target: processingNode,
-            event: new TransactionCreatingEvent(processingNode, sourceAddress, targetAddress, amount)
+            event: new TransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount)
         };
     }
 

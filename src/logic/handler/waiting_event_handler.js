@@ -1,3 +1,4 @@
+import { Utils } from "../../common.js";
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
@@ -32,8 +33,16 @@ export class WaitingEventHandler extends EventHandler {
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.PEERS_DISCOVERY, waitTime)
                     ];
                 }
+            case CyclicEventsName.TRANSACTION_GENERATION:
+                var waitTime = 10000 + Math.random() * 100000;
+                var sourceWallet = Utils.getRandomElement(processingNode.knownWallets);
+                var targetAddress = Utils.getRandomElement(this.network.walletPool.getAllAddresses());
+                var amount = 1 + Math.floor(Math.random() * 10);
 
-
+                return [
+                    this.eventFactory.createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount),
+                    this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
+                ];
         }
     }
 }

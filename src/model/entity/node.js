@@ -1,6 +1,7 @@
 import { TransactionPool } from '../transaction/transaction_pool.js';
 import { NetworkInterface } from '../../network_interface.js';
 import { EventPool } from '../event/event_pool.js';
+import { Blockchain } from '../blockchain/blockchain.js';
 
 
 export class Node {
@@ -18,6 +19,9 @@ export class Node {
         this.events = new EventPool();
         this.transactionPool = new TransactionPool();
         this.networkInterface = new NetworkInterface(this, this.network);
+        this.blockchain = new Blockchain();
+        this.knownWallets = [];
+        this.knownAddresses = [];
 
         this.x = x;
         this.y = y;
