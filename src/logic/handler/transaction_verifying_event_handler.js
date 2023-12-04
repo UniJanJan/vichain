@@ -19,7 +19,6 @@ export class TransactionVerifyingEventHandler extends EventHandler {
     }
 
     isTransactionValid(transaction) {
-        var transactionPayload = transaction.sourceAddress.toString() + transaction.targetAddress.toString() + transaction.amount;
-        return RSA.verifySignature(transactionPayload, transaction.signature, transaction.sourceAddress);
+        return RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress);
     }
 }
