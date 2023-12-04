@@ -30,6 +30,9 @@ const app = createApp({
         },
         pooledTransactions() {
             return this.networkManager.selectedNode ? this.networkManager.selectedNode.transactionPool.transactions : [];
+        },
+        leadingBlocks() {
+            return this.networkManager.selectedNode ? this.networkManager.selectedNode.blockchain.leadingBlocks : [];
         }
     },
     methods: {
@@ -49,6 +52,9 @@ const app = createApp({
                 var y = randomY % (this.networkManager.canvas.height - 40) + 20;
                 this.networkManager.addNode(x, y);
             }
+        },
+        installBlockchain() {
+            this.networkManager.installBlockchain();
         }
     }
 });

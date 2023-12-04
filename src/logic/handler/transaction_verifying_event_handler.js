@@ -19,7 +19,8 @@ export class TransactionVerifyingEventHandler extends EventHandler {
     }
 
     isTransactionValid(transaction) {
-        return !transaction.transactionBody.sourceAddress.equals(this.network.walletPool.getBurnAddress()) &&
+        return !transaction.transactionBody.sourceAddress.equals(transaction.transactionBody.targetAddress) &&
+            !transaction.transactionBody.sourceAddress.equals(this.network.walletPool.getBurnAddress()) &&
             RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress);
     }
 }

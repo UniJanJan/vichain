@@ -34,7 +34,7 @@ export class WaitingEventHandler extends EventHandler {
             case CyclicEventsName.TRANSACTION_GENERATION:
                 var waitTime = this.getTransactionGenerationTimeInterval.bind(this)();
                 var sourceWallet = Utils.getRandomElement(processingNode.knownWallets);
-                var targetAddress = Utils.getRandomElement(this.network.walletPool.getAllAddresses());
+                var targetAddress = Utils.getRandomElement(this.network.walletPool.getAllAddresses().filter(address => !address.equals(sourceWallet.publicKey)));
                 var amount = 1 + Math.floor(Math.random() * 10);
 
                 return [

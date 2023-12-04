@@ -1,3 +1,4 @@
+import { BlockchainInstallingEvent } from "../../model/event/blockchain_installing_event.js";
 import { LinkCreatingEvent } from "../../model/event/link_creating_event.js";
 import { LinkRemovingEvent } from "../../model/event/link_removing_event.js";
 import { MessageReceivingEvent } from "../../model/event/message_receiving_event.js";
@@ -138,5 +139,12 @@ export class EventFactory {
         });
 
         return classification;
+    }
+
+    createBlockchainInstallingEvent(processingNetwork, nodesForInstall) {
+        return {
+            target: processingNetwork,
+            event: new BlockchainInstallingEvent(nodesForInstall)
+        };
     }
 }

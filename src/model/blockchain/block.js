@@ -1,7 +1,6 @@
 export class Block {
-    constructor(blockHash, previousBlockHash, transactions) {
+    constructor(blockBody, blockHash) {
+        this.blockBody = blockBody;
         this.blockHash = blockHash;
-        this.previousBlockHash = previousBlockHash;
-        this.transactions = transactions;
     }
 }
