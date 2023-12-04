@@ -1,3 +1,4 @@
+import { DiscreteIntervalMap } from "../../common/interval_map.js";
 import { Block } from "../../model/blockchain/block.js";
 import { BlockBody } from "../../model/blockchain/block_body.js";
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
@@ -11,9 +12,11 @@ export class BlockchainInstallingEventHandler extends EventHandler {
     }
 
     handle(processingNetwork, processedEvent) {
-        var nextProcessableEvents = [];
+        // var nextProcessableEvents = [];
         // var initTokenAmount = 1000;
         var initTokenAmountPerNode = 100;
+        var burnAddress = processingNetwork.walletPool.getBurnAddress();
+        // var burntMap = new DiscreteIntervalMap();
         var transactions = [];
 
         processedEvent.nodes.forEach(node => {
@@ -23,18 +26,30 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             var incomeTransaction = new Transaction(new TransactionBody(null, newWallet.publicKey, initTokenAmountPerNode + 1), null);
             transactions.push(incomeTransaction);
 
-            var burnTransaction = new Transaction(new TransactionBody(newWallet.publicKey, processingNetwork.walletPool.getBurnAddress(), 1), null);
+            var burnTransaction = new Transaction(new TransactionBody(newWallet.publicKey, burnAddress, 1), null);
             transactions.push(burnTransaction);
         });
 
-        var genesisBlockBody = new BlockBody(0, null, transactions);
-        var genesisBlock = new Block(genesisBlockBody, CryptoJS.SHA256(JSON.stringify(genesisBlockBody)));
+        // transactions.forEach(transaction => {
+        //     if (transaction.transactionBody.targetAddress.equals(burnAddress)) {
+        //         burntMap.push(transaction.transactionBody.amount, transaction.transactionBody.sourceAddress);
+        //     }
+        // });
 
-        processedEvent.nodes.forEach(node => {
-            // node.knownAddresses = 
-            node.blockchain.appendBlock(genesisBlock);
-            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000));
-        });
-        return nextProcessableEvents;
+        var genesisBlockBody = new BlockBody(0, null, transactions);
+        var genesisBlock = new Block(genesisBlockBody, CryptoJS.SHA256(JSON.stringify(genesisBlockBody)), null);
+
+        // processedEvent.nodes.forEach(node => {
+        //     node.blockchain.appendBlock(genesisBlock);
+        //     nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000));
+        // });
+        // return nextProcessableEvents;
+
+
+        return processedEvent.nodes.flatMap(node => [
+            this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000),
+            this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0),
+            this.eventFactory.createBlockVerifyingEvent(node, genesisBlock)
+        ]);
     }
 }

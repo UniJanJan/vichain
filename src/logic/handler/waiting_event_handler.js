@@ -1,4 +1,5 @@
 import { Utils } from "../../common.js";
+import { RSA } from "../../common/rsa.js";
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
@@ -41,6 +42,41 @@ export class WaitingEventHandler extends EventHandler {
                     this.eventFactory.createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount),
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
                 ];
+            case CyclicEventsName.MINERS_SELECTION:
+                var waitTime = this.network.settings.roundTime - (this.network.timer.currentTimestamp % this.network.settings.roundTime);
+
+
+                processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
+                    var minersPerRound = this.network.settings.minersPerRound;
+                    var lastBlocks = [];
+                    var currentBlock = leadingBlock.block;
+                    while (lastBlocks.length < 2 * minersPerRound && currentBlock !== null) {
+                        lastBlocks.unshift(currentBlock);
+                        currentBlock = currentBlock.previousBlock;
+                    }
+
+                    var seedInputBlocks = lastBlocks.slice(0, minersPerRound);
+
+                    var seed = seedInputBlocks.map(block => parseInt(block.blockHash.toString()[1], 16) % 2).join('') + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height; // maybe timestamp should be added here
+
+                    var miners = [...Array(minersPerRound).keys()]
+                        .map((_, index) => CryptoJS.SHA256(seed + index).toString())
+                        .map(RSA.encode)
+                        .map(number => number % leadingBlock.burnMap.summedInvervalsSize)
+                        .map(leadingBlock.burnMap.get.bind(leadingBlock.burnMap))
+                        .map(Vue.toRaw);
+
+                    leadingBlock.miners = miners;
+
+                    var selfIndex = miners.indexOf(processingNode.knownWallets[0].publicKey); //TODO [0]
+                    if (selfIndex > -1) {
+                        console.log("I'm choosen");
+                    }
+                })
+
+                return [
+                    this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.MINERS_SELECTION, waitTime)
+                ];
         }
     }
 
@@ -53,5 +89,6 @@ export class WaitingEventHandler extends EventHandler {
             15000 + Math.random() * 10000 :
             300000 + Math.random() * 50000;
     }
+
 
 }

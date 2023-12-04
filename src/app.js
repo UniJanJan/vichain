@@ -11,6 +11,7 @@ const app = createApp({
                 'MessageReceivingEvent': 'Message receiving',
                 'TransactionCreatingEvent': 'Transaction creation',
                 'TransactionVerifyingEvent': 'Transaction verification',
+                'BlockVerifyingEvent': 'Block verification',
                 'WaitingEvent': 'Waiting for '
             }
         }

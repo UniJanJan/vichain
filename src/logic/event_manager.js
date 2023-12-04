@@ -22,6 +22,8 @@ import { TransactionVerifyingEventHandler } from "./handler/transaction_verifyin
 import { WaitingEventHandler } from "./handler/waiting_event_handler.js";
 import { BlockchainInstallingEvent } from "../model/event/blockchain_installing_event.js";
 import { BlockchainInstallingEventHandler } from "./handler/blockchain_installing_event_handler.js";
+import { BlockVerifyingEvent } from "../model/event/block_verifying_event.js";
+import { BlockVerifyingEventHandler } from "./handler/block_verifying_event_handler.js";
 
 export class EventManager {
     constructor(network, eventFactory) {
@@ -52,6 +54,7 @@ export class EventManager {
                 [MessageReceivingEvent.name, new MessageReceivingEventHandler(this.network, this.eventFactory)],
                 [TransactionCreatingEvent.name, new TransactionCreatingEventHandler(this.network, this.eventFactory)],
                 [TransactionVerifyingEvent.name, new TransactionVerifyingEventHandler(this.network, this.eventFactory)],
+                [BlockVerifyingEvent.name, new BlockVerifyingEventHandler(this.network, this.eventFactory)],
                 [WaitingEvent.name, new WaitingEventHandler(this.network, this.eventFactory)]
             ])],
             [Link.name, new Map([
