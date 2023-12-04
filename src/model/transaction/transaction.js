@@ -1,12 +1,11 @@
 export class Transaction {
-    constructor(sourceAddress, targetAddress, amount, signature) {
-        this.sourceAddress = sourceAddress;
-        this.targetAddress = targetAddress;
-        this.amount = amount;
+    constructor(transactionBody, signature) {
+        this.transactionBody = transactionBody;
         this.signature = signature;
+        Object.freeze(this);
     }
 
     clone() {
-        return Object.assign(new Object(), this);
+        return Object.assign(new Object(), this); // TODO
     }
 }

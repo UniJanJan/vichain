@@ -101,9 +101,9 @@
                                 <ul class="list-group" v-for="transaction in pooledTransactions">
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
-                                        {{ transaction.amount }} from
-                                        {{transaction.sourceAddress.toString().slice(0,8)}}... to
-                                        {{transaction.targetAddress.toString().slice(0,8)}}...</li>
+                                        {{ transaction.transactionBody.amount }} from
+                                        {{ transaction.transactionBody.sourceAddress.toString().slice(0,8) }}... to
+                                        {{ transaction.transactionBody.targetAddress.toString().slice(0,8) }}...</li>
                                 </ul>
                             </div>
                             <div v-else>

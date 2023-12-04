@@ -72,14 +72,14 @@ export class RSA {
     }
 
     static createSignature(data, privateKey, publicKey) {
-        var hashedData = CryptoJS.SHA256(data).toString().slice(0, 32);
+        var hashedData = CryptoJS.SHA256(JSON.stringify(data)).toString().slice(0, 32);
         var encodedData = RSA.encode(hashedData);
         return RSA.encrypt(encodedData, publicKey, privateKey);
     }
 
     static verifySignature(data, signature, publicKey) {
         var decryptedData = RSA.decrypt(signature, RSA.e, publicKey);
-        var hashedData = CryptoJS.SHA256(data).toString().slice(0, 32);
+        var hashedData = CryptoJS.SHA256(JSON.stringify(data)).toString().slice(0, 32);
         var encodedData = RSA.encode(hashedData);
         return encodedData.equals(decryptedData);
     }

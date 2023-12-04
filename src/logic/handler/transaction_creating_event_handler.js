@@ -1,5 +1,6 @@
 import { RSA } from "../../common/rsa.js";
 import { Transaction } from "../../model/transaction/transaction.js";
+import { TransactionBody } from "../../model/transaction/transaction_body.js";
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionCreatingEventHandler extends EventHandler {
@@ -8,13 +9,18 @@ export class TransactionCreatingEventHandler extends EventHandler {
     }
 
     handle(processingNode, processedEvent) {
-        var transactionPayload = processedEvent.sourceWallet.publicKey.toString() + processedEvent.targetAddress.toString() + processedEvent.amount;
-        var signature = RSA.createSignature(transactionPayload, processedEvent.sourceWallet.privateKey, processedEvent.sourceWallet.publicKey);
-        
-        var transaction = new Transaction(processedEvent.sourceWallet.publicKey, processedEvent.targetAddress, processedEvent.amount, signature);
+        var transaction = this.createSignedTransaction(processedEvent);
+
         processingNode.transactionPool.put(transaction);
+        
         return [
             this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction)
         ];
+    }
+
+    createSignedTransaction(processedEvent) {
+        var transactionBody = new TransactionBody(processedEvent.sourceWallet.publicKey, processedEvent.targetAddress, processedEvent.amount);
+        var signature = RSA.createSignature(transactionBody, processedEvent.sourceWallet.privateKey, processedEvent.sourceWallet.publicKey);
+        return new Transaction(transactionBody, signature);
     }
 }
