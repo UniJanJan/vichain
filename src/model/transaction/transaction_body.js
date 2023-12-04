@@ -8,7 +8,7 @@ export class TransactionBody {
     }
 
     clone() {
-        return Object.assign(new Object(), this); // TODO
+        return Object.assign(new Object(), this);
     }
 
 }
