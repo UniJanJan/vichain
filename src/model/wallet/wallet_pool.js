@@ -1,7 +1,7 @@
 import { Wallet } from "./wallet.js";
 
 export class WalletPool {
-    constructor(poolSize) {
+    constructor() {
         this.walletPool = []; //[...Array(poolSize).keys()].map(i => Wallet.random());
         this.nextFreeWalletIndex = 0;
         this.burnAddress = Wallet.random().publicKey;

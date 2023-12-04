@@ -124,12 +124,12 @@
                             <div v-if="leadingBlocks.length > 0">
                                 <!-- TODO: leadingBlocks[0] -->
                                 <h6>
-                                    Block {{leadingBlocks[0].blockBody.height}}
+                                    Block {{leadingBlocks[0].block.blockBody.height}}
                                 </h6>
                                 <div style="text-overflow: ellipsis; overflow: hidden">
-                                    Hash: {{leadingBlocks[0].blockHash.toString()}}
+                                    Hash: {{leadingBlocks[0].block.blockHash.toString()}}
                                 </div>
-                                <ul class="list-group" v-for="transaction in leadingBlocks[0].blockBody.transactions">
+                                <ul class="list-group" v-for="transaction in leadingBlocks[0].block.blockBody.transactions">
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
                                         <div v-if="transaction.transactionBody.sourceAddress">

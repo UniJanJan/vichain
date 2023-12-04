@@ -1,3 +1,4 @@
+import { BlockVerifyingEvent } from "../../model/event/block_verifying_event.js";
 import { BlockchainInstallingEvent } from "../../model/event/blockchain_installing_event.js";
 import { LinkCreatingEvent } from "../../model/event/link_creating_event.js";
 import { LinkRemovingEvent } from "../../model/event/link_removing_event.js";
@@ -147,4 +148,12 @@ export class EventFactory {
             event: new BlockchainInstallingEvent(nodesForInstall)
         };
     }
+
+    createBlockVerifyingEvent(processingNode, block) {
+        return {
+            target: processingNode,
+            event: new BlockVerifyingEvent(processingNode, block)
+        };
+    }
+
 }

@@ -32,6 +32,10 @@ export class NetworkManager {
                     isVisible: true,
                     color: 'rgb(192,192,192)'
                 },
+                'BlockVerifyingEvent': {
+                    isVisible: true,
+                    color: 'rgb(165,165,78)'
+                },
                 'WaitingEvent': {
                     isVisible: null,
                     color: 'rgb(165,42,42)'

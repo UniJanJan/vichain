@@ -14,13 +14,16 @@ export class Network {
 
         this.events = new EventPool();
 
-        this.walletPool = new WalletPool(10);
+        this.walletPool = new WalletPool();
 
         this.settings = {
             minLinksPerNode: 3,
             maxLinksPerNode: 20,
             minTransactionCreationInterval: 20000,
-            avgTransactionCreationInterval: 100000
+            avgTransactionCreationInterval: 100000,
+
+            roundTime: 50000,
+            minersPerRound: 2
         }
     }
 
