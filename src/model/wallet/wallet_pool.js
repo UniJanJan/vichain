@@ -4,6 +4,7 @@ export class WalletPool {
     constructor(poolSize) {
         this.walletPool = [...Array(poolSize).keys()].map(i => Wallet.random());
         this.nextFreeWalletIndex = 0;
+        this.burnAddress = Wallet.random().publicKey;
     }
 
     hasAnyFreeWallet() {
@@ -17,6 +18,10 @@ export class WalletPool {
     }
 
     getAllAddresses() {
-        return this.walletPool.map(wallet => wallet.publicKey);
+        return this.walletPool.map(wallet => wallet.publicKey).concat([this.burnAddress]);
+    }
+
+    getBurnAddress() {
+        return this.burnAddress;
     }
 }
