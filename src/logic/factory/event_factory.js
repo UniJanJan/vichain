@@ -1,3 +1,4 @@
+import { BlockCreatingEvent } from "../../model/event/block_creating_event.js";
 import { BlockVerifyingEvent } from "../../model/event/block_verifying_event.js";
 import { BlockchainInstallingEvent } from "../../model/event/blockchain_installing_event.js";
 import { LinkCreatingEvent } from "../../model/event/link_creating_event.js";
@@ -9,6 +10,7 @@ import { NodeCreatingEvent } from "../../model/event/node_creating_event.js";
 import { TransactionCreatingEvent } from "../../model/event/transaction_creating_event.js";
 import { TransactionVerifyingEvent } from "../../model/event/transaction_verifying_event.js";
 import { WaitingEvent } from "../../model/event/waiting_event.js";
+import { BlockMessage } from "../../model/message/block_message.js";
 import { RejectMessage } from "../../model/message/reject_message.js";
 import { TrxMessage } from "../../model/message/trx_message.js"
 import { VersionMessage } from "../../model/message/version_message.js";
@@ -65,10 +67,10 @@ export class EventFactory {
         };
     }
 
-    createWaitingEvent(processingNode, name, timeInterval) {
+    createWaitingEvent(processingNode, name, timeInterval, additionalData) {
         return {
             target: processingNode,
-            event: new WaitingEvent(name, timeInterval)
+            event: new WaitingEvent(name, timeInterval, additionalData)
         };
     }
 
@@ -154,6 +156,17 @@ export class EventFactory {
             target: processingNode,
             event: new BlockVerifyingEvent(processingNode, block)
         };
+    }
+
+    createBlockCreatingEvent(processingNode, leadingBlock, selectedAddress) {
+        return {
+            target: processingNode,
+            event: new BlockCreatingEvent(processingNode, leadingBlock, selectedAddress)
+        };
+    }
+
+    createBlockBroadcastEvent(sourceNode, block) {
+        return this.createMessageBroadcastEvent(sourceNode, new BlockMessage(block));
     }
 
 }

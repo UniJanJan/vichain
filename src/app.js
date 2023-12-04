@@ -12,6 +12,7 @@ const app = createApp({
                 'TransactionCreatingEvent': 'Transaction creation',
                 'TransactionVerifyingEvent': 'Transaction verification',
                 'BlockVerifyingEvent': 'Block verification',
+                'BlockCreatingEvent': 'Block mining',
                 'WaitingEvent': 'Waiting for '
             }
         }
