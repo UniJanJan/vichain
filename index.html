@@ -61,12 +61,16 @@
                             Processing events
                             <div v-if="processingEvents.length > 0">
                                 <ul class="list-group" v-for="event in processingEvents">
-                                    <li class="list-group-item"
-                                        :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
-                                        {{translateEventClassName(event)}} ({{ event.message ?
-                                        event.message.constructor.name : '' }})
-                                        <progress :value="event.progress" :max="event.duration"></progress>
-                                    </li>
+                                    <div>
+                                        <li class="list-group-item"
+                                            :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
+                                            {{translateEventClassName(event)}} ({{ event.message ?
+                                            event.message.constructor.name : '' }})
+
+                                        </li>
+                                        <progress :value="event.progress" :max="event.duration"
+                                            style="width: 99%; height: 3; margin-bottom: 5;"></progress>
+                                    </div>
                                 </ul>
                             </div>
                             <div v-else>
