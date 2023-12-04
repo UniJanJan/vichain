@@ -18,7 +18,9 @@ export class Network {
 
         this.settings = {
             minLinksPerNode: 3,
-            maxLinksPerNode: 20
+            maxLinksPerNode: 20,
+            minTransactionCreationInterval: 20000,
+            avgTransactionCreationInterval: 100000
         }
     }
 

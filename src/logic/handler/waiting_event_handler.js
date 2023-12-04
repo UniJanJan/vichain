@@ -17,9 +17,7 @@ export class WaitingEventHandler extends EventHandler {
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.SENDING_ADDRESS, 360000)
                 ];
             case CyclicEventsName.PEERS_DISCOVERY:
-                var waitTime = processingNode.networkInterface.getLinksNumber() < this.network.settings.minLinksPerNode ?
-                    15000 + Math.random() * 10000 :
-                    300000 + Math.random() * 50000;
+                var waitTime = this.getPeersDiscoveryTimeInterval.bind(this)(processingNode);
 
                 if (processingNode.networkInterface.getAllEstablishedLinkedNodes().length > 0) {
                     return [
@@ -34,7 +32,7 @@ export class WaitingEventHandler extends EventHandler {
                     ];
                 }
             case CyclicEventsName.TRANSACTION_GENERATION:
-                var waitTime = 10000 + Math.random() * 100000;
+                var waitTime = this.getTransactionGenerationTimeInterval.bind(this)();
                 var sourceWallet = Utils.getRandomElement(processingNode.knownWallets);
                 var targetAddress = Utils.getRandomElement(this.network.walletPool.getAllAddresses());
                 var amount = 1 + Math.floor(Math.random() * 10);
@@ -45,4 +43,15 @@ export class WaitingEventHandler extends EventHandler {
                 ];
         }
     }
+
+    getTransactionGenerationTimeInterval() {
+        return this.network.settings.minTransactionCreationInterval + Math.random() * 2 * (this.network.settings.avgTransactionCreationInterval - this.network.settings.minTransactionCreationInterval);
+    }
+
+    getPeersDiscoveryTimeInterval(processingNode) {
+        return processingNode.networkInterface.getLinksNumber() < this.network.settings.minLinksPerNode ?
+            15000 + Math.random() * 10000 :
+            300000 + Math.random() * 50000;
+    }
+
 }
