@@ -22,8 +22,11 @@ export class Network {
             minTransactionCreationInterval: 20000,
             avgTransactionCreationInterval: 100000,
 
+            initTokenAmountPerNode: 100,
             roundTime: 50000,
-            minersPerRound: 2
+            minersPerRound: 2,
+            maxTransactionsPerBlock: 10,
+            miningAward: 80
         }
     }
 

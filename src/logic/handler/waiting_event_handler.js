@@ -45,6 +45,7 @@ export class WaitingEventHandler extends EventHandler {
             case CyclicEventsName.MINERS_SELECTION:
                 var waitTime = this.network.settings.roundTime - (this.network.timer.currentTimestamp % this.network.settings.roundTime);
 
+                var nextProcessableEvents = [];
 
                 processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
                     var minersPerRound = this.network.settings.minersPerRound;
@@ -68,15 +69,20 @@ export class WaitingEventHandler extends EventHandler {
 
                     leadingBlock.miners = miners;
 
-                    var selfIndex = miners.indexOf(processingNode.knownWallets[0].publicKey); //TODO [0]
-                    if (selfIndex > -1) {
-                        console.log("I'm choosen");
-                    }
+                    var timeQuantum = this.network.settings.roundTime / minersPerRound;
+                    miners.forEach((miner, index) => {
+                        if (miner === processingNode.knownWallets[0].publicKey) {
+                            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(processingNode, "block_mining", index * timeQuantum, { leadingBlock, selectedAddress: processingNode.knownWallets[0].publicKey }));
+                        }
+                    });
                 })
 
                 return [
+                    ...nextProcessableEvents,
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.MINERS_SELECTION, waitTime)
                 ];
+            case "block_mining":
+                return [this.eventFactory.createBlockCreatingEvent(processingNode, processedEvent.additionalData.leadingBlock, processedEvent.additionalData.selectedAddress)];
         }
     }
 

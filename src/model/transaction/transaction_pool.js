@@ -10,4 +10,8 @@ export class TransactionPool {
     put(transaction) {
         this.transactions.push(transaction);
     }
+
+    pick(transactionsNumber = 1) {
+        return this.transactions.splice(0, transactionsNumber);
+    }
 }

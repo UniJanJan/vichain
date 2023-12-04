@@ -14,7 +14,6 @@ export class BlockchainInstallingEventHandler extends EventHandler {
     handle(processingNetwork, processedEvent) {
         // var nextProcessableEvents = [];
         // var initTokenAmount = 1000;
-        var initTokenAmountPerNode = 100;
         var burnAddress = processingNetwork.walletPool.getBurnAddress();
         // var burntMap = new DiscreteIntervalMap();
         var transactions = [];
@@ -23,7 +22,7 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             var newWallet = processingNetwork.walletPool.addRandomWallet();
             node.knownWallets.push(newWallet);
 
-            var incomeTransaction = new Transaction(new TransactionBody(null, newWallet.publicKey, initTokenAmountPerNode + 1), null);
+            var incomeTransaction = new Transaction(new TransactionBody(null, newWallet.publicKey, processingNetwork.settings.initTokenAmountPerNode + 1), null);
             transactions.push(incomeTransaction);
 
             var burnTransaction = new Transaction(new TransactionBody(newWallet.publicKey, burnAddress, 1), null);

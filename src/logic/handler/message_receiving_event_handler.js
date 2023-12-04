@@ -1,5 +1,6 @@
 import { LinkStatus } from "../../model/entity/link.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
+import { BlockMessage } from "../../model/message/block_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
 import { RejectMessage } from "../../model/message/reject_message.js";
 import { TrxMessage } from "../../model/message/trx_message.js";
@@ -60,6 +61,8 @@ export class MessageReceivingEventHandler extends EventHandler {
             return [this.eventFactory.createTransactionVerifyingEvent(processingNode, event.message.transaction)];
         } else if (event.message instanceof GetAddrMessage) {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new AddrMessage(processingNode.networkInterface.getAllLinkableNodes()))];
+        } else if (event.message instanceof BlockMessage) {
+            return [this.eventFactory.createBlockVerifyingEvent(processingNode, event.message.block)];
         }
     }
 }

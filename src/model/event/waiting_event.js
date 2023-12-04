@@ -8,10 +8,11 @@ export const CyclicEventsName = {
 }
 
 export class WaitingEvent extends Event {
-    constructor(name, timeInterval) {
+    constructor(name, timeInterval, additionalData) {
         super(timeInterval);
         this.name = name;
         this.loadSize = 0;
+        this.additionalData = additionalData;
     }
 
     draw(graphics) {

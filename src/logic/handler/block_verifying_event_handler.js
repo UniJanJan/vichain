@@ -6,7 +6,7 @@ export class BlockVerifyingEventHandler extends EventHandler {
         super(network, eventFactory);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent) { //TODO
         if (this.isBlockValid(processedEvent.block)) {
             var burnAddress = this.network.walletPool.getBurnAddress();
             var burnMap = new DiscreteIntervalMap();
