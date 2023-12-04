@@ -14,6 +14,7 @@ export class NetworkManager {
 
         // this.nodePositionsMap = {};
         this.settings = {
+            isRunning: true,
             events: {
                 'MessageSendingEvent': {
                     isVisible: true,
@@ -71,10 +72,12 @@ export class NetworkManager {
         this.selectedNode = null;
     }
 
-    update(tFrame = 0) { // TODO
-        var elapsedTime = this.network.timer.update(tFrame);
-        this.network.update(elapsedTime);
-        this.eventManager.update(elapsedTime);
+    update(tFrame = 0) { // TODO maybe
+        var elapsedTime = this.network.timer.update(tFrame, this.settings.isRunning);
+        if (this.settings.isRunning) {
+            this.network.update(elapsedTime);
+            this.eventManager.update(elapsedTime);
+        }
     }
 
     draw(graphics) { //TODO

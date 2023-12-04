@@ -14,4 +14,8 @@ export class Utils {
         return array[Math.floor(Math.random() * array.length)];
     }
 
+    static evaluate(valueOrFunction, ...args) {
+        return valueOrFunction instanceof Function ? valueOrFunction(...args) : valueOrFunction;
+    }
+
 }

@@ -64,7 +64,9 @@
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
                                         {{translateEventClassName(event)}} ({{ event.message ?
-                                        event.message.constructor.name : '' }})</li>
+                                        event.message.constructor.name : '' }})
+                                        <progress :value="event.progress" :max="event.duration"></progress>
+                                    </li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -131,11 +133,11 @@
                         Welcome to Vichain!
                     </h3>
                     <div class="mt-4 mb-4">
-                        <h5 class="mb-0">
+                        <h6 class="mb-0">
                             <button type="button" class="btn btn-info disabled btn-sm">Left click</button> with <button
                                 type="button" class="btn btn-info disabled btn-sm">Ctrl</button> to create new
                             node
-                        </h5>
+                        </h6>
                         <div>
                             or
                         </div>
@@ -145,22 +147,27 @@
                         </div>
                     </div>
 
-                    <h5 class="mt-4 mb-4">
+                    <h6 class="mt-4 mb-4">
                         <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node with
                         <button type="button" class="btn btn-info disabled btn-sm">Shift</button> holded and drag to
                         another node to create link between the nodes manually (links are created also automatically)
-                    </h5>
+                    </h6>
 
-                    <h5 class="mt-4 mb-4">
+                    <h6 class="mt-4 mb-4">
                         <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node to
                         select it
-                    </h5>
+                    </h6>
 
-                    <h5 class="mt-4 mb-4">
+                    <h6 class="mt-4 mb-4">
                         Hold <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node
                         and
                         drag to move it
-                    </h5>
+                    </h6>
+
+                    <h6 class="mt-4 mb-4">
+                        Press <button type="button" class="btn btn-info disabled btn-sm">Space</button> to (un)pause
+                        the simulation
+                    </h6>
                 </div>
 
             </div>
