@@ -72,6 +72,10 @@ export class NetworkManager {
         this.selectedNode = null;
     }
 
+    installBlockchain() {
+        this.eventManager.enqueueExecution(this.eventFactory.createBlockchainInstallingEvent(this.network, this.network.nodes));
+    }
+
     update(tFrame = 0) { // TODO maybe
         var elapsedTime = this.network.timer.update(tFrame, this.settings.isRunning);
         if (this.settings.isRunning) {

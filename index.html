@@ -28,7 +28,7 @@
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                             <button class="nav-link active" id="nav-events-tab" data-bs-toggle="tab"
-                                data-bs-target="#nav-events" type="button" role="tab" aria-controls="nav-home"
+                                data-bs-target="#nav-events" type="button" role="tab" aria-controls="nav-events"
                                 aria-selected="true">Events</button>
                             <button class="nav-link" id="nav-mempool-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-mempool" type="button" role="tab" aria-controls="nav-mempool"
@@ -120,7 +120,39 @@
                         </div>
                         <div class="tab-pane fade" id="nav-blockchain" role="tabpanel"
                             aria-labelledby="nav-blockchain-tab">
-                            ...</div>
+
+                            <div v-if="leadingBlocks.length > 0">
+                                <!-- TODO: leadingBlocks[0] -->
+                                <h6>
+                                    Block {{leadingBlocks[0].blockBody.height}}
+                                </h6>
+                                <div style="text-overflow: ellipsis; overflow: hidden">
+                                    Hash: {{leadingBlocks[0].blockHash.toString()}}
+                                </div>
+                                <ul class="list-group" v-for="transaction in leadingBlocks[0].blockBody.transactions">
+                                    <li class="list-group-item"
+                                        style="font-size: small; padding: 0; background-color: chartreuse;">
+                                        <div v-if="transaction.transactionBody.sourceAddress">
+                                            {{ transaction.transactionBody.amount }} token(s) transfer from
+                                            {{ transaction.transactionBody.sourceAddress.toString().slice(0,8) }}... to
+                                            {{ transaction.transactionBody.targetAddress.toString().slice(0,8) }}...
+                                        </div>
+                                        <div v-else>
+                                            {{ transaction.transactionBody.amount }} token(s) generation for
+                                            {{ transaction.transactionBody.targetAddress.toString().slice(0,8) }}...
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-else>
+                                <ul class="list-group">
+                                    <li class="list-group-item" style="font-size: small; padding: 0;">Blockchain not
+                                        installed yet
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
                     </div>
 
 
@@ -133,45 +165,84 @@
                     </div> -->
                 </div>
                 <div v-else>
-                    <h3 class="mt-4 mb-5">
+                    <h3 class="mt-4 mb-4">
                         Welcome to Vichain!
                     </h3>
-                    <div class="mt-4 mb-4">
-                        <h6 class="mb-0">
-                            <button type="button" class="btn btn-info disabled btn-sm">Left click</button> with <button
-                                type="button" class="btn btn-info disabled btn-sm">Ctrl</button> to create new
-                            node
-                        </h6>
-                        <div>
-                            or
+
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-start-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-start" type="button" role="tab" aria-controls="nav-home"
+                                aria-selected="true">Start</button>
+                            <button class="nav-link" id="nav-blockchain-overview-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-blockchain-overview" type="button" role="tab"
+                                aria-controls="nav-blockchain-overview" aria-selected="false">Blockchain</button>
                         </div>
-                        <div>
-                            <button type="button" class="btn btn-primary btn-sm" @click="createRandomNode">Create random
-                                node</button>
+                    </nav>
+
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active overflow-scroll" style="max-height: fit-content;"
+                            id="nav-start" role="tabpanel" aria-labelledby="nav-start-tab">
+
+                            <div class="mt-4 mb-3">
+                                <h6 class="mb-0">
+                                    <button type="button" class="btn btn-info disabled btn-sm">Left click</button> with
+                                    <button type="button" class="btn btn-info disabled btn-sm">Ctrl</button> to create
+                                    new
+                                    node
+                                </h6>
+                                <div>
+                                    or
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        @click="createRandomNode">Create random
+                                        node</button>
+                                </div>
+                            </div>
+
+                            <h6 class="mt-4 mb-3">
+                                <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node
+                                with
+                                <button type="button" class="btn btn-info disabled btn-sm">Shift</button> holded and
+                                drag to
+                                another node to create link between the nodes manually (links are created also
+                                automatically)
+                            </h6>
+
+                            <h6 class="mt-4 mb-3">
+                                <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node
+                                to
+                                select it
+                            </h6>
+
+                            <h6 class="mt-4 mb-3">
+                                Hold <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a
+                                node
+                                and
+                                drag to move it
+                            </h6>
+
+                            <h6 class="mt-4 mb-3">
+                                Press <button type="button" class="btn btn-info disabled btn-sm">Space</button> to
+                                (un)pause
+                                the simulation
+                            </h6>
+
+                            <h6 class="mt-4 mb-3">
+                                And finally <button type="button" class="btn btn-primary btn-sm"
+                                    @click="installBlockchain">Install Proof-of-Burn
+                                    blockchain on created nodes</button>
+                            </h6>
+                        </div>
+
+                        <div class="tab-pane fade" id="nav-blockchain-overview" role="tabpanel"
+                            aria-labelledby="nav-blockchain-overview-tab">
+                            <button type="button" class="btn btn-primary btn-sm" @click="installBlockchain">Install
+                                Proof-of-Burn
+                                blockchain on created nodes</button>
                         </div>
                     </div>
-
-                    <h6 class="mt-4 mb-4">
-                        <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node with
-                        <button type="button" class="btn btn-info disabled btn-sm">Shift</button> holded and drag to
-                        another node to create link between the nodes manually (links are created also automatically)
-                    </h6>
-
-                    <h6 class="mt-4 mb-4">
-                        <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node to
-                        select it
-                    </h6>
-
-                    <h6 class="mt-4 mb-4">
-                        Hold <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node
-                        and
-                        drag to move it
-                    </h6>
-
-                    <h6 class="mt-4 mb-4">
-                        Press <button type="button" class="btn btn-info disabled btn-sm">Space</button> to (un)pause
-                        the simulation
-                    </h6>
                 </div>
 
             </div>
