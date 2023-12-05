@@ -14,7 +14,7 @@ export class NetworkManager {
 
         // this.nodePositionsMap = {};
         this.settings = {
-            isRunning: true,
+            isRunning: false,
             events: {
                 'MessageSendingEvent': {
                     isVisible: true,
@@ -50,10 +50,12 @@ export class NetworkManager {
 
     addNode(x, y) {
         this.eventManager.enqueueExecution(this.eventFactory.createNodeCreatingEvent(this.network, x, y));
+        this.settings.isRunning = true;
     }
 
     addLink(initiatingNode, targetNode) {
         this.eventManager.enqueueExecution(this.eventFactory.createLinkCreatingEvent(this.network, initiatingNode, targetNode));
+        this.settings.isRunning = true;
     }
 
     getNode(x, y) {

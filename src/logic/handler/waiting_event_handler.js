@@ -43,7 +43,7 @@ export class WaitingEventHandler extends EventHandler {
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
                 ];
             case CyclicEventsName.MINERS_SELECTION:
-                var waitTime = this.network.settings.roundTime - (this.network.timer.currentTimestamp % this.network.settings.roundTime);
+                var waitTime = this.network.settings.roundTime - (this.network.timer.currentTimestamp % this.network.settings.roundTime) + 1000;
 
                 var nextProcessableEvents = [];
 
@@ -58,7 +58,9 @@ export class WaitingEventHandler extends EventHandler {
 
                     var seedInputBlocks = lastBlocks.slice(0, minersPerRound);
 
-                    var seed = seedInputBlocks.map(block => parseInt(block.blockHash.toString()[1], 16) % 2).join('') + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height; // maybe timestamp should be added here
+                    var seed = seedInputBlocks.map(block => parseInt(block.blockHash.toString()[1], 16) % 2).join('')
+                        + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height
+                        + Math.floor(this.network.timer.currentTimestamp / this.network.settings.roundTime);
 
                     var miners = [...Array(minersPerRound).keys()]
                         .map((_, index) => CryptoJS.SHA256(seed + index).toString())
