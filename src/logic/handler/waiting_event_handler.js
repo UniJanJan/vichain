@@ -62,8 +62,8 @@ export class WaitingEventHandler extends EventHandler {
 
                     var miners = [...Array(minersPerRound).keys()]
                         .map((_, index) => CryptoJS.SHA256(seed + index).toString())
-                        .map(RSA.encode)
-                        .map(number => number % leadingBlock.burnMap.summedInvervalsSize)
+                        .map(hash => bigInt(hash, 16))
+                        .map(number => number.mod(leadingBlock.burnMap.summedInvervalsSize))
                         .map(leadingBlock.burnMap.get.bind(leadingBlock.burnMap))
                         .map(Vue.toRaw);
 
