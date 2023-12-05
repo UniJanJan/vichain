@@ -50,9 +50,9 @@ export class WaitingEventHandler extends EventHandler {
                 processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
                     var minersPerRound = this.network.settings.minersPerRound;
                     var lastBlocks = [];
-                    var currentBlock = leadingBlock.block;
+                    var currentBlock = leadingBlock;
                     while (lastBlocks.length < 2 * minersPerRound && currentBlock !== null) {
-                        lastBlocks.unshift(currentBlock);
+                        lastBlocks.unshift(currentBlock.block);
                         currentBlock = currentBlock.previousBlock;
                     }
 

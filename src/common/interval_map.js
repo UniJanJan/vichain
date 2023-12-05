@@ -1,7 +1,12 @@
 export class DiscreteIntervalMap {
-    constructor() {
-        this.intervals = [];
-        this.summedInvervalsSize = 0;
+    constructor(discreteIntervalMap) {
+        if (discreteIntervalMap) {
+            this.intervals = [...discreteIntervalMap.intervals];
+            this.summedInvervalsSize = discreteIntervalMap.summedInvervalsSize;
+        } else {
+            this.intervals = [];
+            this.summedInvervalsSize = 0;
+        }
     }
 
     /* intervalSize should be natural number */
