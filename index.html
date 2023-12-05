@@ -106,8 +106,8 @@
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
                                         {{ transaction.transactionBody.amount }} from
-                                        {{ transaction.transactionBody.sourceAddress.toString().slice(0,8) }}... to
-                                        {{ transaction.transactionBody.targetAddress.toString().slice(0,8) }}...</li>
+                                        0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}... to
+                                        0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...</li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -134,12 +134,12 @@
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
                                         <div v-if="transaction.transactionBody.sourceAddress">
                                             {{ transaction.transactionBody.amount }} token(s) transfer from
-                                            {{ transaction.transactionBody.sourceAddress.toString().slice(0,8) }}... to
-                                            {{ transaction.transactionBody.targetAddress.toString().slice(0,8) }}...
+                                            0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}... to
+                                            0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...
                                         </div>
                                         <div v-else>
                                             {{ transaction.transactionBody.amount }} token(s) generation for
-                                            {{ transaction.transactionBody.targetAddress.toString().slice(0,8) }}...
+                                            0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...
                                         </div>
                                     </li>
                                 </ul>
