@@ -1,7 +1,8 @@
 export class Block {
-    constructor(blockBody, blockHash, previousBlock) {
+    constructor(blockBody, blockHash) {
         this.blockBody = blockBody;
         this.blockHash = blockHash;
-        this.previousBlock = previousBlock;
+
+        Object.freeze(this);
     }
 }

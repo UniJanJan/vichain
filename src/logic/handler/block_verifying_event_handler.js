@@ -1,4 +1,3 @@
-import { DiscreteIntervalMap } from "../../common/interval_map.js";
 import { EventHandler } from "./event_handler.js";
 
 export class BlockVerifyingEventHandler extends EventHandler {
@@ -7,19 +6,27 @@ export class BlockVerifyingEventHandler extends EventHandler {
     }
 
     handle(processingNode, processedEvent) { //TODO
-        if (this.isBlockValid(processedEvent.block)) {
+        if (processingNode.blockchain.getBlockByHashAndHeight(processedEvent.block.blockHash, processedEvent.block.blockBody.height) === null
+            && this.isBlockValid(processedEvent.block)) {
+            // processingNode.blockchain.getBlockByHashAndHeight(processedEvent.block.blockHash, processedEvent.block.blockBody.height - 1);
+
             var burnAddress = this.network.walletPool.getBurnAddress();
-            var burnMap = new DiscreteIntervalMap();
+            processingNode.blockchain.appendBlock(processedEvent.block, burnAddress);
 
             processedEvent.block.blockBody.transactions.forEach(transaction => {
-                if (transaction.transactionBody.targetAddress.equals(burnAddress)) {
-                    burnMap.push(transaction.transactionBody.amount, transaction.transactionBody.sourceAddress);
+                if (processingNode.transactionPool.contains(transaction)) {
+                    processingNode.transactionPool.remove(transaction);
                 }
             });
 
-            processingNode.blockchain.appendBlock(processedEvent.block, burnMap);
+            if (processedEvent.block.blockBody.height === 0) {
+                return [];
+            } else {
+                return [
+                    this.eventFactory.createBlockBroadcastEvent(processingNode, processedEvent.block)
+                ];
+            }
 
-            return []; // TODO
         } else {
             return [];
         }

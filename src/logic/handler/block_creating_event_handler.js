@@ -11,7 +11,9 @@ export class BlockCreatingEventHandler extends EventHandler {
     }
 
     handle(processingNode, processedEvent) {
-        var leadingBlockIndex = processingNode.blockchain.leadingBlocks.indexOf(processedEvent.leadingBlock);
+        var currentlyLeadingBlock = processingNode.blockchain.getBlockByHashAndHeight(processedEvent.leadingBlock.block.blockHash, processedEvent.leadingBlock.block.blockBody.height).leadingBlock; // TODO currentlyLeading probably has been changed because of other miners
+        // var leadingBlockIndex = processingNode.blockchain.leadingBlocks.indexOf(processedEvent.leadingBlock);
+        var leadingBlockIndex = processingNode.blockchain.leadingBlocks.indexOf(currentlyLeadingBlock);
         if (leadingBlockIndex === -1) {
             throw new Error('Leading block not found in blockchain of ' + processingNode);
         }
@@ -24,17 +26,13 @@ export class BlockCreatingEventHandler extends EventHandler {
         transactions.push(new Transaction(awardTransactionBody, signature));
 
         var newBlockBody = new BlockBody(leadingBlock.block.blockBody.height + 1, leadingBlock.block.blockHash, transactions);
-        var newBlock = new Block(newBlockBody, CryptoJS.SHA256(JSON.stringify(newBlockBody)), leadingBlock.block);
-
-        leadingBlock.block = newBlock;
+        var newBlock = new Block(newBlockBody, CryptoJS.SHA256(JSON.stringify(newBlockBody)));
 
         var burnAddress = this.network.walletPool.getBurnAddress();
-        transactions.forEach(transaction => {
-            if (transaction.transactionBody.targetAddress.equals(burnAddress)) {
-                leadingBlock.burnMap.push(transaction.transactionBody.amount, transaction.transactionBody.sourceAddress);
-            }
-        });
+        processingNode.blockchain.appendBlock(newBlock, burnAddress);
 
-        return [this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock)];
+        return [
+            this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock)
+        ];
     }
 }

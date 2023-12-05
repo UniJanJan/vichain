@@ -3,5 +3,7 @@ export class BlockBody {
         this.height = height;
         this.previousBlockHash = previousBlockHash;
         this.transactions = transactions;
+
+        Object.freeze(this);
     }
 }

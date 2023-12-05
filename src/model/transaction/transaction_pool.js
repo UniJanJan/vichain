@@ -11,6 +11,10 @@ export class TransactionPool {
         this.transactions.push(transaction);
     }
 
+    remove(transaction) {
+        this.transactions.splice(this.transactions.indexOf(transaction), 1);
+    }
+
     pick(transactionsNumber = 1) {
         return this.transactions.splice(0, transactionsNumber);
     }

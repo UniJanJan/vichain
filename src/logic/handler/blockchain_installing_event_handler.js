@@ -1,4 +1,3 @@
-import { DiscreteIntervalMap } from "../../common/interval_map.js";
 import { Block } from "../../model/blockchain/block.js";
 import { BlockBody } from "../../model/blockchain/block_body.js";
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
@@ -29,20 +28,8 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             transactions.push(burnTransaction);
         });
 
-        // transactions.forEach(transaction => {
-        //     if (transaction.transactionBody.targetAddress.equals(burnAddress)) {
-        //         burntMap.push(transaction.transactionBody.amount, transaction.transactionBody.sourceAddress);
-        //     }
-        // });
-
         var genesisBlockBody = new BlockBody(0, null, transactions);
         var genesisBlock = new Block(genesisBlockBody, CryptoJS.SHA256(JSON.stringify(genesisBlockBody)), null);
-
-        // processedEvent.nodes.forEach(node => {
-        //     node.blockchain.appendBlock(genesisBlock);
-        //     nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000));
-        // });
-        // return nextProcessableEvents;
 
 
         return processedEvent.nodes.flatMap(node => [
