@@ -11,10 +11,11 @@ export class BlockchainInstallingEventHandler extends EventHandler {
     }
 
     handle(processingNetwork, processedEvent) {
-        // var nextProcessableEvents = [];
-        // var initTokenAmount = 1000;
+        if (this.network.settings.isBlockchainInstalled) {
+            throw new Error("Blockchain has been installed yet!");
+        }
+
         var burnAddress = processingNetwork.walletPool.getBurnAddress();
-        // var burntMap = new DiscreteIntervalMap();
         var transactions = [];
 
         processedEvent.nodes.forEach(node => {
@@ -31,9 +32,12 @@ export class BlockchainInstallingEventHandler extends EventHandler {
         var genesisBlockBody = new BlockBody(0, null, transactions);
         var genesisBlock = new Block(genesisBlockBody, CryptoJS.SHA256(JSON.stringify(genesisBlockBody)), null);
 
+        this.network.settings.isBlockchainInstalled = true;
+        this.network.settings.genesisBlock = genesisBlock;
 
         return processedEvent.nodes.flatMap(node => [
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000),
+            this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0),
             this.eventFactory.createBlockVerifyingEvent(node, genesisBlock)
         ]);

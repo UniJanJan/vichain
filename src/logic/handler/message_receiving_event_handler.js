@@ -1,6 +1,8 @@
 import { LinkStatus } from "../../model/entity/link.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
 import { BlockMessage } from "../../model/message/block_message.js";
+import { GetTransactionsMessage } from "../../model/message/get_transactions_message.js";
+import { GetTransactionsResponseMessage } from "../../model/message/get_transactions_response_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
 import { RejectMessage } from "../../model/message/reject_message.js";
 import { TrxMessage } from "../../model/message/trx_message.js";
@@ -63,6 +65,15 @@ export class MessageReceivingEventHandler extends EventHandler {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new AddrMessage(processingNode.networkInterface.getAllLinkableNodes()))];
         } else if (event.message instanceof BlockMessage) {
             return [this.eventFactory.createBlockVerifyingEvent(processingNode, event.message.block)];
+        } else if (event.message instanceof GetTransactionsMessage) {
+            return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetTransactionsResponseMessage(processingNode.transactionPool.transactions))];
+        } else if (event.message instanceof GetTransactionsResponseMessage) {
+            event.message.transactions.forEach(transaction => {
+                if (!processingNode.transactionPool.contains(transaction)) {
+                    processingNode.transactionPool.put(transaction);
+                }
+            })
+            return [];
         }
     }
 }

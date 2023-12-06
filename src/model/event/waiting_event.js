@@ -3,6 +3,7 @@ import { Event } from "./event.js";
 export const CyclicEventsName = {
     SENDING_ADDRESS: 'addr',
     PEERS_DISCOVERY: 'peers_discovery',
+    TRANSACTIONS_DISCOVERY: 'transactions_discovery',
     TRANSACTION_GENERATION: 'transaction_generation',
     MINERS_SELECTION: 'miners_selection'
 }
