@@ -22,8 +22,20 @@ export class NodeCreatingEventHandler extends EventHandler {
             processingNetwork.addInformativeNode(node);
         }
 
-        return [
+        var nextProcessableEvents = [
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.PEERS_DISCOVERY, 1000)
         ];
+
+        if (processingNetwork.settings.isBlockchainInstalled) {
+            var newWallet = processingNetwork.walletPool.addRandomWallet();
+            node.knownWallets.push(newWallet);
+
+            nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(node, processingNetwork.settings.genesisBlock));
+            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0));
+            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0));
+            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000));
+        }
+
+        return nextProcessableEvents;
     }
 }

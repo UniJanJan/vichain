@@ -19,6 +19,10 @@ export class Network {
         this.settings = {
             minLinksPerNode: 3,
             maxLinksPerNode: 20,
+
+            isBlockchainInstalled: false,
+            genesisBlock: null,
+
             minTransactionCreationInterval: 20000,
             avgTransactionCreationInterval: 100000,
 

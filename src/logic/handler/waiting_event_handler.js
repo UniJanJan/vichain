@@ -2,6 +2,7 @@ import { Utils } from "../../common.js";
 import { RSA } from "../../common/rsa.js";
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
+import { GetTransactionsMessage } from "../../model/message/get_transactions_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
 import { EventHandler } from "./event_handler.js";
 
@@ -32,8 +33,23 @@ export class WaitingEventHandler extends EventHandler {
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.PEERS_DISCOVERY, waitTime)
                     ];
                 }
+            case CyclicEventsName.TRANSACTIONS_DISCOVERY:
+                // var waitTime = this.getTimeInterval(this.network.settings.minTransactionsDiscoveryInterval, this.network.settings.avgTransactionsDiscoveryInterval);
+
+                if (processingNode.transactionPool.transactions.length < 3) {
+                    return [
+                        this.eventFactory.createMessageBroadcastEvent(processingNode, new GetTransactionsMessage()),
+                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTIONS_DISCOVERY, 20000)
+                    ]
+                } else {
+                    return [
+                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTIONS_DISCOVERY, 10000)
+                    ]
+                }
+
             case CyclicEventsName.TRANSACTION_GENERATION:
-                var waitTime = this.getTransactionGenerationTimeInterval.bind(this)();
+                var waitTime = this.getTimeInterval(this.network.settings.minTransactionCreationInterval, this.network.settings.avgTransactionCreationInterval);
+
                 var sourceWallet = Utils.getRandomElement(processingNode.knownWallets);
                 var targetAddress = Utils.getRandomElement(this.network.walletPool.getAllAddresses().filter(address => !address.equals(sourceWallet.publicKey)));
                 var amount = 1 + Math.floor(Math.random() * 10);
@@ -88,8 +104,8 @@ export class WaitingEventHandler extends EventHandler {
         }
     }
 
-    getTransactionGenerationTimeInterval() {
-        return this.network.settings.minTransactionCreationInterval + Math.random() * 2 * (this.network.settings.avgTransactionCreationInterval - this.network.settings.minTransactionCreationInterval);
+    getTimeInterval(minInterval, avgInterval) {
+        return minInterval + Math.random() * 2 * (avgInterval - minInterval);
     }
 
     getPeersDiscoveryTimeInterval(processingNode) {
