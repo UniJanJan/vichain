@@ -107,7 +107,8 @@
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
                                         {{ transaction.transactionBody.amount }} from
                                         0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}... to
-                                        0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...</li>
+                                        0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...
+                                    </li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -129,12 +130,14 @@
                                 <div style="text-overflow: ellipsis; overflow: hidden">
                                     Hash: 0x{{leadingBlocks[0].block.blockHash.toString()}}
                                 </div>
-                                <ul class="list-group" v-for="transaction in leadingBlocks[0].block.blockBody.transactions">
+                                <ul class="list-group"
+                                    v-for="transaction in leadingBlocks[0].block.blockBody.transactions">
                                     <li class="list-group-item"
                                         style="font-size: small; padding: 0; background-color: chartreuse;">
                                         <div v-if="transaction.transactionBody.sourceAddress">
                                             {{ transaction.transactionBody.amount }} token(s) transfer from
-                                            0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}... to
+                                            0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}...
+                                            to
                                             0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...
                                         </div>
                                         <div v-else>
@@ -165,7 +168,7 @@
                     </div> -->
                 </div>
                 <div v-else>
-                    <h3 class="mt-4 mb-4">
+                    <h3 class="mt-2 mb-2">
                         Welcome to Vichain!
                     </h3>
 
@@ -186,65 +189,112 @@
                             aria-labelledby="nav-start-tab">
 
                             <h6 class="mt-3 mb-1" style="text-indent: 1rem; line-height: 1.8rem;">
-                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> with
-                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Ctrl</button> to create
-                                new node or <button type="button" class="btn btn-primary btn-sm" style="font-size: x-small; font-weight: bold;"
-                                    @click="createRandomNode">Create random
+                                <button type="button" class="btn btn-info disabled btn-sm"
+                                    style="font-size: x-small; font-weight: bold;">Left click</button> with
+                                <button type="button" class="btn btn-info disabled btn-sm"
+                                    style="font-size: x-small; font-weight: bold;">Ctrl</button> to create
+                                new node or <button type="button" class="btn btn-primary btn-sm"
+                                    style="font-size: x-small; font-weight: bold;" @click="createRandomNode">Create
+                                    random
                                     node</button>.
                             </h6>
 
-                            <hr class="mt-2 mb-2"/>
+                            <hr class="mt-2 mb-2" />
 
                             <h6 class="mb-1" style="text-indent: 1rem; line-height: 1.5rem;">
-                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> on a node
+                                <button type="button" class="btn btn-info disabled btn-sm"
+                                    style="font-size: x-small; font-weight: bold;">Left click</button> on a node
                                 with
-                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Shift</button> holded and
+                                <button type="button" class="btn btn-info disabled btn-sm"
+                                    style="font-size: x-small; font-weight: bold;">Shift</button> holded and
                                 drag to
                                 another node to create link between the nodes manually (links are created also
                                 automatically).
                             </h6>
 
-                            <hr class="mt-2 mb-2"/>
+                            <hr class="mt-2 mb-2" />
 
                             <h6 class="mb-1" style="text-indent: 1rem;">
-                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> on a node
+                                <button type="button" class="btn btn-info disabled btn-sm"
+                                    style="font-size: x-small; font-weight: bold;">Left click</button> on a node
                                 to
                                 select it.
                             </h6>
 
-                            <hr class="mt-2 mb-2"/>
+                            <hr class="mt-2 mb-2" />
 
                             <h6 class="mb-1" style="text-indent: 1rem;">
-                                Hold <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> on a
+                                Hold <button type="button" class="btn btn-info disabled btn-sm"
+                                    style="font-size: x-small; font-weight: bold;">Left click</button> on a
                                 node
                                 and
                                 drag to move it.
                             </h6>
 
-                            <hr class="mt-2 mb-2"/>
+                            <hr class="mt-2 mb-2" />
 
                             <h6 class="mb-1" style="text-indent: 1rem;">
-                                Press <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Space</button> to
+                                Press <button type="button" class="btn btn-info disabled btn-sm"
+                                    style="font-size: x-small; font-weight: bold;">Space</button> to
                                 (un)pause
                                 the simulation.
                             </h6>
 
-                            <hr class="mt-2 mb-2"/>
+                            <hr class="mt-2 mb-2" v-if="!networkManager.network.settings.isBlockchainInstalled"/>
 
-                            <h6 v-if="!networkManager.network.settings.isBlockchainInstalled" class="mb-1" style="text-indent: 1rem;">
+                            <h6 v-if="!networkManager.network.settings.isBlockchainInstalled" class="mb-1"
+                                style="text-indent: 1rem;">
                                 And finally go to Blockchain tab!
                             </h6>
                         </div>
 
                         <div class="tab-pane fade mt-3" id="nav-blockchain-overview" role="tabpanel"
                             aria-labelledby="nav-blockchain-overview-tab">
+                            <div class="form-floating mb-2">
+                                <select id="consensusSelect" class="form-select" aria-label="Consensus mechanism"
+                                    disabled>
+                                    <option selected>Proof-of-Burn</option>
+                                </select>
+                                <label for="consensusSelect">Consensus mechanism</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="initTokenAmountPerNodeInput" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.initTokenAmountPerNode"
+                                    :disabled="networkManager.network.settings.isBlockchainInstalled" />
+                                <label for="initTokenAmountPerNodeInput">Initial tokens amount per node</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="roundTime" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.roundTime"
+                                    :disabled="networkManager.network.settings.isBlockchainInstalled" />
+                                <label for="roundTimeInput">Mining round duration (ms)</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="minersPerRound" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.minersPerRound"
+                                    :disabled="networkManager.network.settings.isBlockchainInstalled" />
+                                <label for="minersPerRoundInput">Selected miners per round</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="miningAward" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.miningAward"
+                                    :disabled="networkManager.network.settings.isBlockchainInstalled" />
+                                <label for="miningAwardInput">Tokens award for mined block</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="maxTransactionsPerBlock" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.maxTransactionsPerBlock"
+                                    :disabled="networkManager.network.settings.isBlockchainInstalled" />
+                                <label for="maxTransactionsPerBlockInput">Maximum transactions per block</label>
+                            </div>
+
                             <button v-if="!networkManager.network.settings.isBlockchainInstalled"
                                 :disabled="networkManager.network.nodes.length === 0" type="button"
-                                class="btn btn-primary btn-sm" @click="installBlockchain">Install
-                                Proof-of-Burn
+                                class="btn btn-primary btn-sm" style="width: 100%" @click="installBlockchain">Install
                                 blockchain on created nodes</button>
-                            <span style="font-size: x-small; color: red; font-weight: bold;">To install blockchain You
-                                need to create at least one node!</span>
+                            <span style="font-size: x-small; color: red; font-weight: bold;"
+                                v-if="networkManager.network.nodes.length === 0">To install blockchain at least one node
+                                has to be created!</span>
                         </div>
                     </div>
                 </div>
