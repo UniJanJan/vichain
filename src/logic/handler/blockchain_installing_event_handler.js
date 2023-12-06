@@ -15,6 +15,10 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             throw new Error("Blockchain has been installed yet!");
         }
 
+        if (this.network.nodes.length === 0) {
+            throw new Error("Lack of nodes to install blockchain on!");
+        }
+
         var burnAddress = processingNetwork.walletPool.getBurnAddress();
         var transactions = [];
 
