@@ -181,66 +181,70 @@
                     </nav>
 
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active overflow-scroll" style="max-height: fit-content;"
-                            id="nav-start" role="tabpanel" aria-labelledby="nav-start-tab">
+                        <div class="tab-pane fade show active overflow-scroll"
+                            style="max-height: fit-content; text-align: left;" id="nav-start" role="tabpanel"
+                            aria-labelledby="nav-start-tab">
 
-                            <div class="mt-4 mb-3">
-                                <h6 class="mb-0">
-                                    <button type="button" class="btn btn-info disabled btn-sm">Left click</button> with
-                                    <button type="button" class="btn btn-info disabled btn-sm">Ctrl</button> to create
-                                    new
-                                    node
-                                </h6>
-                                <div>
-                                    or
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-primary btn-sm"
-                                        @click="createRandomNode">Create random
-                                        node</button>
-                                </div>
-                            </div>
+                            <h6 class="mt-3 mb-1" style="text-indent: 1rem; line-height: 1.8rem;">
+                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> with
+                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Ctrl</button> to create
+                                new node or <button type="button" class="btn btn-primary btn-sm" style="font-size: x-small; font-weight: bold;"
+                                    @click="createRandomNode">Create random
+                                    node</button>.
+                            </h6>
 
-                            <h6 class="mt-4 mb-3">
-                                <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node
+                            <hr class="mt-2 mb-2"/>
+
+                            <h6 class="mb-1" style="text-indent: 1rem; line-height: 1.5rem;">
+                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> on a node
                                 with
-                                <button type="button" class="btn btn-info disabled btn-sm">Shift</button> holded and
+                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Shift</button> holded and
                                 drag to
                                 another node to create link between the nodes manually (links are created also
-                                automatically)
+                                automatically).
                             </h6>
 
-                            <h6 class="mt-4 mb-3">
-                                <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a node
+                            <hr class="mt-2 mb-2"/>
+
+                            <h6 class="mb-1" style="text-indent: 1rem;">
+                                <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> on a node
                                 to
-                                select it
+                                select it.
                             </h6>
 
-                            <h6 class="mt-4 mb-3">
-                                Hold <button type="button" class="btn btn-info disabled btn-sm">Left click</button> on a
+                            <hr class="mt-2 mb-2"/>
+
+                            <h6 class="mb-1" style="text-indent: 1rem;">
+                                Hold <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Left click</button> on a
                                 node
                                 and
-                                drag to move it
+                                drag to move it.
                             </h6>
 
-                            <h6 class="mt-4 mb-3">
-                                Press <button type="button" class="btn btn-info disabled btn-sm">Space</button> to
+                            <hr class="mt-2 mb-2"/>
+
+                            <h6 class="mb-1" style="text-indent: 1rem;">
+                                Press <button type="button" class="btn btn-info disabled btn-sm" style="font-size: x-small; font-weight: bold;">Space</button> to
                                 (un)pause
-                                the simulation
+                                the simulation.
                             </h6>
 
-                            <h6 class="mt-4 mb-3">
-                                And finally <button type="button" class="btn btn-primary btn-sm"
-                                    @click="installBlockchain">Install Proof-of-Burn
-                                    blockchain on created nodes</button>
+                            <hr class="mt-2 mb-2"/>
+
+                            <h6 v-if="!networkManager.network.settings.isBlockchainInstalled" class="mb-1" style="text-indent: 1rem;">
+                                And finally go to Blockchain tab!
                             </h6>
                         </div>
 
-                        <div class="tab-pane fade" id="nav-blockchain-overview" role="tabpanel"
+                        <div class="tab-pane fade mt-3" id="nav-blockchain-overview" role="tabpanel"
                             aria-labelledby="nav-blockchain-overview-tab">
-                            <button type="button" class="btn btn-primary btn-sm" @click="installBlockchain">Install
+                            <button v-if="!networkManager.network.settings.isBlockchainInstalled"
+                                :disabled="networkManager.network.nodes.length === 0" type="button"
+                                class="btn btn-primary btn-sm" @click="installBlockchain">Install
                                 Proof-of-Burn
                                 blockchain on created nodes</button>
+                            <span style="font-size: x-small; color: red; font-weight: bold;">To install blockchain You
+                                need to create at least one node!</span>
                         </div>
                     </div>
                 </div>
