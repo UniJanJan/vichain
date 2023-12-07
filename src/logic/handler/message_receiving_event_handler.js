@@ -1,6 +1,8 @@
 import { LinkStatus } from "../../model/entity/link.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
 import { BlockMessage } from "../../model/message/block_message.js";
+import { GetBlocksMessage } from "../../model/message/get_blocks_message.js";
+import { GetBlocksResponseMessage } from "../../model/message/get_blocks_response_message.js";
 import { GetTransactionsMessage } from "../../model/message/get_transactions_message.js";
 import { GetTransactionsResponseMessage } from "../../model/message/get_transactions_response_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
@@ -73,6 +75,25 @@ export class MessageReceivingEventHandler extends EventHandler {
                     processingNode.transactionPool.put(transaction);
                 }
             })
+            return [];
+        } else if (event.message instanceof GetBlocksMessage) {
+            return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.leadingBlocks))];
+        } else if (event.message instanceof GetBlocksResponseMessage) {
+            processingNode.blockchain.leadingBlocks = processingNode.blockchain.leadingBlocks.flatMap(currentlyLeadingBlock => {
+                return event.message.leadingBlocks.flatMap(potentialyNewLeadingBlock => {
+                    if (currentlyLeadingBlock.block.blockBody.height > potentialyNewLeadingBlock.block.blockBody.height) {
+                        return [currentlyLeadingBlock];
+                    }
+
+                    var currentBlock = currentlyLeadingBlock;
+                    while (currentlyLeadingBlock.block.blockBody.height < currentBlock.block.blockBody.height) {
+                        currentBlock = currentBlock.previousBlock;
+                    }
+
+                    return currentBlock.block === currentlyLeadingBlock.block ? [potentialyNewLeadingBlock] : [];
+                });
+            })
+            // .map(leadingBlock => clone); //TODO
             return [];
         }
     }

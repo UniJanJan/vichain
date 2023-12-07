@@ -40,10 +40,11 @@ export class BlockchainInstallingEventHandler extends EventHandler {
         this.network.settings.genesisBlock = genesisBlock;
 
         return processedEvent.nodes.flatMap(node => [
+            this.eventFactory.createBlockVerifyingEvent(node, genesisBlock),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0),
-            this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0),
-            this.eventFactory.createBlockVerifyingEvent(node, genesisBlock)
+            this.eventFactory.createWaitingEvent(node, CyclicEventsName.BLOCKS_DISCOVERY, 0),
+            this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0)
         ]);
     }
 }

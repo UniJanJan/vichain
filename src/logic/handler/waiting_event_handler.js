@@ -2,6 +2,7 @@ import { Utils } from "../../common.js";
 import { RSA } from "../../common/rsa.js";
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
+import { GetBlocksMessage } from "../../model/message/get_blocks_message.js";
 import { GetTransactionsMessage } from "../../model/message/get_transactions_message.js";
 import { GetAddrMessage } from "../../model/message/getaddr_message.js";
 import { EventHandler } from "./event_handler.js";
@@ -46,7 +47,17 @@ export class WaitingEventHandler extends EventHandler {
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTIONS_DISCOVERY, 10000)
                     ]
                 }
-
+            case CyclicEventsName.BLOCKS_DISCOVERY:
+                if (processingNode.blockchain.leadingBlocks.length > 0 && processingNode.blockchain.leadingBlocks[0].block.blockBody.height === 0) { // TODO
+                    return [
+                        this.eventFactory.createMessageBroadcastEvent(processingNode, new GetBlocksMessage()),
+                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.BLOCKS_DISCOVERY, 20000)
+                    ]
+                } else {
+                    return [
+                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.BLOCKS_DISCOVERY, 10000)
+                    ]
+                }
             case CyclicEventsName.TRANSACTION_GENERATION:
                 var waitTime = this.getTimeInterval(this.network.settings.minTransactionCreationInterval, this.network.settings.avgTransactionCreationInterval);
 

@@ -32,6 +32,7 @@ export class NodeCreatingEventHandler extends EventHandler {
 
             nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(node, processingNetwork.settings.genesisBlock));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0));
+            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.BLOCKS_DISCOVERY, 0));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000));
         }

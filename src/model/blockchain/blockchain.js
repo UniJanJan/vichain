@@ -19,7 +19,7 @@ export class Blockchain {
                     this.leadingBlocks.push(insertableBlock);
                 }
             } else {
-                throw new Error("Invalid block append attempt!", block);
+                // throw new Error("Invalid block append attempt!", block);
             }
         }
     }
