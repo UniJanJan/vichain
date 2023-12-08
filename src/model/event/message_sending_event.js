@@ -11,9 +11,9 @@ export class MessageSendingEvent extends Event {
     draw(graphics, settings) {
         const progressRatio = this.progress / this.duration;
         graphics.beginPath();
-        graphics.moveTo(this.nodeFrom.x, this.nodeFrom.y);
-        graphics.arc(this.nodeFrom.x, this.nodeFrom.y, this.nodeFrom.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * progressRatio, false);
-        graphics.fillStyle = settings.color;
-        graphics.fill();
+        graphics.arc(this.nodeFrom.x, this.nodeFrom.y, this.nodeFrom.radius + 4, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * progressRatio, false);
+        graphics.strokeStyle = settings.color;
+        graphics.lineWidth = 7;
+        graphics.stroke();
     }
 }

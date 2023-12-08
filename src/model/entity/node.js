@@ -63,11 +63,37 @@ export class Node {
     draw(graphics, settings) {
         graphics.beginPath();
         graphics.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-        graphics.fillStyle = this.isSelected ? 'yellow' : 'blue';
+        graphics.fillStyle = 'rgb(192, 192, 192)' // silver
         graphics.fill();
-        graphics.strokeStyle = 'black';
-        graphics.lineWidth = 3;
+        graphics.strokeStyle = this.isSelected ? 'yellow' : 'black';
+        graphics.lineWidth = 5;
         graphics.stroke();
+
+        if (this.isSelected) {
+            graphics.beginPath();
+            graphics.arc(this.x, this.y, this.radius - 3, 0, 2 * Math.PI, false);
+            graphics.strokeStyle = 'black';
+            graphics.lineWidth = 2;
+            graphics.stroke();
+
+            graphics.beginPath();
+            graphics.arc(this.x, this.y, this.radius + 3, 0, 2 * Math.PI, false);
+            graphics.strokeStyle = 'black';
+            graphics.lineWidth = 2;
+            graphics.stroke();
+        }
+
+        var leadingBlocksNumber = this.blockchain.leadingBlocks.length;
+        if (leadingBlocksNumber > 0) {
+            var percent = 1 / leadingBlocksNumber;
+            this.blockchain.leadingBlocks.forEach((leadingBlock, index) => {
+                graphics.beginPath();
+                graphics.moveTo(this.x, this.y);
+                graphics.arc(this.x, this.y, this.radius - 2, -Math.PI / 2 + 2 * Math.PI * percent * index, -Math.PI / 2 + 2 * Math.PI * percent * (index + 1), false);
+                graphics.fillStyle = '#' + leadingBlock.block.blockHash.toString().slice(0, 6);
+                graphics.fill();
+            });
+        }
 
         this.events.processingEvents
             .filter(event => settings.events[event.constructor.name].isVisible)
