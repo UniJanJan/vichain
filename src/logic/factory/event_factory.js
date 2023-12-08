@@ -27,17 +27,17 @@ export class EventFactory {
         };
     }
 
-    createTransactionVerifyingEvent(processingNode, transaction) {
+    createTransactionVerifyingEvent(processingNode, transaction, informatorNode) {
         return {
             target: processingNode,
-            event: new TransactionVerifyingEvent(processingNode, transaction)
+            event: new TransactionVerifyingEvent(processingNode, transaction, informatorNode)
         };
     }
 
-    createMessagesSendingEvent(sourceNode, targetNodes, message) {
+    createMessagesSendingEvent(sourceNode, targetNodes, message, prioritized = false) {
         return {
             target: sourceNode,
-            event: new MessageSendingEvent(sourceNode, targetNodes, message)
+            event: new MessageSendingEvent(sourceNode, targetNodes, message).withPriority(prioritized)
         };
     }
 
@@ -45,12 +45,13 @@ export class EventFactory {
         return this.createMessagesSendingEvent(sourceNode, [targetNode], message);
     }
 
-    createTransactionBroadcastEvent(sourceNode, transaction) {
-        return this.createMessageBroadcastEvent(sourceNode, new TrxMessage(transaction));
+    createTransactionBroadcastEvent(sourceNode, transaction, excludedNodes = []) {
+        return this.createMessageBroadcastEvent(sourceNode, new TrxMessage(transaction), excludedNodes);
     }
 
-    createMessageBroadcastEvent(sourceNode, message) {
-        return this.createMessagesSendingEvent(sourceNode, sourceNode.networkInterface.getAllEstablishedLinkedNodes(), message); // TODO
+    createMessageBroadcastEvent(sourceNode, message, excludedNodes = [], prioritized) {
+        var targetNodes = sourceNode.networkInterface.getAllEstablishedLinkedNodes().filter(targetNode => !excludedNodes.includes(targetNode));
+        return this.createMessagesSendingEvent(sourceNode, targetNodes, message, prioritized);
     }
 
     createMessageTransmissionEvent(link, sourceNode, targetNode, message) {
@@ -63,7 +64,7 @@ export class EventFactory {
     createMessageReceivingEvent(sourceNode, targetNode, message) {
         return {
             target: targetNode,
-            event: new MessageReceivingEvent(sourceNode, targetNode, message)
+            event: new MessageReceivingEvent(sourceNode, targetNode, message).withPriority(message.prioritized)
         };
     }
 
@@ -151,22 +152,22 @@ export class EventFactory {
         };
     }
 
-    createBlockVerifyingEvent(processingNode, block) {
+    createBlockVerifyingEvent(processingNode, block, informatorNode) {
         return {
             target: processingNode,
-            event: new BlockVerifyingEvent(processingNode, block)
+            event: new BlockVerifyingEvent(processingNode, block, informatorNode).withPriority()
         };
     }
 
     createBlockCreatingEvent(processingNode, leadingBlock, selectedAddress) {
         return {
             target: processingNode,
-            event: new BlockCreatingEvent(processingNode, leadingBlock, selectedAddress)
+            event: new BlockCreatingEvent(processingNode, leadingBlock, selectedAddress).withPriority()
         };
     }
 
-    createBlockBroadcastEvent(sourceNode, block) {
-        return this.createMessageBroadcastEvent(sourceNode, new BlockMessage(block));
+    createBlockBroadcastEvent(sourceNode, block, excludedNodes = []) {
+        return this.createMessageBroadcastEvent(sourceNode, new BlockMessage(block), excludedNodes, true);
     }
 
 }

@@ -11,7 +11,7 @@ export class TransactionVerifyingEventHandler extends EventHandler {
         if (!processingNode.transactionPool.contains(transaction) && this.isTransactionValid(transaction)) {
             processingNode.transactionPool.put(transaction);
             return [
-                this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction)
+                this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction, [processedEvent.informatorNode])
             ];
         } else {
             return [];

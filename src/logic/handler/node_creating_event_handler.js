@@ -30,7 +30,7 @@ export class NodeCreatingEventHandler extends EventHandler {
             var newWallet = processingNetwork.walletPool.addRandomWallet();
             node.knownWallets.push(newWallet);
 
-            nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(node, processingNetwork.settings.genesisBlock));
+            nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(node, processingNetwork.settings.genesisBlock, this.network.nodes));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.BLOCKS_DISCOVERY, 0));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0));

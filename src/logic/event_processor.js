@@ -29,7 +29,7 @@ export class EventProcessor {
     enqueueExecution(event) {
         if (event.status === EventStatus.PROCESSABLE) {
             event.enqueuingTimestamp = this.timer.currentTimestamp;
-            if (event.loadSize === 0) {
+            if (event.loadSize === 0 || event.prioritized) {
                 this.processableEvents.unshift(event);
             } else {
                 this.processableEvents.push(event);
