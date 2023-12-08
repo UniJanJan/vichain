@@ -3,7 +3,7 @@ import { Event } from "./event.js";
 export class MessageTransmissionEvent extends Event {
     constructor(nodeFrom, nodeTo, message) {
         var link = nodeFrom.networkInterface.getLinkWith(nodeTo);
-        super(link.distance * 15); // TODO
+        super(link.distance * 10); // TODO
         this.link = link;
         this.nodeFrom = nodeFrom;
         this.nodeTo = nodeTo;

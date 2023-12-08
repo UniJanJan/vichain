@@ -2,7 +2,7 @@ import { Event } from "./event.js";
 
 export class BlockVerifyingEvent extends Event {
     constructor(processingNode, block) {
-        super(200);
+        super(1000);
         this.processingNode = processingNode;
         this.block = block;
     }

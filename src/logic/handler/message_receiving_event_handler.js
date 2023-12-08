@@ -79,21 +79,24 @@ export class MessageReceivingEventHandler extends EventHandler {
         } else if (event.message instanceof GetBlocksMessage) {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.leadingBlocks))];
         } else if (event.message instanceof GetBlocksResponseMessage) {
-            processingNode.blockchain.leadingBlocks = processingNode.blockchain.leadingBlocks.flatMap(currentlyLeadingBlock => {
-                return event.message.leadingBlocks.flatMap(potentialyNewLeadingBlock => {
-                    if (currentlyLeadingBlock.block.blockBody.height > potentialyNewLeadingBlock.block.blockBody.height) {
-                        return [currentlyLeadingBlock];
-                    }
+            // TODO
+            if (processingNode.blockchain.leadingBlocks.leadingBlocks === 1 && processingNode.blockchain.leadingBlocks[0].block.blockBody.height === 0) {
+                processingNode.blockchain.leadingBlocks = processingNode.blockchain.leadingBlocks.flatMap(currentlyLeadingBlock => {
+                    return event.message.leadingBlocks.flatMap(potentialyNewLeadingBlock => {
+                        if (currentlyLeadingBlock.block.blockBody.height > potentialyNewLeadingBlock.block.blockBody.height) {
+                            return [currentlyLeadingBlock];
+                        }
 
-                    var currentBlock = currentlyLeadingBlock;
-                    while (currentlyLeadingBlock.block.blockBody.height < currentBlock.block.blockBody.height) {
-                        currentBlock = currentBlock.previousBlock;
-                    }
+                        var currentBlock = currentlyLeadingBlock;
+                        while (currentlyLeadingBlock.block.blockBody.height < currentBlock.block.blockBody.height) {
+                            currentBlock = currentBlock.previousBlock;
+                        }
 
-                    return currentBlock.block === currentlyLeadingBlock.block ? [potentialyNewLeadingBlock] : [];
-                });
-            })
-            // .map(leadingBlock => clone); //TODO
+                        return currentBlock.block === currentlyLeadingBlock.block ? [potentialyNewLeadingBlock] : [];
+                    });
+                })
+                // .map(leadingBlock => clone); //TODO
+            }
             return [];
         }
     }
