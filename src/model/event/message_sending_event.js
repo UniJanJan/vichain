@@ -2,7 +2,7 @@ import { Event } from "./event.js";
 
 export class MessageSendingEvent extends Event {
     constructor(nodeFrom, nodesTo, message) {
-        super(500); // TODO
+        super(250); // TODO
         this.nodeFrom = nodeFrom;
         this.nodesTo = nodesTo;
         this.message = message;

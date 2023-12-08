@@ -11,7 +11,14 @@ export class BlockCreatingEventHandler extends EventHandler {
     }
 
     handle(processingNode, processedEvent) {
-        var currentlyLeadingBlock = processingNode.blockchain.getBlockByHashAndHeight(processedEvent.leadingBlock.block.blockHash, processedEvent.leadingBlock.block.blockBody.height).leadingBlock; // TODO currentlyLeading probably has been changed because of other miners
+        // TODO currentlyLeading probably has been changed because of other miners
+        var currentlyLeadingBlock = processingNode.blockchain.getBlockByHashAndHeight(processedEvent.leadingBlock.block.blockHash, processedEvent.leadingBlock.block.blockBody.height);
+        if (currentlyLeadingBlock !== null) {
+            currentlyLeadingBlock = currentlyLeadingBlock.leadingBlock;
+        } else {
+            // longer chain appeared
+            return [];
+        }
         // var leadingBlockIndex = processingNode.blockchain.leadingBlocks.indexOf(processedEvent.leadingBlock);
         var leadingBlockIndex = processingNode.blockchain.leadingBlocks.indexOf(currentlyLeadingBlock);
         if (leadingBlockIndex === -1) {

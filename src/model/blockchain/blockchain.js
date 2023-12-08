@@ -2,19 +2,28 @@ import { DiscreteIntervalMap } from "../../common/interval_map.js";
 
 export class Blockchain {
     constructor() {
-        this.leadingBlocks = []; //TODO
+        this.leadingBlocks = []; // Invariant: all leading blocks have the same height
     }
 
     appendBlock(block, burnAddress) { //TODO
         if (this.leadingBlocks.length === 0 && block.blockBody.height === 0) {
             var insertableGenesisBlock = new BlockWrapper(block, null, burnAddress);
             this.leadingBlocks.push(insertableGenesisBlock);
-        } else if (this.leadingBlocks.length > 0 && block.blockBody.height > 0) {
+        } else if (this.leadingBlocks.length > 0 && block.blockBody.height >= this.leadingBlocks[0].block.blockBody.height) {
             var jointBlock = this.getBlockByHashAndHeight(block.blockBody.previousBlockHash, block.blockBody.height - 1);
             if (jointBlock !== null) {
                 var insertableBlock = new BlockWrapper(block, jointBlock.block, burnAddress);
                 if (jointBlock.isLeadingBlock) {
-                    this.leadingBlocks.splice(this.leadingBlocks.indexOf(jointBlock.leadingBlock), 1, insertableBlock);
+                    // LONGEST-CHAIN RULE (NO HEIGHT DIFFERENCE ALLOWED)
+                    this.leadingBlocks = this.leadingBlocks.flatMap(leadingBlock => {
+                        if (leadingBlock === jointBlock.leadingBlock) {
+                            return [insertableBlock];
+                        } else if (leadingBlock.block.blockBody.height >= insertableBlock.block.blockBody.height) {
+                            return [leadingBlock];
+                        } else {
+                            return [];
+                        }
+                    });
                 } else {
                     this.leadingBlocks.push(insertableBlock);
                 }
