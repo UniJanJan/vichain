@@ -33,14 +33,14 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             transactions.push(burnTransaction);
         });
 
-        var genesisBlockBody = new BlockBody(0, null, transactions);
+        var genesisBlockBody = new BlockBody(0, null, transactions, this.network.timer.currentTimestamp);
         var genesisBlock = new Block(genesisBlockBody, CryptoJS.SHA256(JSON.stringify(genesisBlockBody)), null);
 
         this.network.settings.isBlockchainInstalled = true;
         this.network.settings.genesisBlock = genesisBlock;
 
         return processedEvent.nodes.flatMap(node => [
-            this.eventFactory.createBlockVerifyingEvent(node, genesisBlock),
+            this.eventFactory.createBlockVerifyingEvent(node, genesisBlock, this.network.nodes),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.BLOCKS_DISCOVERY, 0),
