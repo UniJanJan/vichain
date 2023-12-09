@@ -5,6 +5,10 @@ export class Blockchain {
         this.leadingBlocks = []; // Invariant: all leading blocks have the same height
     }
 
+    getHeight() {
+        return this.leadingBlocks.length > 0 ? this.leadingBlocks[0].block.blockBody.height : -1;
+    }
+
     appendBlock(block, burnAddress) { //TODO
         if (this.leadingBlocks.length === 0 && block.blockBody.height === 0) {
             var insertableGenesisBlock = new BlockWrapper(block, null, burnAddress);
@@ -67,12 +71,14 @@ class BlockWrapper {
 
 
             if (sourceAddress) {
-                var inputBalance = this.accountMap.get(transaction.transactionBody.sourceAddress) || 0;
-                this.accountMap.set(sourceAddress, inputBalance - amount);
+                var inputBalance = this.accountMap.get(sourceAddress.toString(16)) || 0;
+                this.accountMap.set(sourceAddress.toString(16), inputBalance - amount);
             }
 
-            var outputBalance = this.accountMap.get(targetAddress) || 0;
-            this.accountMap.set(targetAddress, outputBalance + amount);
+            var outputBalance = this.accountMap.get(targetAddress.toString(16)) || 0;
+            this.accountMap.set(targetAddress.toString(16), outputBalance + amount);
         });
+
+        this.accountMap.delete(burnAddress.toString(16));
     }
 }
