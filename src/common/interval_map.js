@@ -3,9 +3,11 @@ export class DiscreteIntervalMap {
         if (discreteIntervalMap) {
             this.intervals = [...discreteIntervalMap.intervals];
             this.summedInvervalsSize = discreteIntervalMap.summedInvervalsSize;
+            this.summaryMap = new Map(discreteIntervalMap.summaryMap);
         } else {
             this.intervals = [];
             this.summedInvervalsSize = 0;
+            this.summaryMap = new Map();
         }
     }
 
@@ -13,6 +15,8 @@ export class DiscreteIntervalMap {
     push(intervalSize, object) {
         this.intervals.push(new DiscreteInterval(this.summedInvervalsSize, intervalSize, object));
         this.summedInvervalsSize += intervalSize;
+        var keySummedInvervalsSize = this.summaryMap.get(object) || 0;
+        this.summaryMap.set(object, keySummedInvervalsSize + intervalSize);
     }
 
     get(n) {
@@ -25,6 +29,10 @@ export class DiscreteIntervalMap {
                 return interval.object;
             }
         }
+    }
+
+    getObjectIntervalsSize(object) {
+        return this.summaryMap.get(object);
     }
 }
 
