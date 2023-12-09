@@ -104,7 +104,7 @@
                             <div v-if="pooledTransactions.length > 0">
                                 <ul class="list-group" v-for="transaction in pooledTransactions">
                                     <li class="list-group-item"
-                                        style="font-size: small; padding: 0; background-color: chartreuse;">
+                                        :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === transaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
                                         {{ transaction.transactionBody.amount }} from
                                         0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}... to
                                         0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...
@@ -139,7 +139,7 @@
                                             <ul class="list-group"
                                                 v-for="transaction in leadingBlock.block.blockBody.transactions">
                                                 <li class="list-group-item"
-                                                    style="font-size: small; padding: 0; background-color: chartreuse;">
+                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === transaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
                                                     <div v-if="transaction.transactionBody.sourceAddress">
                                                         {{ transaction.transactionBody.amount }} token(s) transfer from
                                                         0x{{
@@ -169,11 +169,18 @@
                                                     <tr>
                                                         <td scope="col">Address</td>
                                                         <td scope="col">Balance</td>
-                                                        <td scope="col">Burnt coins</td>
+                                                        <td scope="col">Burnt tokens</td>
                                                         <td scope="col">Mining chance</td>
                                                     </tr>
                                                 </thead>
                                                 <tbody style="font-size: small;">
+                                                    <tr>
+                                                        <td scope="col">All</td>
+                                                        <td scope="col">{{ leadingBlock.spendableTokensSupply }}</td>
+                                                        <td scope="col">{{ leadingBlock.burnMap.summedInvervalsSize }}
+                                                        </td>
+                                                        <td scope="col"></td>
+                                                    </tr>
                                                     <tr v-for="address in leadingBlock.accountMap.keys()">
                                                         <td>0x{{ address.slice(0,8) }}...</td>
                                                         <td>{{ leadingBlock.accountMap.get(address) }}
