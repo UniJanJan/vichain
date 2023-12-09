@@ -158,6 +158,31 @@
                                                     </div>
                                                 </li>
                                             </ul>
+
+                                            <hr/>
+
+                                            <h6>
+                                                Current blockchain state
+                                            </h6>
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <td scope="col">Address</td>
+                                                        <td scope="col">Balance</td>
+                                                        <td scope="col">Burnt coins</td>
+                                                        <td scope="col">Mining chance</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style="font-size: small;">
+                                                    <tr v-for="address in leadingBlock.accountMap.keys()">
+                                                        <td>0x{{ address.toString(16).slice(0,8) }}...</td>
+                                                        <td>{{ leadingBlock.accountMap.get(address) }}
+                                                        </td>
+                                                        <td>---</td>
+                                                        <td>---</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                     <button v-if="leadingBlocks.length > 1" class="carousel-control-prev" type="button"
