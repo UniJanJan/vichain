@@ -159,7 +159,7 @@
                                                 </li>
                                             </ul>
 
-                                            <hr/>
+                                            <hr />
 
                                             <h6>
                                                 Current blockchain state
@@ -175,11 +175,16 @@
                                                 </thead>
                                                 <tbody style="font-size: small;">
                                                     <tr v-for="address in leadingBlock.accountMap.keys()">
-                                                        <td>0x{{ address.toString(16).slice(0,8) }}...</td>
+                                                        <td>0x{{ address.slice(0,8) }}...</td>
                                                         <td>{{ leadingBlock.accountMap.get(address) }}
                                                         </td>
-                                                        <td>---</td>
-                                                        <td>---</td>
+                                                        <td>{{ leadingBlock.burnMap.getObjectIntervalsSize(address) || 0
+                                                            }}
+                                                        </td>
+                                                        <td>{{
+                                                            ((leadingBlock.burnMap.getObjectIntervalsSize(address) ||
+                                                            0)*100/leadingBlock.burnMap.summedInvervalsSize).toFixed(2)
+                                                            }}%</td>
                                                     </tr>
                                                 </tbody>
                                             </table>

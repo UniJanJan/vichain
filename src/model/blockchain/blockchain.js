@@ -66,7 +66,7 @@ class BlockWrapper {
             var { sourceAddress, targetAddress, amount } = transaction.transactionBody;
 
             if (targetAddress.equals(burnAddress)) {
-                this.burnMap.push(amount, sourceAddress);
+                this.burnMap.push(amount, sourceAddress.toString(16));
             }
 
 
