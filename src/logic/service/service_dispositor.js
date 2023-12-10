@@ -1,4 +1,5 @@
 import { AccountService } from "./account_service.js";
+import { BlockchainService } from "./blockchain_service.js";
 import { TransactionService } from "./transaction_service.js";
 
 export class ServiceDispositor {
@@ -28,6 +29,10 @@ export class ServiceDispositor {
 
     getAccountService(node) {
         return this.getService(AccountService, node);
+    }
+
+    getBlockchainService(node) {
+        return this.getService(BlockchainService, node);
     }
 
 }
