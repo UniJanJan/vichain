@@ -13,8 +13,8 @@ import { VersionMessage } from "../../model/message/version_message.js";
 import { EventHandler } from "./event_handler.js";
 
 export class MessageReceivingEventHandler extends EventHandler {
-    constructor(network, eventFactory) {
-        super(network, eventFactory);
+    constructor(network, eventFactory, serviceDispositor) {
+        super(network, eventFactory, serviceDispositor);
     }
 
     handle(processingNode, processedEvent) {
@@ -62,12 +62,18 @@ export class MessageReceivingEventHandler extends EventHandler {
             event.message.linkedNodes.forEach(processingNode.networkInterface.rememberNode.bind(processingNode.networkInterface));
             return this.eventFactory.createLinksUpdateEvents(this.network, processingNode);
         } else if (event.message instanceof TrxMessage) {
-            return [this.eventFactory.createTransactionVerifyingEvent(processingNode, event.message.transaction)];
+            return [this.eventFactory.createTransactionVerifyingEvent(processingNode, event.message.transaction, event.nodeFrom)];
         } else if (event.message instanceof GetAddrMessage) {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new AddrMessage(processingNode.networkInterface.getAllLinkableNodes()))];
         } else if (event.message instanceof BlockMessage) {
-            return [this.eventFactory.createBlockVerifyingEvent(processingNode, event.message.block)];
+            var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
+            if (blockchainService.getBlockchainHeight() + 1 < event.message.block.blockBody.height) {
+                return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksMessage())];
+            } else {
+                return [this.eventFactory.createBlockVerifyingEvent(processingNode, event.message.block, event.nodeFrom)];
+            }
         } else if (event.message instanceof GetTransactionsMessage) {
+            processingNode.transactionPool.dropStaleTransactions(this.network.timer.currentTimestamp);
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetTransactionsResponseMessage(processingNode.transactionPool.transactions))];
         } else if (event.message instanceof GetTransactionsResponseMessage) {
             event.message.transactions.forEach(transaction => {
@@ -80,23 +86,28 @@ export class MessageReceivingEventHandler extends EventHandler {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.leadingBlocks))];
         } else if (event.message instanceof GetBlocksResponseMessage) {
             // TODO
-            if (processingNode.blockchain.leadingBlocks.leadingBlocks === 1 && processingNode.blockchain.leadingBlocks[0].block.blockBody.height === 0) {
-                processingNode.blockchain.leadingBlocks = processingNode.blockchain.leadingBlocks.flatMap(currentlyLeadingBlock => {
-                    return event.message.leadingBlocks.flatMap(potentialyNewLeadingBlock => {
-                        if (currentlyLeadingBlock.block.blockBody.height > potentialyNewLeadingBlock.block.blockBody.height) {
-                            return [currentlyLeadingBlock];
-                        }
+            // if (processingNode.blockchain.leadingBlocks.leadingBlocks === 1 && processingNode.blockchain.leadingBlocks[0].block.blockBody.height === 0) {
+            //     processingNode.blockchain.leadingBlocks = processingNode.blockchain.leadingBlocks.flatMap(currentlyLeadingBlock => {
+            //         return event.message.leadingBlocks.flatMap(potentialyNewLeadingBlock => {
+            //             if (currentlyLeadingBlock.block.blockBody.height > potentialyNewLeadingBlock.block.blockBody.height) {
+            //                 return [currentlyLeadingBlock];
+            //             }
 
-                        var currentBlock = currentlyLeadingBlock;
-                        while (currentlyLeadingBlock.block.blockBody.height < currentBlock.block.blockBody.height) {
-                            currentBlock = currentBlock.previousBlock;
-                        }
+            //             var currentBlock = currentlyLeadingBlock;
+            //             while (currentlyLeadingBlock.block.blockBody.height < currentBlock.block.blockBody.height) {
+            //                 currentBlock = currentBlock.previousBlock;
+            //             }
 
-                        return currentBlock.block === currentlyLeadingBlock.block ? [potentialyNewLeadingBlock] : [];
-                    });
-                })
-                // .map(leadingBlock => clone); //TODO
-            }
+            //             return currentBlock.block === currentlyLeadingBlock.block ? [potentialyNewLeadingBlock] : [];
+            //         });
+            //     })
+            //     // .map(leadingBlock => clone); //TODO
+            // }
+
+            // new blockchain needs to be validated
+            var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
+            if (blockchainService.getBlockchainHeight() < event.message.leadingBlocks[0].block.blockBody.height)
+                processingNode.blockchain.leadingBlocks = event.message.leadingBlocks;
             return [];
         }
     }

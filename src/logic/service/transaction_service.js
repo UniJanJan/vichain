@@ -7,6 +7,8 @@ export class TransactionService {
     constructor(network, node) {
         this.network = network;
         this.node = node;
+
+        this.transactionPool = this.node.transactionPool;
     }
 
     createTransaction(sourceAccount, targetAddress, amount) {
@@ -37,6 +39,14 @@ export class TransactionService {
 
     postTransaction(sourceAddress, targetAddress, amount) {
 
+    }
+
+    dropTransactions(transactions) {
+        transactions.forEach(transaction => {
+            if (this.transactionPool.contains(transaction)) {
+                this.transactionPool.remove(transaction);
+            }
+        });
     }
 
 }
