@@ -1,5 +1,3 @@
-import { Block } from "../../model/blockchain/block.js";
-import { BlockBody } from "../../model/blockchain/block_body.js";
 import { EventHandler } from "./event_handler.js";
 
 export class BlockCreatingEventHandler extends EventHandler {
@@ -9,7 +7,8 @@ export class BlockCreatingEventHandler extends EventHandler {
 
     handle(processingNode, processedEvent) {
         // TODO currentlyLeading probably has been changed because of other miners
-        var currentlyLeadingBlock = processingNode.blockchain.getBlockByHashAndHeight(processedEvent.leadingBlock.block.blockHash, processedEvent.leadingBlock.block.blockBody.height);
+        var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
+        var currentlyLeadingBlock = blockchainService.getBlockByHashAndHeight(processedEvent.leadingBlock.block.blockHash, processedEvent.leadingBlock.block.blockBody.height);
         if (currentlyLeadingBlock !== null) {
             currentlyLeadingBlock = currentlyLeadingBlock.leadingBlock;
         } else {
@@ -35,9 +34,7 @@ export class BlockCreatingEventHandler extends EventHandler {
         var leadingBlock = processingNode.blockchain.leadingBlocks[leadingBlockIndex];
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
         var newBlock = blockchainService.createBlock(leadingBlock.block, transactions);
-
-        var burnAddress = this.network.walletPool.getBurnAddress();
-        processingNode.blockchain.appendBlock(newBlock, burnAddress);
+        blockchainService.appendBlock(newBlock);
 
         return [
             this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock)

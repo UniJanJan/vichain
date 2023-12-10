@@ -79,8 +79,9 @@ export class WaitingEventHandler extends EventHandler {
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
                 var managedAddress = accountService.getRandomManagedAccount().wallet.publicKey; // TODO
 
+                var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
                 processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
-                    var miners = this.getMiners(leadingBlock);
+                    var miners = blockchainService.getMiners(leadingBlock);
 
                     leadingBlock.miners = miners;
 
@@ -111,29 +112,5 @@ export class WaitingEventHandler extends EventHandler {
             15000 + Math.random() * 10000 :
             300000 + Math.random() * 50000;
     }
-
-    getMiners(leadingBlock) {
-        var minersPerRound = this.network.settings.minersPerRound;
-        var lastBlocks = [];
-        var currentBlock = leadingBlock;
-        while (lastBlocks.length < 2 * minersPerRound && currentBlock !== null) {
-            lastBlocks.unshift(currentBlock.block);
-            currentBlock = currentBlock.previousBlock;
-        }
-
-        var seedInputBlocks = lastBlocks.slice(0, minersPerRound);
-
-        var seed = seedInputBlocks.map(block => parseInt(block.blockHash.toString()[1], 16) % 2).join('')
-            + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height
-            + Math.floor(this.network.timer.currentTimestamp / this.network.settings.roundTime);
-
-        return [...Array(minersPerRound).keys()]
-            .map((_, index) => CryptoJS.SHA256(seed + index).toString())
-            .map(hash => bigInt(hash, 16))
-            .map(number => number.mod(leadingBlock.burnMap.summedInvervalsSize))
-            .map(leadingBlock.burnMap.get.bind(leadingBlock.burnMap))
-            .map(Vue.toRaw);
-    }
-
 
 }

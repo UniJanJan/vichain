@@ -1,23 +1,19 @@
 import { EventHandler } from "./event_handler.js";
 
 export class BlockVerifyingEventHandler extends EventHandler {
-    constructor(network, eventFactory) {
-        super(network, eventFactory);
+    constructor(network, eventFactory, serviceDispositor) {
+        super(network, eventFactory, serviceDispositor);
     }
 
     handle(processingNode, processedEvent) { //TODO
-        if (processingNode.blockchain.getBlockByHashAndHeight(processedEvent.block.blockHash, processedEvent.block.blockBody.height) === null
-            && this.isBlockValid(processedEvent.block)) {
+        var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
+        if (blockchainService.isBlockValid(processedEvent.block)) {
             // processingNode.blockchain.getBlockByHashAndHeight(processedEvent.block.blockHash, processedEvent.block.blockBody.height - 1);
 
-            var burnAddress = this.network.walletPool.getBurnAddress();
-            processingNode.blockchain.appendBlock(processedEvent.block, burnAddress);
+            blockchainService.appendBlock(processedEvent.block);
 
-            processedEvent.block.blockBody.transactions.forEach(transaction => {
-                if (processingNode.transactionPool.contains(transaction)) {
-                    processingNode.transactionPool.remove(transaction);
-                }
-            });
+            var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+            transactionService.dropTransactions(processedEvent.block.blockBody.transactions);
 
             if (processedEvent.block.blockBody.height === 0) {
                 return [];
@@ -32,7 +28,4 @@ export class BlockVerifyingEventHandler extends EventHandler {
         }
     }
 
-    isBlockValid(block) {
-        return true; // TODO
-    }
 }
