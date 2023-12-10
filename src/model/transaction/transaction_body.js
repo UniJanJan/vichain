@@ -1,10 +1,13 @@
 export class TransactionBody {
 
-    constructor(sourceAddress, targetAddress, amount) {
-        this.id = null; //TODO
+    constructor(id, sourceAddress, targetAddress, amount, creationTimestamp, validityDuration) {
+        this.id = id;
         this.sourceAddress = sourceAddress;
         this.targetAddress = targetAddress;
         this.amount = amount;
+        this.creationTimestamp = creationTimestamp;
+        this.validityDuration = validityDuration;
+        this.validTo = creationTimestamp + validityDuration;
         Object.freeze(this);
     }
 

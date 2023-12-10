@@ -1,13 +1,11 @@
 import { Block } from "../../model/blockchain/block.js";
 import { BlockBody } from "../../model/blockchain/block_body.js";
 import { CyclicEventsName } from "../../model/event/waiting_event.js";
-import { Transaction } from "../../model/transaction/transaction.js";
-import { TransactionBody } from "../../model/transaction/transaction_body.js";
 import { EventHandler } from "./event_handler.js";
 
 export class BlockchainInstallingEventHandler extends EventHandler {
-    constructor(network, eventFactory) {
-        super(network, eventFactory);
+    constructor(network, eventFactory, serviceDispositor) {
+        super(network, eventFactory, serviceDispositor);
     }
 
     handle(processingNetwork, processedEvent) {
@@ -19,17 +17,21 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             throw new Error("Lack of nodes to install blockchain on!");
         }
 
-        var burnAddress = processingNetwork.walletPool.getBurnAddress();
         var transactions = [];
 
         processedEvent.nodes.forEach(node => {
-            var newWallet = processingNetwork.walletPool.addRandomWallet();
-            node.knownWallets.push(newWallet);
+            var accountService = this.serviceDispositor.getAccountService(node);
+            var newAccount = accountService.createAccount();
 
-            var incomeTransaction = new Transaction(new TransactionBody(null, newWallet.publicKey, processingNetwork.settings.initTokenAmountPerNode + 1), null);
+
+            var transactionService = this.serviceDispositor.getTransactionService(node);
+            
+            var gainAmount = processingNetwork.settings.initTokenAmountPerNode + 1;
+
+            var incomeTransaction = transactionService.createAwardTransaction(newAccount, gainAmount);
+            var burnTransaction = transactionService.createBurnTransaction(newAccount, 1);
+
             transactions.push(incomeTransaction);
-
-            var burnTransaction = new Transaction(new TransactionBody(newWallet.publicKey, burnAddress, 1), null);
             transactions.push(burnTransaction);
         });
 

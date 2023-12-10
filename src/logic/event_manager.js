@@ -26,6 +26,7 @@ import { BlockVerifyingEvent } from "../model/event/block_verifying_event.js";
 import { BlockVerifyingEventHandler } from "./handler/block_verifying_event_handler.js";
 import { BlockCreatingEvent } from "../model/event/block_creating_event.js";
 import { BlockCreatingEventHandler } from "./handler/block_creating_event_handler.js";
+import { ServiceDispositor } from "./service/service_dispositor.js";
 
 export class EventManager {
     constructor(network, eventFactory) {
@@ -33,6 +34,7 @@ export class EventManager {
         this.timer = network.timer;
 
         this.eventFactory = eventFactory;
+        this.serviceDispositor = new ServiceDispositor(this.network);
 
         this.eventProcessors = new Map();
         this.eventProcessors.set(this.network, new EventProcessor(this.timer, Infinity, this.network.events));
@@ -46,22 +48,22 @@ export class EventManager {
 
         this.eventHandler = new Map([
             [Network.name, new Map([
-                [NodeCreatingEvent.name, new NodeCreatingEventHandler(this.network, this.eventFactory)],
-                [LinkCreatingEvent.name, new LinkCreatingEventHandler(this.network, this.eventFactory)],
-                [LinkRemovingEvent.name, new LinkRemovingEventHandler(this.network, this.eventFactory)],
-                [BlockchainInstallingEvent.name, new BlockchainInstallingEventHandler(this.network, this.eventFactory)]
+                [NodeCreatingEvent.name, new NodeCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [LinkCreatingEvent.name, new LinkCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [LinkRemovingEvent.name, new LinkRemovingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [BlockchainInstallingEvent.name, new BlockchainInstallingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]
             ])],
             [Node.name, new Map([
-                [MessageSendingEvent.name, new MessageSendingEventHandler(this.network, this.eventFactory)],
-                [MessageReceivingEvent.name, new MessageReceivingEventHandler(this.network, this.eventFactory)],
-                [TransactionCreatingEvent.name, new TransactionCreatingEventHandler(this.network, this.eventFactory)],
-                [TransactionVerifyingEvent.name, new TransactionVerifyingEventHandler(this.network, this.eventFactory)],
-                [BlockCreatingEvent.name, new BlockCreatingEventHandler(this.network, this.eventFactory)],
-                [BlockVerifyingEvent.name, new BlockVerifyingEventHandler(this.network, this.eventFactory)],
-                [WaitingEvent.name, new WaitingEventHandler(this.network, this.eventFactory)]
+                [MessageSendingEvent.name, new MessageSendingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [MessageReceivingEvent.name, new MessageReceivingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [TransactionCreatingEvent.name, new TransactionCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [TransactionVerifyingEvent.name, new TransactionVerifyingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [BlockCreatingEvent.name, new BlockCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [BlockVerifyingEvent.name, new BlockVerifyingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [WaitingEvent.name, new WaitingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]
             ])],
             [Link.name, new Map([
-                [MessageTransmissionEvent.name, new MessageTransmissionEventHandler(this.network, this.eventFactory)]
+                [MessageTransmissionEvent.name, new MessageTransmissionEventHandler(this.network, this.eventFactory, this.serviceDispositor)]
             ])]
         ]);
     }
