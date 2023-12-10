@@ -18,4 +18,9 @@ export class TransactionPool {
     pick(transactionsNumber = 1) {
         return this.transactions.splice(0, transactionsNumber);
     }
+
+    dropStaleTransactions(timestamp) {
+        this.transactions = this.transactions.filter(transaction => transaction.transactionBody.validTo > timestamp)
+    }
+
 }

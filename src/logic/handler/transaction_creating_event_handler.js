@@ -1,26 +1,22 @@
-import { RSA } from "../../common/rsa.js";
-import { Transaction } from "../../model/transaction/transaction.js";
-import { TransactionBody } from "../../model/transaction/transaction_body.js";
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionCreatingEventHandler extends EventHandler {
-    constructor(network, eventFactory) {
-        super(network, eventFactory);
+    constructor(network, eventFactory, serviceDispositor) {
+        super(network, eventFactory, serviceDispositor);
     }
 
     handle(processingNode, processedEvent) {
-        var transaction = this.createSignedTransaction(processedEvent);
+        var accountService = this.serviceDispositor.getAccountService(processingNode);
+        var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+
+        var sourceAccount = accountService.getManagedAccount(processedEvent.sourceWallet.publicKey);
+        var transaction = transactionService.createTransaction(sourceAccount, processedEvent.targetAddress, processedEvent.amount);
 
         processingNode.transactionPool.put(transaction);
-        
+
         return [
             this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction)
         ];
     }
 
-    createSignedTransaction(processedEvent) {
-        var transactionBody = new TransactionBody(processedEvent.sourceWallet.publicKey, processedEvent.targetAddress, processedEvent.amount);
-        var signature = RSA.createSignature(transactionBody, processedEvent.sourceWallet.privateKey, processedEvent.sourceWallet.publicKey);
-        return new Transaction(transactionBody, signature);
-    }
 }

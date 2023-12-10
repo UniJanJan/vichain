@@ -8,8 +8,8 @@ import { GetAddrMessage } from "../../model/message/getaddr_message.js";
 import { EventHandler } from "./event_handler.js";
 
 export class WaitingEventHandler extends EventHandler {
-    constructor(network, eventFactory) {
-        super(network, eventFactory);
+    constructor(network, eventFactory, serviceDispositor) {
+        super(network, eventFactory, serviceDispositor);
     }
 
     handle(processingNode, processedEvent) {
@@ -61,9 +61,11 @@ export class WaitingEventHandler extends EventHandler {
             case CyclicEventsName.TRANSACTION_GENERATION:
                 var waitTime = this.getTimeInterval(this.network.settings.minTransactionCreationInterval, this.network.settings.avgTransactionCreationInterval);
 
-                var sourceWallet = Utils.getRandomElement(processingNode.knownWallets);
-                var targetAddress = Utils.getRandomElement(this.network.walletPool.getAllAddresses().filter(address => !address.equals(sourceWallet.publicKey)));
-                var amount = 1 + Math.floor(Math.random() * 10);
+                var accountService = this.serviceDispositor.getAccountService(processingNode);
+                var sourceWallet = accountService.getRandomManagedAccount().wallet;
+                var targetAddress = accountService.getRandomNonManagedAddress();
+                var maxSpendableAmount = Math.min(processingNode.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.accountMap.get(sourceWallet.publicKey.toString(16)) || 0));
+                var amount = 1 + Math.floor(Math.random() * Math.max(0, maxSpendableAmount));
 
                 return [
                     this.eventFactory.createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount),
@@ -74,6 +76,9 @@ export class WaitingEventHandler extends EventHandler {
 
                 var nextProcessableEvents = [];
 
+                var accountService = this.serviceDispositor.getAccountService(processingNode);
+                var managedAddress = accountService.getRandomManagedAccount().wallet.publicKey; // TODO
+
                 processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
                     var miners = this.getMiners(leadingBlock);
 
@@ -82,8 +87,8 @@ export class WaitingEventHandler extends EventHandler {
                     var minersPerRound = this.network.settings.minersPerRound;
                     var timeQuantum = this.network.settings.roundTime / minersPerRound;
                     miners.forEach((miner, index) => {
-                        if (miner === processingNode.knownWallets[0].publicKey.toString(16)) {
-                            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(processingNode, "block_mining", index * timeQuantum, { leadingBlock, selectedAddress: processingNode.knownWallets[0].publicKey }));
+                        if (miner === managedAddress.toString(16)) {
+                            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(processingNode, "block_mining", index * timeQuantum, { leadingBlock, selectedAddress: managedAddress }));
                         }
                     });
                 })

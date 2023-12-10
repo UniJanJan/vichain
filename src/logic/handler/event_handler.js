@@ -1,7 +1,8 @@
 export class EventHandler {
-    constructor(network, eventFactory) {
+    constructor(network, eventFactory, serviceDispositor) {
         this.network = network;
         this.eventFactory = eventFactory;
+        this.serviceDispositor = serviceDispositor;
     }
 
     /* handle processed event and returns map of next events to process*/

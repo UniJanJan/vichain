@@ -30,7 +30,9 @@ export class Network {
             roundTime: 180000,
             minersPerRound: 3,
             maxTransactionsPerBlock: 10,
-            miningAward: 80
+            miningAward: 80,
+
+            transactionValidityDuration: 100000
         }
     }
 
