@@ -25,8 +25,6 @@ export class BlockCreatingEventHandler extends EventHandler {
         var currentTimestamp = this.network.timer.currentTimestamp;
         processingNode.transactionPool.dropStaleTransactions(currentTimestamp);
 
-        var leadingBlock = processingNode.blockchain.leadingBlocks[leadingBlockIndex];
-
         var accountService = this.serviceDispositor.getAccountService(processingNode);
         var minerAccount = accountService.getManagedAccount(processedEvent.selectedAddress);
         var transactions = processingNode.transactionPool.pick(this.network.settings.maxTransactionsPerBlock - 1);
@@ -34,8 +32,9 @@ export class BlockCreatingEventHandler extends EventHandler {
         var awardTransaction = transactionService.createAwardTransaction(minerAccount);
         transactions.push(awardTransaction);
 
-        var newBlockBody = new BlockBody(leadingBlock.block.blockBody.height + 1, leadingBlock.block.blockHash, transactions, currentTimestamp);
-        var newBlock = new Block(newBlockBody, CryptoJS.SHA256(JSON.stringify(newBlockBody)));
+        var leadingBlock = processingNode.blockchain.leadingBlocks[leadingBlockIndex];
+        var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
+        var newBlock = blockchainService.createBlock(leadingBlock.block, transactions);
 
         var burnAddress = this.network.walletPool.getBurnAddress();
         processingNode.blockchain.appendBlock(newBlock, burnAddress);
