@@ -49,4 +49,13 @@ export class TransactionService {
         });
     }
 
+    dropStaleTransactions() {
+        var currentTimestamp = this.network.timer.currentTimestamp;
+        this.transactionPool.transactions = this.transactionPool.transactions.filter(transaction => transaction.transactionBody.validTo > currentTimestamp);
+    }
+
+    pickUncommittedTransactions(transactionsNumber = 1) {
+        return this.transactionPool.transactions.splice(0, transactionsNumber);
+    }
+
 }

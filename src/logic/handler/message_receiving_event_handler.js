@@ -73,7 +73,8 @@ export class MessageReceivingEventHandler extends EventHandler {
                 return [this.eventFactory.createBlockVerifyingEvent(processingNode, event.message.block, event.nodeFrom)];
             }
         } else if (event.message instanceof GetTransactionsMessage) {
-            processingNode.transactionPool.dropStaleTransactions(this.network.timer.currentTimestamp);
+            var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+            transactionService.dropStaleTransactions();
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetTransactionsResponseMessage(processingNode.transactionPool.transactions))];
         } else if (event.message instanceof GetTransactionsResponseMessage) {
             event.message.transactions.forEach(transaction => {

@@ -2,7 +2,7 @@ import { Event } from "./event.js";
 
 export class TransactionVerifyingEvent extends Event {
     constructor(processingNode, transaction, informatorNode) {
-        super(800);
+        super(300);
         this.processingNode = processingNode;
         this.transaction = transaction;
         this.informatorNode = informatorNode;
