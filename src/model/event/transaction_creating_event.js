@@ -2,7 +2,7 @@ import { Event } from "./event.js";
 
 export class TransactionCreatingEvent extends Event {
     constructor(processingNode, sourceWallet, targetAddress, amount) {
-        super(1000);
+        super(500);
         this.processingNode = processingNode;
         this.sourceWallet = sourceWallet;
         this.targetAddress = targetAddress;

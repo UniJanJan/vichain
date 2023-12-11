@@ -21,13 +21,12 @@ export class BlockCreatingEventHandler extends EventHandler {
             throw new Error('Leading block not found in blockchain of ' + processingNode);
         }
 
-        var currentTimestamp = this.network.timer.currentTimestamp;
-        processingNode.transactionPool.dropStaleTransactions(currentTimestamp);
+        var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+        transactionService.dropStaleTransactions();
 
         var accountService = this.serviceDispositor.getAccountService(processingNode);
         var minerAccount = accountService.getManagedAccount(processedEvent.selectedAddress);
-        var transactions = processingNode.transactionPool.pick(this.network.settings.maxTransactionsPerBlock - 1);
-        var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+        var transactions = transactionService.pickUncommittedTransactions(this.network.settings.maxTransactionsPerBlock - 1);
         var awardTransaction = transactionService.createAwardTransaction(minerAccount);
         transactions.push(awardTransaction);
 
