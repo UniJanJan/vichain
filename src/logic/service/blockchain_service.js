@@ -81,8 +81,7 @@ export class BlockchainService {
         var seedInputBlocks = lastBlocks.slice(0, minersPerRound);
 
         var seed = seedInputBlocks.map(block => parseInt(block.blockHash.toString()[1], 16) % 2).join('')
-            + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height
-            + Math.floor(this.network.timer.currentTimestamp / this.network.settings.roundTime);
+            + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height;
 
         return [...Array(minersPerRound).keys()]
             .map((_, index) => CryptoJS.SHA256(seed + index).toString())
