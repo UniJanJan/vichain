@@ -66,8 +66,8 @@ export class WaitingEventHandler extends EventHandler {
                 var targetAddress = accountService.getRandomNonManagedAddress();
                 var maxSpendableAmount = sourceAccount.availableBalance;
 
-                if (maxSpendableAmount >= 0) {
-                    var amount = Math.round(Math.random() * maxSpendableAmount);
+                if (maxSpendableAmount > 0) {
+                    var amount = Math.ceil(Math.random() * maxSpendableAmount);
                     console.log(maxSpendableAmount < amount, amount, maxSpendableAmount);
 
                     return [
