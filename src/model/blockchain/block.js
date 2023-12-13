@@ -5,4 +5,12 @@ export class Block {
 
         Object.freeze(this);
     }
+
+    equals(block) {
+        return this === block || JSON.stringify(this) == JSON.stringify(block);
+    }
+
+    isPreviousFor(block) {
+        return this.blockHash == block.blockBody.previousBlockHash;
+    }
 }

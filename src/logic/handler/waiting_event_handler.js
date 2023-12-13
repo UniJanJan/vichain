@@ -67,7 +67,7 @@ export class WaitingEventHandler extends EventHandler {
                 var maxSpendableAmount = sourceAccount.availableBalance;
 
                 if (maxSpendableAmount >= 0) {
-                    var amount = Math.max(1, Math.floor(Math.random() * maxSpendableAmount));
+                    var amount = Math.round(Math.random() * maxSpendableAmount);
                     console.log(maxSpendableAmount < amount, amount, maxSpendableAmount);
 
                     return [

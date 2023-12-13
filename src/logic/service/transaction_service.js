@@ -34,7 +34,7 @@ export class TransactionService {
 
     createSignedTransaction(transactionBody, signingWallet) {
         var signature = RSA.createSignature(transactionBody, signingWallet.privateKey, signingWallet.publicKey);
-        var transactionHash = CryptoJS.SHA256(transactionBody);
+        var transactionHash = CryptoJS.SHA256(JSON.stringify(transactionBody));
         return new Transaction(transactionBody, signature, transactionHash);
     }
 
