@@ -30,6 +30,9 @@
                             <button class="nav-link active" id="nav-events-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-events" type="button" role="tab" aria-controls="nav-events"
                                 aria-selected="true">Events</button>
+                            <button class="nav-link" id="nav-wallets-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-wallets" type="button" role="tab" aria-controls="nav-wallets"
+                                aria-selected="false">Wallets</button>
                             <button class="nav-link" id="nav-mempool-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-mempool" type="button" role="tab" aria-controls="nav-mempool"
                                 aria-selected="false">Mempool</button>
@@ -100,6 +103,28 @@
                             </div>
 
                         </div>
+
+                        <div class="tab-pane fade" id="nav-wallets" role="tabpanel" aria-labelledby="nav-wallets-tab">
+                            Managed wallets
+                            <div v-if="managedAccounts.length > 0">
+                                <ul class="list-group" v-for="account in managedAccounts">
+                                    <li class="list-group-item">
+                                        <div>Public key: {{ account.wallet.publicKey.toString(16).slice(0,8) }}...</div>
+                                        <div>Private key: {{ account.wallet.privateKey.toString(16).slice(0,8)
+                                            }}...</div>
+                                        <div>Spendable token amount: {{ account.availableBalance }}</div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-else>
+                                <ul class="list-group">
+                                    <li class="list-group-item" style="font-size: small; padding: 0;">This node doesn't
+                                        manage any wallets
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div class="tab-pane fade" id="nav-mempool" role="tabpanel" aria-labelledby="nav-mempool-tab">
                             <div v-if="pooledTransactions.length > 0">
                                 <ul class="list-group" v-for="transaction in pooledTransactions">

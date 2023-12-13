@@ -1,6 +1,7 @@
 export class TransactionPool {
     constructor() {
         this.transactions = [];
+        this.lastTransactionId = new Map();
     }
 
     contains(transaction) {

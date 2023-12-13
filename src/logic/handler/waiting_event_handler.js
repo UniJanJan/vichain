@@ -62,15 +62,24 @@ export class WaitingEventHandler extends EventHandler {
                 var waitTime = this.getTimeInterval(this.network.settings.minTransactionCreationInterval, this.network.settings.avgTransactionCreationInterval);
 
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
-                var sourceWallet = accountService.getRandomManagedAccount().wallet;
+                var sourceAccount = accountService.getRandomManagedAccount();
                 var targetAddress = accountService.getRandomNonManagedAddress();
-                var maxSpendableAmount = Math.min(processingNode.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.accountMap.get(sourceWallet.publicKey.toString(16)) || 0));
-                var amount = 1 + Math.floor(Math.random() * Math.max(0, maxSpendableAmount));
+                var maxSpendableAmount = sourceAccount.availableBalance;
 
-                return [
-                    this.eventFactory.createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount),
-                    this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
-                ];
+                if (maxSpendableAmount >= 0) {
+                    var amount = Math.max(1, Math.floor(Math.random() * maxSpendableAmount));
+                    console.log(maxSpendableAmount < amount, amount, maxSpendableAmount);
+
+                    return [
+                        this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount),
+                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
+                    ];
+                } else {
+                    return [
+                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
+                    ];
+                }
+
             case CyclicEventsName.MINERS_SELECTION:
                 var waitTime = this.network.settings.roundTime - (this.network.timer.currentTimestamp % this.network.settings.roundTime) + 1000;
 
