@@ -7,4 +7,9 @@ export class BlockBody {
 
         Object.freeze(this);
     }
+
+    equals(blockBody) {
+        return this === blockBody || JSON.stringify(this) == JSON.stringify(blockBody);
+    }
+
 }

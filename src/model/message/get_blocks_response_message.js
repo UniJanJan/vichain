@@ -1,6 +1,6 @@
 export class GetBlocksResponseMessage {
-    constructor(leadingBlocks) {
-        this.leadingBlocks = leadingBlocks; // probably TODO
+    constructor(blocks) {
+        this.blocks = blocks;
 
         Object.freeze(this);
     }

@@ -1,3 +1,5 @@
+import { RSA } from "../../common/rsa.js";
+import { BlockWrapper } from "../../model/blockchain/blockchain.js";
 import { LinkStatus } from "../../model/entity/link.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
 import { BlockMessage } from "../../model/message/block_message.js";
@@ -83,32 +85,71 @@ export class MessageReceivingEventHandler extends EventHandler {
             putTransactions.forEach(accountService.updateAvailableBalance.bind(accountService));
             return [];
         } else if (event.message instanceof GetBlocksMessage) {
-            return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.leadingBlocks))];
+            return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.getFirstBlockchain()))];
         } else if (event.message instanceof GetBlocksResponseMessage) {
-            // TODO
-            // if (processingNode.blockchain.leadingBlocks.leadingBlocks === 1 && processingNode.blockchain.leadingBlocks[0].block.blockBody.height === 0) {
-            //     processingNode.blockchain.leadingBlocks = processingNode.blockchain.leadingBlocks.flatMap(currentlyLeadingBlock => {
-            //         return event.message.leadingBlocks.flatMap(potentialyNewLeadingBlock => {
-            //             if (currentlyLeadingBlock.block.blockBody.height > potentialyNewLeadingBlock.block.blockBody.height) {
-            //                 return [currentlyLeadingBlock];
-            //             }
-
-            //             var currentBlock = currentlyLeadingBlock;
-            //             while (currentlyLeadingBlock.block.blockBody.height < currentBlock.block.blockBody.height) {
-            //                 currentBlock = currentBlock.previousBlock;
-            //             }
-
-            //             return currentBlock.block === currentlyLeadingBlock.block ? [potentialyNewLeadingBlock] : [];
-            //         });
-            //     })
-            //     // .map(leadingBlock => clone); //TODO
-            // }
-
-            // new blockchain needs to be validated
             var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
-            if (blockchainService.getBlockchainHeight() < event.message.leadingBlocks[0].block.blockBody.height)
-                processingNode.blockchain.leadingBlocks = event.message.leadingBlocks;
+
+            var blocks = event.message.blocks;
+
+            if (blockchainService.getBlockchainHeight() >= blocks.length || !blocks[0].equals(this.network.settings.genesisBlock)) {
+                return [];
+            }
+
+            var burnAddress = this.network.walletPool.getBurnAddress();
+            var leadingBlock = new BlockWrapper(blocks[0], null, burnAddress);
+            var miners = [];
+
+            for (var i = 1; i < blocks.length; i++) {
+                if (Math.floor(blocks[i - 1].blockBody.creationTimestamp / this.network.settings.roundTime) <
+                    Math.floor(blocks[i].blockBody.creationTimestamp / this.network.settings.roundTime)) {
+
+                    miners = blockchainService.getMiners(leadingBlock);
+                }
+
+                if (this.isBlockValid(blocks[i - 1], blocks[i], miners)) {
+                    leadingBlock = new BlockWrapper(blocks[i], leadingBlock, burnAddress);
+                } else {
+                    return [];
+                }
+            }
+
+            processingNode.blockchain.leadingBlocks = [leadingBlock];
+
             return [];
         }
     }
+
+    isBlockValid(previousBlock, block, miners) {
+        return previousBlock.isPreviousFor(block)
+            && previousBlock.blockBody.height + 1 === block.blockBody.height
+            && previousBlock.blockBody.creationTimestamp < block.blockBody.creationTimestamp
+            && CryptoJS.SHA256(JSON.stringify(block.blockBody)).toString() === block.blockHash.toString()
+            && this.areTransactionsValid(block.blockBody.transactions, block.blockBody.creationTimestamp, miners);
+    }
+
+    areTransactionsValid(transactions, blockCreationTimestamp, miners) {
+        var awardTransactions = transactions.filter(transaction => transaction.transactionBody.sourceAddress === null)
+        if (awardTransactions.length !== 1
+            || awardTransactions[0].transactionBody.amount !== this.network.settings.miningAward) {
+            return false;
+        }
+
+
+        while (miners.length > 0 && awardTransactions[0].transactionBody.targetAddress.toString(16) !== miners[0]) {
+            miners.splice(0, 1);
+        }
+
+        if (miners.length > 0 && awardTransactions[0].transactionBody.targetAddress.toString(16) === miners[0]) {
+            miners.splice(0, 1);
+        } else {
+            return false;
+        }
+
+
+        return transactions.every(transaction =>
+            transaction.transactionBody.validTo >= blockCreationTimestamp
+            && CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash.toString()
+            && RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress || transaction.transactionBody.targetAddress))
+    }
+
 }
