@@ -7,10 +7,12 @@ export class BlockVerifyingEventHandler extends EventHandler {
 
     handle(processingNode, processedEvent) { //TODO
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
+        var accountService = this.serviceDispositor.getAccountService(processingNode);
         if (blockchainService.isBlockValid(processedEvent.block)) {
             // processingNode.blockchain.getBlockByHashAndHeight(processedEvent.block.blockHash, processedEvent.block.blockBody.height - 1);
 
-            blockchainService.appendBlock(processedEvent.block);
+            var currentlyLeadingBlock = blockchainService.appendBlock(processedEvent.block);
+            accountService.updateAvailableBalances(currentlyLeadingBlock);
 
             var transactionService = this.serviceDispositor.getTransactionService(processingNode);
             transactionService.dropTransactions(processedEvent.block.blockBody.transactions);

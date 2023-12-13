@@ -45,6 +45,7 @@ export class BlockchainService {
         if (this.blockchain.leadingBlocks.length === 0 && block.blockBody.height === 0) {
             var insertableGenesisBlock = new BlockWrapper(block, null, burnAddress);
             this.blockchain.leadingBlocks.push(insertableGenesisBlock);
+            return insertableGenesisBlock;
         } else if (this.blockchain.leadingBlocks.length > 0 && block.blockBody.height >= this.blockchain.leadingBlocks[0].block.blockBody.height) {
             var jointBlock = this.getBlockByHashAndHeight(block.blockBody.previousBlockHash, block.blockBody.height - 1);
             if (jointBlock !== null) {
@@ -63,8 +64,32 @@ export class BlockchainService {
                 } else {
                     this.blockchain.leadingBlocks.push(insertableBlock);
                 }
+
+                block.blockBody.transactions.forEach(transaction => {
+                    var { id, sourceAddress } = transaction.transactionBody;
+
+                    if (sourceAddress) {
+                        var lastTransactionId = this.node.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
+                        if (lastTransactionId < id) {
+                            this.node.transactionPool.lastTransactionId.set(sourceAddress.toString(16), id);
+                        }
+                    }
+                })
+
+                // this.node.managedAccounts.accounts.forEach((account, address) => {
+                //     var lastTransactionId = this.node.transactionPool.lastTransactionId.get(address);
+                //     account.frozenAmounts.forEach((frozenAmount, transactionHash) => {
+                //         if (frozenAmount.transactionId < lastTransactionId) {
+                //             account.availableBalance += frozenAmount.amount;
+                //             account.frozenAmounts.delete(transactionHash);
+                //             console.log(`Transaction ${transactionHash} dropped for ${address}`)
+                //         }
+                //     });
+                // });
+
+                return insertableBlock;
             } else {
-                // throw new Error("Invalid block append attempt!", block);
+                return null;
             }
         }
     }

@@ -30,6 +30,9 @@ const app = createApp({
         processedEvents() {
             return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processedEvents : [];
         },
+        managedAccounts() {
+            return this.networkManager.selectedNode ? Array.from(this.networkManager.selectedNode.managedAccounts.accounts.values()) : [];
+        },
         pooledTransactions() {
             return this.networkManager.selectedNode ? this.networkManager.selectedNode.transactionPool.transactions : [];
         },

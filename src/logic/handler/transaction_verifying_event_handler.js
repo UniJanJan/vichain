@@ -2,14 +2,20 @@ import { RSA } from "../../common/rsa.js";
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionVerifyingEventHandler extends EventHandler {
-    constructor(network, eventFactory) {
-        super(network, eventFactory);
+    constructor(network, eventFactory, serviceDispositor) {
+        super(network, eventFactory, serviceDispositor);
     }
 
     handle(processingNode, processedEvent) {
         var transaction = processedEvent.transaction;
         if (!processingNode.transactionPool.contains(transaction) && this.isTransactionValid(transaction)) {
-            processingNode.transactionPool.put(transaction);
+            var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+
+            if (transactionService.putUncommittedTransaction(transaction) && processingNode.transactionPool.contains(transaction)) {
+                var accountService = this.serviceDispositor.getAccountService(processingNode);
+                accountService.updateAvailableBalance(transaction);
+            }
+
             return [
                 this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction, [processedEvent.informatorNode])
             ];

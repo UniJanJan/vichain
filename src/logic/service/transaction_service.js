@@ -34,7 +34,8 @@ export class TransactionService {
 
     createSignedTransaction(transactionBody, signingWallet) {
         var signature = RSA.createSignature(transactionBody, signingWallet.privateKey, signingWallet.publicKey);
-        return new Transaction(transactionBody, signature);
+        var transactionHash = CryptoJS.SHA256(transactionBody);
+        return new Transaction(transactionBody, signature, transactionHash);
     }
 
     postTransaction(sourceAddress, targetAddress, amount) {
@@ -55,7 +56,50 @@ export class TransactionService {
     }
 
     pickUncommittedTransactions(transactionsNumber = 1) {
+        // var uncommittedTransactions = this.transactionPool.transactions.splice(0, transactionsNumber);
+        // uncommittedTransactions.forEach(transaction => {
+        //     var { id, sourceAddress } = transaction.transactionBody;
+        //     var lastTransactionId = this.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
+        //     if (lastTransactionId < id) {
+        //         this.transactionPool.lastTransactionId.set(sourceAddress.toString(16), id);
+        //     }
+
+        // });
         return this.transactionPool.transactions.splice(0, transactionsNumber);
+    }
+
+    putUncommittedTransaction(transaction) {
+        return this.putUncommittedTransactions([transaction]).length === 1;
+    }
+
+    putUncommittedTransactions(transactions) {
+        // var newLastTransactionIds = [];
+
+        var putTransactions = []
+
+        transactions.forEach(transaction => {
+            var { id, sourceAddress } = transaction.transactionBody;
+
+            var lastTransactionId = this.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
+            if (id > lastTransactionId) { // what if two the same ids?
+                // newLastTransactionIds.push({ sourceAddress, id });
+                this.transactionPool.transactions.push(transaction);
+                putTransactions.push(transaction);
+            }
+        })
+
+        // newLastTransactionIds.forEach(entry => this.transactionPool.lastTransactionId.set(entry.sourceAddress.toString(16), entry.id));
+
+        transactions.forEach(transaction => {
+            var { id, sourceAddress } = transaction.transactionBody;
+
+            var lastTransactionId = this.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
+            if (id > lastTransactionId) {
+                this.transactionPool.lastTransactionId.set(sourceAddress.toString(16), id);
+            }
+        })
+
+        return putTransactions;
     }
 
 }
