@@ -58,28 +58,6 @@ export class BlockchainService {
                     this.blockchain.leadingBlocks.push(validLeadingBlock);
                 }
 
-                block.blockBody.transactions.forEach(transaction => {
-                    var { id, sourceAddress } = transaction.transactionBody;
-
-                    if (sourceAddress) {
-                        var lastTransactionId = this.node.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
-                        if (lastTransactionId < id) {
-                            this.node.transactionPool.lastTransactionId.set(sourceAddress.toString(16), id);
-                        }
-                    }
-                })
-
-                // this.node.managedAccounts.accounts.forEach((account, address) => {
-                //     var lastTransactionId = this.node.transactionPool.lastTransactionId.get(address);
-                //     account.frozenAmounts.forEach((frozenAmount, transactionHash) => {
-                //         if (frozenAmount.transactionId < lastTransactionId) {
-                //             account.availableBalance += frozenAmount.amount;
-                //             account.frozenAmounts.delete(transactionHash);
-                //             console.log(`Transaction ${transactionHash} dropped for ${address}`)
-                //         }
-                //     });
-                // });
-
                 return true;
             } else {
                 return false;

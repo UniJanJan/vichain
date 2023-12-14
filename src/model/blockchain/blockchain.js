@@ -1,5 +1,3 @@
-import { DiscreteIntervalMap } from "../../common/interval_map.js";
-
 export class Blockchain {
 
     constructor() {

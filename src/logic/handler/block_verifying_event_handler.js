@@ -7,7 +7,6 @@ export class BlockVerifyingEventHandler extends EventHandler {
 
     handle(processingNode, processedEvent) {
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
-        var accountService = this.serviceDispositor.getAccountService(processingNode);
 
         var nextProcessableEvents = [];
 
@@ -25,22 +24,23 @@ export class BlockVerifyingEventHandler extends EventHandler {
             var insertableBlock = validLeadingBlock || leadingBlock;
             var isAppended = blockchainService.appendBlock(insertableBlock);
             var blockchainHeight = blockchainService.getBlockchainHeight();
-            if (isAppended && blockchainHeight > 0) {
-                nextProcessableEvents.push(
-                    this.eventFactory.createBlockBroadcastEvent(processingNode, insertableBlock.block)
-                );
+            if (isAppended) {
+                var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+                transactionService.updateTransactionPool(insertableBlock);
+
+                var accountService = this.serviceDispositor.getAccountService(processingNode);
+                accountService.updateAvailableBalances(insertableBlock);
+
+                if (blockchainHeight > 0) {
+                    nextProcessableEvents.push(
+                        this.eventFactory.createBlockBroadcastEvent(processingNode, insertableBlock.block)
+                    );
+                }
             }
 
         })
 
         return nextProcessableEvents;
-
-        //     var currentlyLeadingBlock = blockchainService.appendBlock(processedEvent.block);
-        //     accountService.updateAvailableBalances(currentlyLeadingBlock);
-
-        //     var transactionService = this.serviceDispositor.getTransactionService(processingNode);
-        //     transactionService.dropTransactions(processedEvent.block.blockBody.transactions);
-
     }
 
 }

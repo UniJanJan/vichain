@@ -42,7 +42,7 @@ export class AccountService {
     }
 
     updateAvailableBalance(transaction) {
-        var managedAccount = this.getManagedAccount(transaction.transactionBody.sourceAddress);
+        var managedAccount = this.getManagedAccount(transaction.transactionBody.sourceAddress.toString(16));
         if (managedAccount) {
             managedAccount.freezeAmount(transaction.transactionHash, transaction.transactionBody.amount, transaction.transactionBody.validTo, transaction.transactionBody.id);
         }
@@ -62,7 +62,7 @@ export class AccountService {
                 }
             });
 
-            var lastTransactionId = this.node.transactionPool.lastTransactionId.get(managedAccount.wallet.publicKey.toString(16));
+            var lastTransactionId = this.node.transactionPool.lastTransactionIds.get(managedAccount.wallet.publicKey.toString(16));
             managedAccount.frozenAmounts.forEach((frozenAmount, transactionHash) => {
                 if (leadingBlockCreationTimestamp > frozenAmount.frozenToTimestamp || lastTransactionId >= frozenAmount.transactionId) {
                     managedAccount.availableBalance += frozenAmount.amount;
