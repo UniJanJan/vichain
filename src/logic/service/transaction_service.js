@@ -50,21 +50,28 @@ export class TransactionService {
         });
     }
 
+    updateTransactionPool(leadingBlock) {
+        this.transactionPool.lastTransactionIds.forEach((lastId, address) => {
+            var blockchainLastId = leadingBlock.lastTransactionIds.get(address) || 0;
+            if (blockchainLastId > lastId) {
+                this.transactionPool.lastTransactionIds.set(address, blockchainLastId);
+            }
+        });
+
+        this.transactionPool.transactions.forEach((transaction, index) => {
+            var lastId = leadingBlock.lastTransactionIds.get(transaction.transactionBody.sourceAddress.toString(16)) || 0;
+            if (transaction.transactionBody.id <= lastId) {
+                this.transactionPool.transactions.splice(index, 1);
+            }
+        })
+    }
+
     dropStaleTransactions() {
         var currentTimestamp = this.network.timer.currentTimestamp;
         this.transactionPool.transactions = this.transactionPool.transactions.filter(transaction => transaction.transactionBody.validTo > currentTimestamp);
     }
 
     pickUncommittedTransactions(transactionsNumber = 1) {
-        // var uncommittedTransactions = this.transactionPool.transactions.splice(0, transactionsNumber);
-        // uncommittedTransactions.forEach(transaction => {
-        //     var { id, sourceAddress } = transaction.transactionBody;
-        //     var lastTransactionId = this.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
-        //     if (lastTransactionId < id) {
-        //         this.transactionPool.lastTransactionId.set(sourceAddress.toString(16), id);
-        //     }
-
-        // });
         return this.transactionPool.transactions.splice(0, transactionsNumber);
     }
 
@@ -80,7 +87,7 @@ export class TransactionService {
         transactions.forEach(transaction => {
             var { id, sourceAddress } = transaction.transactionBody;
 
-            var lastTransactionId = this.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
+            var lastTransactionId = this.transactionPool.lastTransactionIds.get(sourceAddress.toString(16)) || 0;
             if (id > lastTransactionId) { // what if two the same ids?
                 // newLastTransactionIds.push({ sourceAddress, id });
                 this.transactionPool.transactions.push(transaction);
@@ -93,9 +100,9 @@ export class TransactionService {
         transactions.forEach(transaction => {
             var { id, sourceAddress } = transaction.transactionBody;
 
-            var lastTransactionId = this.transactionPool.lastTransactionId.get(sourceAddress.toString(16)) || 0;
+            var lastTransactionId = this.transactionPool.lastTransactionIds.get(sourceAddress.toString(16)) || 0;
             if (id > lastTransactionId) {
-                this.transactionPool.lastTransactionId.set(sourceAddress.toString(16), id);
+                this.transactionPool.lastTransactionIds.set(sourceAddress.toString(16), id);
             }
         })
 

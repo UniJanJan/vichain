@@ -22,13 +22,33 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     isBlockValid(previousBlock, block) {
-        return previousBlock === null && block.equals(this.network.settings.genesisBlock)
-            || (block.blockBody.creationTimestamp <= this.network.timer.currentTimestamp
-                && previousBlock.block.isPreviousFor(block)
-                && previousBlock.block.blockBody.height + 1 === block.blockBody.height
-                && previousBlock.block.blockBody.creationTimestamp < block.blockBody.creationTimestamp
-                && CryptoJS.SHA256(JSON.stringify(block.blockBody)).toString() === block.blockHash.toString()
+        return this.isBlockGenesisBlock(previousBlock, block)
+            || (this.isBlockPredecessorValid(previousBlock, block)
+                && this.isBlockHeightValid(previousBlock, block)
+                && this.isBlockTimestampValid(previousBlock, block)
+                && this.isBlockHashValid(block)
                 && this.areTransactionsValid(block.blockBody.transactions, block.blockBody.creationTimestamp, previousBlock));
+    }
+
+    isBlockPredecessorValid(previousBlock, block) {
+        return previousBlock.block.isPreviousFor(block)
+    }
+
+    isBlockGenesisBlock(previousBlock, block) {
+        return previousBlock === null && block.equals(this.network.settings.genesisBlock);
+    }
+
+    isBlockHeightValid(previousBlock, block) {
+        return previousBlock.block.blockBody.height + 1 === block.blockBody.height;
+    }
+
+    isBlockTimestampValid(previousBlock, block) {
+        return block.blockBody.creationTimestamp <= this.network.timer.currentTimestamp
+            && previousBlock.block.blockBody.creationTimestamp < block.blockBody.creationTimestamp;
+    }
+
+    isBlockHashValid(block) {
+        return CryptoJS.SHA256(JSON.stringify(block.blockBody)).toString() === block.blockHash.toString();
     }
 
     areTransactionsValid(transactions, blockCreationTimestamp, previousBlock) {
@@ -44,10 +64,35 @@ export class ProofOfBurnConsensus extends Consensus {
             return false;
         }
 
-        return transactions.every(transaction =>
-            transaction.transactionBody.validTo >= blockCreationTimestamp
-            && CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash.toString()
-            && RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress || transaction.transactionBody.targetAddress))
+        return transactions.every(transaction => this.isTransactionValid(transaction, blockCreationTimestamp, previousBlock.lastTransactionIds));
+    }
+
+    isTransactionValid(transaction, blockCreationTimestamp, lastTransactionIds) {
+        return this.isTransactionTimestampValid(transaction, blockCreationTimestamp)
+            && this.isTransactionIdValid(transaction, lastTransactionIds)
+            && this.isTransactionHashValid(transaction)
+            && this.isTransactionSignatureValid(transaction);
+    }
+
+    isTransactionTimestampValid(transaction, blockCreationTimestamp) {
+        return transaction.transactionBody.validTo >= blockCreationTimestamp;
+    }
+
+    isTransactionIdValid(transaction, lastTransactionIds) {
+        if (transaction.transactionBody.sourceAddress) {
+            var lastId = lastTransactionIds.get(transaction.transactionBody.sourceAddress) || 0;
+            return transaction.transactionBody.id > lastId;
+        } else {
+            return true;
+        }
+    }
+
+    isTransactionHashValid(transaction) {
+        return CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash.toString();
+    }
+
+    isTransactionSignatureValid(transaction) {
+        return RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress || transaction.transactionBody.targetAddress)
     }
 
     getMiners(currentlyLeadingBlock, nextBlockCreationTimestamp) {
@@ -94,9 +139,10 @@ export class ProofOfBurnConsensus extends Consensus {
         element.burnMap = previousBlockchainElement ? new DiscreteIntervalMap(previousBlockchainElement.burnMap) : new DiscreteIntervalMap();
         element.accountMap = previousBlockchainElement ? new Map(previousBlockchainElement.accountMap) : new Map();
         element.spendableTokensSupply = previousBlockchainElement ? previousBlockchainElement.spendableTokensSupply : 0;
+        element.lastTransactionIds = previousBlockchainElement ? new Map(previousBlockchainElement.lastTransactionIds) : new Map();
 
         block.blockBody.transactions.forEach(transaction => {
-            var { sourceAddress, targetAddress, amount } = transaction.transactionBody;
+            var { id, sourceAddress, targetAddress, amount } = transaction.transactionBody;
 
             if (targetAddress.equals(burnAddress)) {
                 element.burnMap.push(amount, sourceAddress.toString(16));
@@ -107,6 +153,11 @@ export class ProofOfBurnConsensus extends Consensus {
             if (sourceAddress) {
                 var inputBalance = element.accountMap.get(sourceAddress.toString(16)) || 0;
                 element.accountMap.set(sourceAddress.toString(16), inputBalance - amount);
+
+                var lastTransactionId = element.lastTransactionIds.get(sourceAddress.toString(16)) || 0;
+                if (id > lastTransactionId) {
+                    element.lastTransactionIds.set(sourceAddress.toString(16), id);
+                }
             } else {
                 element.spendableTokensSupply += amount;
             }
