@@ -5,29 +5,42 @@ export class BlockVerifyingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNode, processedEvent) { //TODO
+    handle(processingNode, processedEvent) {
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
         var accountService = this.serviceDispositor.getAccountService(processingNode);
-        if (blockchainService.isBlockValid(processedEvent.block)) {
-            // processingNode.blockchain.getBlockByHashAndHeight(processedEvent.block.blockHash, processedEvent.block.blockBody.height - 1);
 
-            var currentlyLeadingBlock = blockchainService.appendBlock(processedEvent.block);
-            accountService.updateAvailableBalances(currentlyLeadingBlock);
+        var nextProcessableEvents = [];
 
-            var transactionService = this.serviceDispositor.getTransactionService(processingNode);
-            transactionService.dropTransactions(processedEvent.block.blockBody.transactions);
-
-            if (processedEvent.block.blockBody.height === 0) {
-                return [];
-            } else {
-                return [
-                    this.eventFactory.createBlockBroadcastEvent(processingNode, processedEvent.block)
-                ];
+        var nextBlock = processedEvent.blocksToVerify[0];
+        processedEvent.leadingBlocks.forEach(leadingBlock => {
+            var validLeadingBlock = blockchainService.constructValidLeadingBlock(leadingBlock, nextBlock);
+            if (validLeadingBlock !== null) {
+                if (processedEvent.blocksToVerify.length > 1) {
+                    nextProcessableEvents.push(
+                        this.eventFactory.createBlockVerifyingEvent(processingNode, [validLeadingBlock], processedEvent.blocksToVerify.slice(1), processedEvent.informatorNode)
+                    );
+                }
             }
 
-        } else {
-            return [];
-        }
+            var insertableBlock = validLeadingBlock || leadingBlock;
+            var isAppended = blockchainService.appendBlock(insertableBlock);
+            var blockchainHeight = blockchainService.getBlockchainHeight();
+            if (isAppended && blockchainHeight > 0) {
+                nextProcessableEvents.push(
+                    this.eventFactory.createBlockBroadcastEvent(processingNode, insertableBlock.block)
+                );
+            }
+
+        })
+
+        return nextProcessableEvents;
+
+        //     var currentlyLeadingBlock = blockchainService.appendBlock(processedEvent.block);
+        //     accountService.updateAvailableBalances(currentlyLeadingBlock);
+
+        //     var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+        //     transactionService.dropTransactions(processedEvent.block.blockBody.transactions);
+
     }
 
 }

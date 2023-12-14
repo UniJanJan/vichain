@@ -1,6 +1,6 @@
 import { Block } from "../../model/blockchain/block.js";
 import { BlockBody } from "../../model/blockchain/block_body.js";
-import { BlockWrapper } from "../../model/blockchain/blockchain.js";
+import { ProofOfBurnConsensus } from "../consensus/proof_of_burn_consensus.js";
 
 export class BlockchainService {
 
@@ -9,6 +9,10 @@ export class BlockchainService {
         this.node = node;
 
         this.blockchain = this.node.blockchain;
+
+        this.consensuses = new Map([
+            [ProofOfBurnConsensus.name, new ProofOfBurnConsensus(network)]
+        ]);
     }
 
     getBlockchainHeight() {
@@ -39,30 +43,19 @@ export class BlockchainService {
         return null;
     }
 
-    appendBlock(block) {
-        var burnAddress = this.network.walletPool.getBurnAddress();
+    appendBlock(validLeadingBlock) {
+        var block = validLeadingBlock.block;
+        var blockHeight = block.blockBody.height;
+        var blockchainHeight = this.getBlockchainHeight();
 
-        if (this.blockchain.leadingBlocks.length === 0 && block.blockBody.height === 0) {
-            var insertableGenesisBlock = new BlockWrapper(block, null, burnAddress);
-            this.blockchain.leadingBlocks.push(insertableGenesisBlock);
-            return insertableGenesisBlock;
-        } else if (this.blockchain.leadingBlocks.length > 0 && block.blockBody.height >= this.blockchain.leadingBlocks[0].block.blockBody.height) {
-            var jointBlock = this.getBlockByHashAndHeight(block.blockBody.previousBlockHash, block.blockBody.height - 1);
-            if (jointBlock !== null) {
-                var insertableBlock = new BlockWrapper(block, jointBlock.block, burnAddress);
-                if (jointBlock.isLeadingBlock) {
-                    // LONGEST-CHAIN RULE (NO HEIGHT DIFFERENCE ALLOWED)
-                    this.blockchain.leadingBlocks = this.blockchain.leadingBlocks.flatMap(leadingBlock => {
-                        if (leadingBlock === jointBlock.leadingBlock) {
-                            return [insertableBlock];
-                        } else if (leadingBlock.block.blockBody.height >= insertableBlock.block.blockBody.height) {
-                            return [leadingBlock];
-                        } else {
-                            return [];
-                        }
-                    });
+        if (blockHeight >= blockchainHeight) {
+            if (!this.isOneOfTheLeadingBlocks(block)) {
+                // LONGEST-CHAIN RULE (NO HEIGHT DIFFERENCE ALLOWED)
+                var blockchainHeight = this.getBlockchainHeight();
+                if (blockHeight > blockchainHeight) {
+                    this.blockchain.leadingBlocks = [validLeadingBlock];
                 } else {
-                    this.blockchain.leadingBlocks.push(insertableBlock);
+                    this.blockchain.leadingBlocks.push(validLeadingBlock);
                 }
 
                 block.blockBody.transactions.forEach(transaction => {
@@ -87,83 +80,25 @@ export class BlockchainService {
                 //     });
                 // });
 
-                return insertableBlock;
+                return true;
             } else {
-                return null;
+                return false;
             }
         }
     }
 
-    getMiners(leadingBlock) {
-        var minersPerRound = this.network.settings.minersPerRound;
-        var lastBlocks = [];
-        var currentBlock = leadingBlock;
-        while (lastBlocks.length < 2 * minersPerRound && currentBlock !== null) {
-            lastBlocks.unshift(currentBlock.block);
-            currentBlock = currentBlock.previousBlock;
-        }
-
-        var seedInputBlocks = lastBlocks.slice(0, minersPerRound);
-
-        var seed = seedInputBlocks.map(block => parseInt(block.blockHash.toString()[1], 16) % 2).join('')
-            + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height;
-
-        return [...Array(minersPerRound).keys()]
-            .map((_, index) => CryptoJS.SHA256(seed + index).toString())
-            .map(hash => bigInt(hash, 16))
-            .map(number => number.mod(leadingBlock.burnMap.summedInvervalsSize))
-            .map(leadingBlock.burnMap.get.bind(leadingBlock.burnMap))
-            .map(Vue.toRaw);
+    isOneOfTheLeadingBlocks(block) {
+        return this.blockchain.leadingBlocks.some(leadingBlock => leadingBlock.block.equals(block));
     }
 
-    isBlockValid(block) {
-        var blockchainHeight = this.getBlockchainHeight();
-        if (block.blockBody.height !== blockchainHeight + 1
-            && block.blockBody.height !== blockchainHeight) {
-            return false;
-        }
+    constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock) {
+        var consensusProtocol = this.consensuses.get(ProofOfBurnConsensus.name);
+        return consensusProtocol.constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock);
+    }
 
-        if (this.getBlockByHashAndHeight(block.blockHash, block.blockBody.height) !== null) {
-            return false;
-        }
-
-        if (block === this.network.settings.genesisBlock) {
-            return true;
-        }
-
-        var blockCreationTimestamp = block.blockBody.creationTimestamp;
-        if (blockCreationTimestamp > this.network.timer.currentTimestamp) {
-            return false;
-        }
-
-        var potentialyPreviousBlock = this.getBlockByHashAndHeight(block.blockBody.previousBlockHash, block.blockBody.height - 1);
-        if (potentialyPreviousBlock === null) {
-            return false;
-        }
-
-
-        //drop blocks from the future
-        var roundStartTimestamp = blockCreationTimestamp - (blockCreationTimestamp % this.network.settings.roundTime);
-        var currentBlock = potentialyPreviousBlock.block;
-        var blocksInRound = [block];
-        while (currentBlock.block.blockBody.creationTimestamp > roundStartTimestamp) {
-            blocksInRound.unshift(currentBlock.block);
-            currentBlock = currentBlock.previousBlock;
-        }
-
-        var miners = this.getMiners(currentBlock);
-
-        var i = 0;
-        var j = 0;
-        while (i < blocksInRound.length && j < miners.length) {
-            if (miners[j] === blocksInRound[i].blockBody.transactions[blocksInRound[i].blockBody.transactions.length - 1].transactionBody.targetAddress.toString(16)) {
-                i++;
-            } else {
-                j++;
-            }
-        }
-
-        return i === blocksInRound.length;
+    canAddressConstructNewBlock(currentlyLeadingBlock, potentialyConstructingAddress, timestamp) {
+        var consensusProtocol = this.consensuses.get(ProofOfBurnConsensus.name);
+        return consensusProtocol.canAddressConstructNewBlock(currentlyLeadingBlock, potentialyConstructingAddress, timestamp);
     }
 
 }

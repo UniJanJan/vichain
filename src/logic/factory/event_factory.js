@@ -152,10 +152,10 @@ export class EventFactory {
         };
     }
 
-    createBlockVerifyingEvent(processingNode, block, informatorNode) {
+    createBlockVerifyingEvent(processingNode, leadingBlocks, blocksToVerify, informatorNode) {
         return {
             target: processingNode,
-            event: new BlockVerifyingEvent(processingNode, block, informatorNode).withPriority()
+            event: new BlockVerifyingEvent(processingNode, leadingBlocks, blocksToVerify, informatorNode).withPriority()
         };
     }
 

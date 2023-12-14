@@ -1,10 +1,11 @@
 import { Event } from "./event.js";
 
 export class BlockVerifyingEvent extends Event {
-    constructor(processingNode, block, informatorNode) {
+    constructor(processingNode, leadingBlocks, blocksToVerify, informatorNode) {
         super(1000);
         this.processingNode = processingNode;
-        this.block = block;
+        this.leadingBlocks = leadingBlocks;
+        this.blocksToVerify = blocksToVerify;
         this.informatorNode = informatorNode;
     }
 
