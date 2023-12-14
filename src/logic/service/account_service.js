@@ -18,7 +18,7 @@ export class AccountService {
         }
 
         var account = new Account(wallet, 0);
-        this.managedAccounts.accounts.set(wallet.publicKey, account);
+        this.managedAccounts.accounts.set(wallet.publicKey.toString(16), account);
         return account;
     }
 
@@ -26,8 +26,12 @@ export class AccountService {
         return this.managedAccounts.accounts.get(publicKey);
     }
 
+    getManagedAccounts() {
+        return Array.from(this.managedAccounts.accounts.values());
+    }
+
     getRandomManagedAccount() {
-        return Utils.getRandomElement(Array.from(this.managedAccounts.accounts.values()));
+        return Utils.getRandomElement(this.getManagedAccounts());
     }
 
     getRandomNonManagedAddress() {

@@ -6,19 +6,12 @@ export class BlockCreatingEventHandler extends EventHandler {
     }
 
     handle(processingNode, processedEvent) {
-        // TODO currentlyLeading probably has been changed because of other miners
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
-        var currentlyLeadingBlock = blockchainService.getBlockByHashAndHeight(processedEvent.leadingBlock.block.blockHash, processedEvent.leadingBlock.block.blockBody.height);
-        if (currentlyLeadingBlock !== null) {
-            currentlyLeadingBlock = currentlyLeadingBlock.leadingBlock;
-        } else {
-            // longer chain appeared
-            return [];
-        }
-        // var leadingBlockIndex = processingNode.blockchain.leadingBlocks.indexOf(processedEvent.leadingBlock);
-        var leadingBlockIndex = processingNode.blockchain.leadingBlocks.indexOf(currentlyLeadingBlock);
-        if (leadingBlockIndex === -1) {
-            throw new Error('Leading block not found in blockchain of ' + processingNode);
+        var leadingBlock = processedEvent.leadingBlock;
+        var isStillLeading = processingNode.blockchain.leadingBlocks.includes(leadingBlock);
+        if (!isStillLeading) {
+            //throw new Error('Leading block not found in blockchain of ' + processingNode);
+            return []
         }
 
         var transactionService = this.serviceDispositor.getTransactionService(processingNode);
@@ -30,11 +23,12 @@ export class BlockCreatingEventHandler extends EventHandler {
         var awardTransaction = transactionService.createAwardTransaction(minerAccount);
         transactions.push(awardTransaction);
 
-        var leadingBlock = processingNode.blockchain.leadingBlocks[leadingBlockIndex];
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
         var newBlock = blockchainService.createBlock(leadingBlock.block, transactions);
-        currentlyLeadingBlock = blockchainService.appendBlock(newBlock);
-        accountService.updateAvailableBalances(currentlyLeadingBlock);
+        var nextLeadingBlock = blockchainService.constructValidLeadingBlock(leadingBlock, newBlock);
+        blockchainService.appendBlock(nextLeadingBlock);
+        accountService.updateAvailableBalances(nextLeadingBlock);
+
 
         return [
             this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock)

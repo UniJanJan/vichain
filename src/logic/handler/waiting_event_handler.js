@@ -81,34 +81,33 @@ export class WaitingEventHandler extends EventHandler {
                 }
 
             case CyclicEventsName.MINERS_SELECTION:
-                var waitTime = this.network.settings.roundTime - (this.network.timer.currentTimestamp % this.network.settings.roundTime) + 1000;
+                var { currentTimestamp } = this.network.timer;
+                var { roundTime, minersPerRound } = this.network.settings;
+
+                var timeQuantum = roundTime / minersPerRound;
+                var waitTime = timeQuantum - (currentTimestamp % timeQuantum) + 1000;
 
                 var nextProcessableEvents = [];
 
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
-                var managedAddress = accountService.getRandomManagedAccount().wallet.publicKey; // TODO
+                var managedAddresses = accountService.getManagedAccounts();
 
                 var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
                 processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
-                    var miners = blockchainService.getMiners(leadingBlock);
-
-                    leadingBlock.miners = miners;
-
-                    var minersPerRound = this.network.settings.minersPerRound;
-                    var timeQuantum = this.network.settings.roundTime / minersPerRound;
-                    miners.forEach((miner, index) => {
-                        if (miner === managedAddress.toString(16)) {
-                            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(processingNode, "block_mining", index * timeQuantum, { leadingBlock, selectedAddress: managedAddress }));
+                    managedAddresses.forEach(managedAddress => {
+                        if (blockchainService.canAddressConstructNewBlock(leadingBlock, managedAddress.wallet.publicKey.toString(16), currentTimestamp)) {
+                            nextProcessableEvents.push(
+                                this.eventFactory.createBlockCreatingEvent(processingNode, leadingBlock, managedAddress.wallet.publicKey.toString(16))
+                            );
                         }
-                    });
+                    })
+
                 })
 
                 return [
                     ...nextProcessableEvents,
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.MINERS_SELECTION, waitTime)
                 ];
-            case "block_mining":
-                return [this.eventFactory.createBlockCreatingEvent(processingNode, processedEvent.additionalData.leadingBlock, processedEvent.additionalData.selectedAddress)];
         }
     }
 

@@ -1,5 +1,3 @@
-import { RSA } from "../../common/rsa.js";
-import { BlockWrapper } from "../../model/blockchain/blockchain.js";
 import { LinkStatus } from "../../model/entity/link.js";
 import { AddrMessage } from "../../model/message/addr_message.js";
 import { BlockMessage } from "../../model/message/block_message.js";
@@ -72,7 +70,7 @@ export class MessageReceivingEventHandler extends EventHandler {
             if (blockchainService.getBlockchainHeight() + 1 < event.message.block.blockBody.height) {
                 return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksMessage())];
             } else {
-                return [this.eventFactory.createBlockVerifyingEvent(processingNode, event.message.block, event.nodeFrom)];
+                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks, [event.message.block], event.nodeFrom)];
             }
         } else if (event.message instanceof GetTransactionsMessage) {
             var transactionService = this.serviceDispositor.getTransactionService(processingNode);
@@ -89,67 +87,16 @@ export class MessageReceivingEventHandler extends EventHandler {
         } else if (event.message instanceof GetBlocksResponseMessage) {
             var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
 
-            var blocks = event.message.blocks;
+            var blocks = [...event.message.blocks];
 
-            if (blockchainService.getBlockchainHeight() >= blocks.length || !blocks[0].equals(this.network.settings.genesisBlock)) {
+            if (blockchainService.getBlockchainHeight() + 1 < blocks.length) {
+                return [
+                    this.eventFactory.createBlockVerifyingEvent(processingNode, [null], blocks, event.informatorNode)
+                ];
+            } else {
                 return [];
             }
-
-            var burnAddress = this.network.walletPool.getBurnAddress();
-            var leadingBlock = new BlockWrapper(blocks[0], null, burnAddress);
-            var miners = [];
-
-            for (var i = 1; i < blocks.length; i++) {
-                if (Math.floor(blocks[i - 1].blockBody.creationTimestamp / this.network.settings.roundTime) <
-                    Math.floor(blocks[i].blockBody.creationTimestamp / this.network.settings.roundTime)) {
-
-                    miners = blockchainService.getMiners(leadingBlock);
-                }
-
-                if (this.isBlockValid(blocks[i - 1], blocks[i], miners)) {
-                    leadingBlock = new BlockWrapper(blocks[i], leadingBlock, burnAddress);
-                } else {
-                    return [];
-                }
-            }
-
-            processingNode.blockchain.leadingBlocks = [leadingBlock];
-
-            return [];
         }
-    }
-
-    isBlockValid(previousBlock, block, miners) {
-        return previousBlock.isPreviousFor(block)
-            && previousBlock.blockBody.height + 1 === block.blockBody.height
-            && previousBlock.blockBody.creationTimestamp < block.blockBody.creationTimestamp
-            && CryptoJS.SHA256(JSON.stringify(block.blockBody)).toString() === block.blockHash.toString()
-            && this.areTransactionsValid(block.blockBody.transactions, block.blockBody.creationTimestamp, miners);
-    }
-
-    areTransactionsValid(transactions, blockCreationTimestamp, miners) {
-        var awardTransactions = transactions.filter(transaction => transaction.transactionBody.sourceAddress === null)
-        if (awardTransactions.length !== 1
-            || awardTransactions[0].transactionBody.amount !== this.network.settings.miningAward) {
-            return false;
-        }
-
-
-        while (miners.length > 0 && awardTransactions[0].transactionBody.targetAddress.toString(16) !== miners[0]) {
-            miners.splice(0, 1);
-        }
-
-        if (miners.length > 0 && awardTransactions[0].transactionBody.targetAddress.toString(16) === miners[0]) {
-            miners.splice(0, 1);
-        } else {
-            return false;
-        }
-
-
-        return transactions.every(transaction =>
-            transaction.transactionBody.validTo >= blockCreationTimestamp
-            && CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash.toString()
-            && RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress || transaction.transactionBody.targetAddress))
     }
 
 }

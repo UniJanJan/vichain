@@ -25,9 +25,13 @@ export class NodeCreatingEventHandler extends EventHandler {
             var accountService = this.serviceDispositor.getAccountService(node);
             accountService.createAccount();
 
-            nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(node, processingNetwork.settings.genesisBlock, this.network.nodes));
+            var currentTimestamp = this.network.timer.currentTimestamp;
+            var { roundTime } = this.network.settings;
+            var timeToNextRound = roundTime - (currentTimestamp % roundTime) + 1000;
+
+            nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(node, [null], [processingNetwork.settings.genesisBlock], this.network.nodes));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0));
-            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, 0));
+            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, timeToNextRound));
             nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000));
         }
 
