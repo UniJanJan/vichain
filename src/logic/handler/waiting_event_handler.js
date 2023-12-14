@@ -68,7 +68,6 @@ export class WaitingEventHandler extends EventHandler {
 
                 if (maxSpendableAmount > 0) {
                     var amount = Math.ceil(Math.random() * maxSpendableAmount);
-                    console.log(maxSpendableAmount < amount, amount, maxSpendableAmount);
 
                     return [
                         this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount),
