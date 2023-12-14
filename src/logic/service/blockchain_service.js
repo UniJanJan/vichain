@@ -26,23 +26,6 @@ export class BlockchainService {
         return new Block(blockBody, CryptoJS.SHA256(JSON.stringify(blockBody)));
     }
 
-    getBlockByHashAndHeight(blockHash, height) {
-        for (var leadingBlock of this.blockchain.leadingBlocks) {
-            var currentBlock = leadingBlock;
-            while (currentBlock.block.blockBody.height > height && currentBlock.previousBlock !== null) {
-                currentBlock = currentBlock.previousBlock;
-            }
-            if (currentBlock.block.blockHash == blockHash && currentBlock.block.blockBody.height === height) {
-                return {
-                    block: currentBlock,
-                    isLeadingBlock: currentBlock === leadingBlock,
-                    leadingBlock: leadingBlock
-                };
-            }
-        }
-        return null;
-    }
-
     appendBlock(validLeadingBlock) {
         var block = validLeadingBlock.block;
         var blockHeight = block.blockBody.height;
