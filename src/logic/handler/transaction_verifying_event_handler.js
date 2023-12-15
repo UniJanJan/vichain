@@ -8,9 +8,8 @@ export class TransactionVerifyingEventHandler extends EventHandler {
 
     handle(processingNode, processedEvent) {
         var transaction = processedEvent.transaction;
-        if (!processingNode.transactionPool.contains(transaction) && this.isTransactionValid(transaction)) {
-            var transactionService = this.serviceDispositor.getTransactionService(processingNode);
-
+        var transactionService = this.serviceDispositor.getTransactionService(processingNode);
+        if (!processingNode.transactionPool.contains(transaction) && transactionService.isTransactionValid(transaction)) {
             if (transactionService.putUncommittedTransaction(transaction) && processingNode.transactionPool.contains(transaction)) {
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
                 accountService.updateAvailableBalance(transaction);
@@ -24,9 +23,4 @@ export class TransactionVerifyingEventHandler extends EventHandler {
         }
     }
 
-    isTransactionValid(transaction) {
-        return !transaction.transactionBody.sourceAddress.equals(transaction.transactionBody.targetAddress) &&
-            !transaction.transactionBody.sourceAddress.equals(this.network.walletPool.getBurnAddress()) &&
-            RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress);
-    }
 }
