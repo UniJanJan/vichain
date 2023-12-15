@@ -37,7 +37,7 @@ export class AccountService {
     getRandomNonManagedAddress() {
         var managedAddresses = Array.from(this.managedAccounts.accounts.keys());
         var nonManagedAddresses = this.walletPool.getAllAddresses()
-            .filter(address => !managedAddresses.includes(address));
+            .filter(address => !managedAddresses.includes(address.toString(16)));
         return Utils.getRandomElement(nonManagedAddresses);
     }
 

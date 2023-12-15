@@ -52,30 +52,56 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     areTransactionsValid(transactions, blockCreationTimestamp, previousBlock) {
+        var { miningAward, roundTime, maxTransactionsPerBlock } = this.network.settings;
+
+        if (transactions.length > maxTransactionsPerBlock) {
+            return false;
+        }
+
         var awardTransactions = transactions.filter(transaction => transaction.transactionBody.sourceAddress === null)
         if (awardTransactions.length !== 1
-            || awardTransactions[0].transactionBody.amount !== this.network.settings.miningAward) {
+            || awardTransactions[0].transactionBody.amount !== miningAward) {
             return false;
         }
 
         var miners = this.getMiners(previousBlock, blockCreationTimestamp);
-        var currentMiner = miners.get(blockCreationTimestamp % this.network.settings.roundTime);
+        var currentMiner = miners.get(blockCreationTimestamp % roundTime);
         if (currentMiner !== awardTransactions[0].transactionBody.targetAddress.toString(16)) {
             return false;
         }
 
-        return transactions.every(transaction => this.isTransactionValid(transaction, blockCreationTimestamp, previousBlock.lastTransactionIds));
+        var awardTransactionIndex = transactions.indexOf(awardTransactions[0]);
+        return transactions.every((transaction, index) => this.isTransactionValid(transaction, index === awardTransactionIndex, blockCreationTimestamp, previousBlock.lastTransactionIds));
     }
 
-    isTransactionValid(transaction, blockCreationTimestamp, lastTransactionIds) {
-        return this.isTransactionTimestampValid(transaction, blockCreationTimestamp)
+    isTransactionValid(transaction, asAwardTransaction, blockCreationTimestamp, lastTransactionIds) {
+        return this.isTransactionAmountValid(transaction)
+            && this.isTransactionTimestampValid(transaction, blockCreationTimestamp)
+            && this.isTransactionAddressesValid(transaction, asAwardTransaction)
             && this.isTransactionIdValid(transaction, lastTransactionIds)
             && this.isTransactionHashValid(transaction)
             && this.isTransactionSignatureValid(transaction);
     }
 
+    isTransactionAmountValid(transaction) {
+        return transaction.transactionBody.amount > 0;
+    }
+
     isTransactionTimestampValid(transaction, blockCreationTimestamp) {
         return transaction.transactionBody.validTo >= blockCreationTimestamp;
+    }
+
+    isTransactionAddressesValid(transaction, asAwardTransaction) {
+        var { sourceAddress, targetAddress } = transaction.transactionBody;
+        var burnAddress = this.network.walletPool.getBurnAddress();
+
+        if (asAwardTransaction) {
+            return sourceAddress === null;
+        } else {
+            return sourceAddress !== null
+                && sourceAddress.toString(16) !== targetAddress.toString(16)
+                && sourceAddress.toString(16) !== burnAddress.toString(16);
+        }
     }
 
     isTransactionIdValid(transaction, lastTransactionIds) {

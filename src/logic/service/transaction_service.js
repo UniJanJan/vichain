@@ -1,6 +1,7 @@
 import { RSA } from "../../common/rsa.js";
 import { Transaction } from "../../model/transaction/transaction.js";
 import { TransactionBody } from "../../model/transaction/transaction_body.js";
+import { ProofOfBurnConsensus } from "../consensus/proof_of_burn_consensus.js";
 
 export class TransactionService {
 
@@ -9,6 +10,10 @@ export class TransactionService {
         this.node = node;
 
         this.transactionPool = this.node.transactionPool;
+
+        this.consensuses = new Map([
+            [ProofOfBurnConsensus.name, new ProofOfBurnConsensus(network)]
+        ]);
     }
 
     createTransaction(sourceAccount, targetAddress, amount) {
@@ -42,10 +47,9 @@ export class TransactionService {
 
     }
 
-    isTransactionValid(transaction) {
-        return !transaction.transactionBody.sourceAddress.equals(transaction.transactionBody.targetAddress) &&
-            !transaction.transactionBody.sourceAddress.equals(this.network.walletPool.getBurnAddress()) &&
-            RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress);
+    isTransactionValid(transaction, asAwardTransaction) {
+        var consensusProtocol = this.consensuses.get(ProofOfBurnConsensus.name);
+        return consensusProtocol.isTransactionValid(transaction, asAwardTransaction, this.network.timer.currentTimestamp, this.transactionPool.lastTransactionIds);
     }
 
     dropTransactions(transactions) {

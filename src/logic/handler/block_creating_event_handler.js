@@ -26,10 +26,14 @@ export class BlockCreatingEventHandler extends EventHandler {
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
         var newBlock = blockchainService.createBlock(leadingBlock.block, transactions);
         var nextLeadingBlock = blockchainService.constructValidLeadingBlock(leadingBlock, newBlock);
-        blockchainService.appendBlock(nextLeadingBlock);
 
-        transactionService.updateTransactionPool(nextLeadingBlock);
-        accountService.updateAvailableBalances(nextLeadingBlock);
+        if (nextLeadingBlock !== null) {
+            var isAppended = blockchainService.appendBlock(nextLeadingBlock);
+            if (isAppended) {
+                transactionService.updateTransactionPool(nextLeadingBlock);
+                accountService.updateAvailableBalances(nextLeadingBlock);
+            }
+        }
 
 
         return [
