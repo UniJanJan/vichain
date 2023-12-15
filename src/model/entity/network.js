@@ -77,4 +77,51 @@ export class Network {
         this.links.forEach(link => link.update(elapsedTime));
     }
 
+    draw(graphics, settings) {
+        graphics.beginPath();
+        graphics.arc(40, 40, 20, -Math.PI / 2, 3 / 2 * Math.PI, false);
+        graphics.strokeStyle = 'grey';
+        graphics.lineWidth = 8;
+        graphics.stroke();
+
+        graphics.beginPath();
+        graphics.arc(40, 40, 28, -Math.PI / 2, 3 / 2 * Math.PI, false);
+        graphics.strokeStyle = 'black';
+        graphics.lineWidth = 2;
+        graphics.stroke();
+
+        if (this.settings.isBlockchainInstalled) {
+            var currentTimestamp = this.timer.currentTimestamp;
+            var { roundTime, minersPerRound } = this.settings;
+
+            var timeQuantum = roundTime / minersPerRound;
+
+            const minerRoundProgressRatio = (currentTimestamp % timeQuantum) / timeQuantum;
+            const roundProgressRatio = (currentTimestamp % roundTime) / roundTime;
+
+            graphics.beginPath();
+            graphics.arc(40, 40, 20, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * minerRoundProgressRatio, false);
+            graphics.strokeStyle = 'blue';
+            graphics.lineWidth = 8;
+            graphics.stroke();
+
+            graphics.beginPath();
+            graphics.arc(40, 40, 28, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * roundProgressRatio, false);
+            graphics.strokeStyle = 'darkblue';
+            graphics.lineWidth = 6;
+            graphics.stroke();
+        }
+
+        if (!settings.isRunning) {
+            graphics.beginPath();
+            graphics.rect(32, 30, 7, 18);
+            graphics.fillStyle = 'red'
+            graphics.fill();
+
+            graphics.rect(41, 30, 7, 18);
+            graphics.fillStyle = 'red'
+            graphics.fill();
+        }
+    }
+
 }
