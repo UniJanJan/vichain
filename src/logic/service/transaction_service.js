@@ -42,6 +42,12 @@ export class TransactionService {
 
     }
 
+    isTransactionValid(transaction) {
+        return !transaction.transactionBody.sourceAddress.equals(transaction.transactionBody.targetAddress) &&
+            !transaction.transactionBody.sourceAddress.equals(this.network.walletPool.getBurnAddress()) &&
+            RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress);
+    }
+
     dropTransactions(transactions) {
         transactions.forEach(transaction => {
             if (this.transactionPool.contains(transaction)) {
