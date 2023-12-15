@@ -14,4 +14,8 @@ export class Consensus {
         throw new Error(`Consensus protocol not implemented!`);
     }
 
+    isTransactionValid(transaction, asAwardTransaction, timestamp, lastTransactionIds) {
+        throw new Error(`Consensus protocol not implemented!`);
+    }
+
 }
