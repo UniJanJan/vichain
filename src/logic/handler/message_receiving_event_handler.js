@@ -67,10 +67,13 @@ export class MessageReceivingEventHandler extends EventHandler {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new AddrMessage(processingNode.networkInterface.getAllLinkableNodes()))];
         } else if (event.message instanceof BlockMessage) {
             var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
-            if (blockchainService.getBlockchainHeight() + 1 < event.message.block.blockBody.height) {
+            var blockchainHeight = blockchainService.getBlockchainHeight();
+            if (blockchainHeight + 1 < event.message.block.blockBody.height) {
                 return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksMessage())];
-            } else {
+            } else if (blockchainHeight + 1 === event.message.block.blockBody.height) {
                 return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks, [event.message.block], event.nodeFrom)];
+            } else if (blockchainHeight === event.message.block.blockBody.height) {
+                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.previousBlock), [event.message.block], event.nodeFrom)];
             }
         } else if (event.message instanceof GetTransactionsMessage) {
             var transactionService = this.serviceDispositor.getTransactionService(processingNode);
