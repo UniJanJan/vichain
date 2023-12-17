@@ -2,6 +2,7 @@ import { Utils } from "./common.js";
 import { EventManager } from "./logic/event_manager.js";
 import { EventFactory } from "./logic/factory/event_factory.js";
 import { Network } from "./model/entity/network.js";
+import { Wallet } from "./model/wallet/wallet.js";
 
 export class NetworkManager {
     constructor(network) {
@@ -84,6 +85,10 @@ export class NetworkManager {
 
     installBlockchain() {
         this.eventManager.enqueueExecution(this.eventFactory.createBlockchainInstallingEvent(this.network, this.network.nodes));
+    }
+
+    postTransaction(request) {
+        this.eventManager.enqueueExecution(this.eventFactory.createTransactionCreatingEvent(this.selectedNode, new Wallet(request.sourceAddres, request.sourceAddresPrivateKey), request.targetAddress, request.amount));
     }
 
     update(tFrame = 0) { // TODO maybe

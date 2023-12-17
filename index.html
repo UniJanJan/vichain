@@ -113,6 +113,24 @@
                                         <div>Private key: {{ account.wallet.privateKey.toString(16).slice(0,8)
                                             }}...</div>
                                         <div>Spendable token amount: {{ account.availableBalance }}</div>
+
+                                        <div v-if="account.frozenAmounts.length > 0">
+                                            <ul class="list-group"
+                                                v-for="frozenAmount in Array.from(account.frozenAmounts.keys())">
+                                                <li class="list-group-item"
+                                                    style="font-size: small; padding: 0; color: white; background-color: silver">
+                                                    {{ frozenAmount.amount }} to
+                                                    {{ frozenAmount.frozenToTimestamp }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div v-else>
+                                            <ul class="list-group">
+                                                <li class="list-group-item" style="font-size: small; padding: 0;">No
+                                                    amount is currently frozen
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -123,6 +141,66 @@
                                     </li>
                                 </ul>
                             </div>
+
+                            <div v-if="networkManager.network.settings.isBlockchainInstalled">
+                                <button type="button" class="btn btn-secondary btn-sm" style="width: 100%"
+                                    data-bs-toggle="modal" data-bs-target="#postTransactionModal"
+                                    @click="postTransaction">Post
+                                    transaction...</button>
+
+
+
+
+
+                                <div class="modal fade" tabindex="-1" id="postTransactionModal">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Transaction posting</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="form-floating mb-2">
+                                                    <span class="input-group-text" id="hex-addon1">0x</span>
+                                                    <input id="sourceAddresInput" type="text" class="form-control"
+                                                        v-model="postTransactionRequest.sourceAddres"
+                                                        aria-describedby="hex-addon1" />
+                                                    <label for="sourceAddresInput">Source address (public key)</label>
+                                                </div>
+                                                <div class="form-floating mb-2">
+                                                    <span class="input-group-text" id="hex-addon2">0x</span>
+                                                    <input id="sourceAddresPrivateKeyInput" type="text"
+                                                        class="form-control"
+                                                        v-model="postTransactionRequest.sourceAddresPrivateKey"
+                                                        aria-describedby="hex-addon2" />
+                                                    <label for="sourceAddresPrivateKeyInput">Source address (private
+                                                        key)</label>
+                                                </div>
+                                                <div class="form-floating mb-2">
+                                                    <span class="input-group-text" id="hex-addon3">0x</span>
+                                                    <input id="targetAddressInput" type="text" class="form-control"
+                                                        v-model="postTransactionRequest.targetAddress"
+                                                        aria-describedby="hex-addon3" />
+                                                    <label for="targetAddressInput">Target address (public key)</label>
+                                                </div>
+                                                <div class="form-floating mb-2">
+                                                    <input id="amountInput" type="number" class="form-control"
+                                                        v-model="postTransactionRequest.amount" />
+                                                    <label for="amountInput">Amount</label>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary">Post transaction</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
                         </div>
 
                         <div class="tab-pane fade" id="nav-mempool" role="tabpanel" aria-labelledby="nav-mempool-tab">
