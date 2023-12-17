@@ -6,6 +6,7 @@ const app = createApp({
     data() {
         return {
             networkManager: ref(new NetworkManager()),
+            postTransactionRequest: this.getClearPostTransactionRequest(),
             translations: {
                 'MessageSendingEvent': 'Message sending',
                 'MessageReceivingEvent': 'Message receiving',
@@ -60,6 +61,18 @@ const app = createApp({
         },
         installBlockchain() {
             this.networkManager.installBlockchain();
+        },
+        postTransaction() {
+            this.networkManager.postTransaction(postTransactionRequest);
+            this.postTransactionRequest = this.getClearPostTransactionRequest();
+        },
+        getClearPostTransactionRequest() {
+            return {
+                sourceAddres: '',
+                sourceAddresPrivateKey: '',
+                targetAddress: '',
+                amount: 0
+            };
         }
     }
 });
