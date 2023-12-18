@@ -109,25 +109,51 @@
                             <div v-if="managedAccounts.length > 0">
                                 <ul class="list-group" v-for="account in managedAccounts">
                                     <li class="list-group-item">
-                                        <div>Public key: {{ account.wallet.publicKey.toString(16).slice(0,8) }}...</div>
-                                        <div>Private key: {{ account.wallet.privateKey.toString(16).slice(0,8)
-                                            }}...</div>
-                                        <div>Spendable token amount: {{ account.availableBalance }}</div>
+                                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            Public key: 0x<u style="text-decoration-style: dashed; cursor: pointer;"
+                                                @click="copyToClipboard">{{ account.wallet.publicKey.toString(16) }}</u>
+                                        </div>
+                                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            Private key: 0x<u style="text-decoration-style: dashed; cursor: pointer;"
+                                                @click="copyToClipboard">{{ account.wallet.privateKey.toString(16)
+                                                }}</u></div>
+                                        <div>Spendable token amount: {{
+                                            account.accountHistory.availableBalanceByLeadingBlockHash.get(leadingBlocks[0].block.blockHash.toString())
+                                            }}</div>
 
-                                        <div v-if="account.frozenAmounts.length > 0">
+                                        <div v-if="account.accountHistory.transactions.length > 0">
                                             <ul class="list-group"
-                                                v-for="frozenAmount in Array.from(account.frozenAmounts.keys())">
+                                                v-for="relatedTransaction in account.accountHistory.transactions">
                                                 <li class="list-group-item"
-                                                    style="font-size: small; padding: 0; color: white; background-color: silver">
-                                                    {{ frozenAmount.amount }} to
-                                                    {{ frozenAmount.frozenToTimestamp }}
+                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === relatedTransaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
+                                                    <div
+                                                        v-if="relatedTransaction.transactionBody.sourceAddress">
+                                                        [{{ relatedTransaction.transactionBody.id }}]
+                                                        {{ relatedTransaction.transactionBody.amount }}
+                                                        token(s) transfer from
+                                                        0x{{
+                                                        relatedTransaction.transactionBody.sourceAddress.toString(16).slice(0,8)
+                                                        }}...
+                                                        to
+                                                        0x{{
+                                                        relatedTransaction.transactionBody.targetAddress.toString(16).slice(0,8)
+                                                        }}...
+                                                    </div>
+                                                    <div v-else>
+                                                        [{{ relatedTransaction.transactionBody.id }}]
+                                                        {{ relatedTransaction.transactionBody.amount }}
+                                                        token(s) generation for
+                                                        0x{{
+                                                        relatedTransaction.transactionBody.targetAddress.toString(16).slice(0,8)
+                                                        }}...
+                                                    </div>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div v-else>
                                             <ul class="list-group">
                                                 <li class="list-group-item" style="font-size: small; padding: 0;">No
-                                                    amount is currently frozen
+                                                    transaction history
                                                 </li>
                                             </ul>
                                         </div>
@@ -144,8 +170,7 @@
 
                             <div v-if="networkManager.network.settings.isBlockchainInstalled">
                                 <button type="button" class="btn btn-secondary btn-sm" style="width: 100%"
-                                    data-bs-toggle="modal" data-bs-target="#postTransactionModal"
-                                    @click="postTransaction">Post
+                                    data-bs-toggle="modal" data-bs-target="#postTransactionModal">Post
                                     transaction...</button>
 
 
@@ -193,7 +218,8 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Post transaction</button>
+                                                <button type="button" class="btn btn-primary"
+                                                    @click="postTransaction">Post transaction</button>
                                             </div>
                                         </div>
                                     </div>
@@ -208,6 +234,7 @@
                                 <ul class="list-group" v-for="transaction in pooledTransactions">
                                     <li class="list-group-item"
                                         :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === transaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
+                                        [{{ transaction.transactionBody.id }}]
                                         {{ transaction.transactionBody.amount }} from
                                         0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}... to
                                         0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...
@@ -244,6 +271,7 @@
                                                 <li class="list-group-item"
                                                     :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === transaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
                                                     <div v-if="transaction.transactionBody.sourceAddress">
+                                                        [{{ transaction.transactionBody.id }}]
                                                         {{ transaction.transactionBody.amount }} token(s) transfer from
                                                         0x{{
                                                         transaction.transactionBody.sourceAddress.toString(16).slice(0,8)
@@ -254,6 +282,7 @@
                                                         }}...
                                                     </div>
                                                     <div v-else>
+                                                        [{{ transaction.transactionBody.id }}]
                                                         {{ transaction.transactionBody.amount }} token(s) generation for
                                                         0x{{
                                                         transaction.transactionBody.targetAddress.toString(16).slice(0,8)
@@ -505,6 +534,7 @@
     </div>
 </body>
 
+<script src=" https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js "></script>
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
     integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

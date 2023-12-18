@@ -9,10 +9,11 @@ export class TransactionVerifyingEventHandler extends EventHandler {
     handle(processingNode, processedEvent) {
         var transaction = processedEvent.transaction;
         var transactionService = this.serviceDispositor.getTransactionService(processingNode);
-        if (!processingNode.transactionPool.contains(transaction) && transactionService.isTransactionValid(transaction, false)) {
-            if (transactionService.putUncommittedTransaction(transaction) && processingNode.transactionPool.contains(transaction)) {
+        if (transactionService.isTransactionValid(transaction, false)) {
+
+            if (transactionService.putUncommittedTransaction(transaction)) {
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
-                accountService.updateAvailableBalance(transaction);
+                accountService.addRelatedTransaction(transaction);
             }
 
             return [

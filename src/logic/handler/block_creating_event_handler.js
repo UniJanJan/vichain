@@ -20,7 +20,7 @@ export class BlockCreatingEventHandler extends EventHandler {
         var accountService = this.serviceDispositor.getAccountService(processingNode);
         var minerAccount = accountService.getManagedAccount(processedEvent.selectedAddress);
         var transactions = transactionService.pickUncommittedTransactions(this.network.settings.maxTransactionsPerBlock - 1);
-        var awardTransaction = transactionService.createAwardTransaction(minerAccount);
+        var awardTransaction = transactionService.createAwardTransaction(minerAccount.wallet);
         transactions.push(awardTransaction);
 
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
@@ -31,7 +31,7 @@ export class BlockCreatingEventHandler extends EventHandler {
             var isAppended = blockchainService.appendBlock(nextLeadingBlock);
             if (isAppended) {
                 transactionService.updateTransactionPool(nextLeadingBlock);
-                accountService.updateAvailableBalances(nextLeadingBlock);
+                accountService.updateRelatedTransactions(nextLeadingBlock);
             }
         }
 

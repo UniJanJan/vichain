@@ -28,8 +28,8 @@ export class BlockchainInstallingEventHandler extends EventHandler {
 
             var gainAmount = processingNetwork.settings.initTokenAmountPerNode + 1;
 
-            var incomeTransaction = transactionService.createAwardTransaction(newAccount, gainAmount);
-            var burnTransaction = transactionService.createBurnTransaction(newAccount, 1);
+            var incomeTransaction = transactionService.createAwardTransaction(newAccount.wallet, gainAmount);
+            var burnTransaction = transactionService.createBurnTransaction(newAccount.wallet, 1);
 
             transactions.push(incomeTransaction);
             transactions.push(burnTransaction);

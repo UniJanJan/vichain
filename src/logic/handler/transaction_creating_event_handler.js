@@ -9,12 +9,11 @@ export class TransactionCreatingEventHandler extends EventHandler {
         var accountService = this.serviceDispositor.getAccountService(processingNode);
         var transactionService = this.serviceDispositor.getTransactionService(processingNode);
 
-        var sourceAccount = accountService.getManagedAccount(processedEvent.sourceWallet.publicKey.toString(16));
-        var transaction = transactionService.createTransaction(sourceAccount, processedEvent.targetAddress, processedEvent.amount);
+        var transaction = transactionService.createTransaction(processedEvent.sourceWallet, processedEvent.targetAddress, processedEvent.amount);
 
         
-        if (transactionService.putUncommittedTransaction(transaction) && processingNode.transactionPool.contains(transaction)) {
-            accountService.updateAvailableBalance(transaction);
+        if (transactionService.putUncommittedTransaction(transaction)) {
+            accountService.addRelatedTransaction(transaction);
         }
 
         return [

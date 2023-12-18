@@ -63,7 +63,7 @@ const app = createApp({
             this.networkManager.installBlockchain();
         },
         postTransaction() {
-            this.networkManager.postTransaction(postTransactionRequest);
+            this.networkManager.postTransaction(this.postTransactionRequest);
             this.postTransactionRequest = this.getClearPostTransactionRequest();
         },
         getClearPostTransactionRequest() {
@@ -73,6 +73,9 @@ const app = createApp({
                 targetAddress: '',
                 amount: 0
             };
+        },
+        copyToClipboard(event) {
+            navigator.clipboard.writeText(event.target.innerText);
         }
     }
 });

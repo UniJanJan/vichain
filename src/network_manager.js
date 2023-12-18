@@ -85,10 +85,11 @@ export class NetworkManager {
 
     installBlockchain() {
         this.eventManager.enqueueExecution(this.eventFactory.createBlockchainInstallingEvent(this.network, this.network.nodes));
+        this.settings.isRunning = true;
     }
 
     postTransaction(request) {
-        this.eventManager.enqueueExecution(this.eventFactory.createTransactionCreatingEvent(this.selectedNode, new Wallet(request.sourceAddres, request.sourceAddresPrivateKey), request.targetAddress, request.amount));
+        this.eventManager.enqueueExecution(this.eventFactory.createTransactionCreatingEvent(this.selectedNode, new Wallet(bigInt(request.sourceAddresPrivateKey, 16), bigInt(request.sourceAddres, 16)), bigInt(request.targetAddress, 16), request.amount));
     }
 
     update(tFrame = 0) { // TODO maybe
