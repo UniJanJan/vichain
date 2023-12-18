@@ -41,37 +41,81 @@ export class AccountService {
         return Utils.getRandomElement(nonManagedAddresses);
     }
 
-    updateAvailableBalance(transaction) {
-        var managedAccount = this.getManagedAccount(transaction.transactionBody.sourceAddress.toString(16));
+    getManagedAccountByTransaction(transaction) {
+        var { sourceAddress, targetAddress } = transaction.transactionBody;
+
+        var account = null;
+        if (sourceAddress !== null) {
+            account = this.getManagedAccount(sourceAddress.toString(16));
+        }
+
+        if (!account) {
+            account = this.getManagedAccount(targetAddress.toString(16));
+        }
+
+        return account;
+    }
+
+    addRelatedTransaction(transaction) {
+        var managedAccount = this.getManagedAccountByTransaction(transaction);
         if (managedAccount) {
-            managedAccount.freezeAmount(transaction.transactionHash, transaction.transactionBody.amount, transaction.transactionBody.validTo, transaction.transactionBody.id);
+            managedAccount.accountHistory.addUncommittedTransaction(transaction);
+            managedAccount.accountHistory.decreaseAvailableBalance(transaction.transactionBody.amount);
         }
     }
 
-    updateAvailableBalances(leadingBlock) {
-        var leadingBlockCreationTimestamp = leadingBlock.block.blockBody.creationTimestamp;
+    updateRelatedTransactions(leadingBlock) {
+        var leadingBlockHash = leadingBlock.block.blockHash.toString();
+        var previousBlockHash = leadingBlock.previousBlock ? leadingBlock.previousBlock.block.blockHash.toString() : "0";
 
         this.managedAccounts.accounts.forEach(managedAccount => {
-            leadingBlock.block.blockBody.transactions.forEach(committedTransaction => {
-                if (managedAccount.frozenAmounts.has(committedTransaction.transactionHash)) {
-                    managedAccount.frozenAmounts.delete(committedTransaction.transactionHash);
-                } else if (managedAccount.wallet.publicKey.toString(16) === committedTransaction.transactionBody.targetAddress.toString(16)) {
-                    managedAccount.availableBalance += committedTransaction.transactionBody.amount;
-                } else if (committedTransaction.transactionBody.sourceAddress && managedAccount.wallet.publicKey.toString(16) === committedTransaction.transactionBody.sourceAddress.toString(16)) {
-                    managedAccount.availableBalance -= committedTransaction.transactionBody.amount;
-                }
-            });
+            var uncommittedTransactions = managedAccount.accountHistory.getUncommittedTransactions(previousBlockHash) || [];
+            var expiredTransactions = managedAccount.accountHistory.getExpiredTransactions(previousBlockHash) || [];
 
-            var lastTransactionId = this.node.transactionPool.lastTransactionIds.get(managedAccount.wallet.publicKey.toString(16));
-            managedAccount.frozenAmounts.forEach((frozenAmount, transactionHash) => {
-                if (leadingBlockCreationTimestamp > frozenAmount.frozenToTimestamp || lastTransactionId >= frozenAmount.transactionId) {
-                    managedAccount.availableBalance += frozenAmount.amount;
-                    managedAccount.frozenAmounts.delete(transactionHash);
-                    this.node.transactionPool = this.node.transactionPool.transactions.filter(transaction => transaction.transactionHash.toString(16) !== transactionHash)
+            managedAccount.accountHistory.uncommittedTransactionsByLeadingBlockHash.set(leadingBlockHash, [...uncommittedTransactions]);
+            managedAccount.accountHistory.expiredTransactionsByLeadingBlockHash.set(leadingBlockHash, [...expiredTransactions]);
+
+            var blockchainBalance = leadingBlock.accountMap.get(managedAccount.wallet.publicKey.toString(16)) || 0;
+            managedAccount.accountHistory.setAvailableBalance(leadingBlockHash, blockchainBalance);
+        });
+
+        leadingBlock.block.blockBody.transactions.forEach(committedTransaction => {
+            var managedAccount = this.getManagedAccountByTransaction(committedTransaction);
+            if (managedAccount) {
+
+                var uncommittedRelatedTransaction = _.find(
+                    managedAccount.accountHistory.getUncommittedTransactions(leadingBlockHash),
+                    relatedTransaction => relatedTransaction.equals(committedTransaction)
+                );
+
+                if (uncommittedRelatedTransaction) {
+                    managedAccount.accountHistory.commitTransaction(leadingBlockHash, uncommittedRelatedTransaction);
+                } else {
+                    managedAccount.accountHistory.addCommittedTransaction(committedTransaction);
+                }
+            }
+        });
+
+
+        var leadingBlockCreationTimestamp = leadingBlock.block.blockBody.creationTimestamp;
+        // var remainingBlockHashes = this.node.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.block.blockHash.toString());
+        // remainingBlockHashes.push(previousBlockHash);
+
+        this.managedAccounts.accounts.forEach(managedAccount => {
+
+            managedAccount.accountHistory.getUncommittedTransactions(leadingBlockHash).forEach(uncommittedTransaction => {
+                var { validTo, amount } = uncommittedTransaction.transactionBody;
+                if (validTo < leadingBlockCreationTimestamp) {
+                    managedAccount.accountHistory.expireTransaction(uncommittedTransaction);
+                    managedAccount.accountHistory.increaseAvailableBalance(amount, leadingBlockHash);
+                } else {
+                    managedAccount.accountHistory.decreaseAvailableBalance(amount, leadingBlockHash);
                 }
             })
 
         });
+
+
     }
 
 }

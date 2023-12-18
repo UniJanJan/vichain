@@ -22,14 +22,14 @@ export class BlockVerifyingEventHandler extends EventHandler {
             }
 
             var insertableBlock = validLeadingBlock || leadingBlock;
+            var accountService = this.serviceDispositor.getAccountService(processingNode);
+            accountService.updateRelatedTransactions(insertableBlock);
+
             var isAppended = blockchainService.appendBlock(insertableBlock);
             var blockchainHeight = blockchainService.getBlockchainHeight();
             if (isAppended) {
                 var transactionService = this.serviceDispositor.getTransactionService(processingNode);
                 transactionService.updateTransactionPool(insertableBlock);
-
-                var accountService = this.serviceDispositor.getAccountService(processingNode);
-                accountService.updateAvailableBalances(insertableBlock);
 
                 if (blockchainHeight > 0) {
                     nextProcessableEvents.push(

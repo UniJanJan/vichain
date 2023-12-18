@@ -85,7 +85,7 @@ export class MessageReceivingEventHandler extends EventHandler {
             var transactionService = this.serviceDispositor.getTransactionService(processingNode);
             var putTransactions = transactionService.putUncommittedTransactions(event.message.transactions);
             var accountService = this.serviceDispositor.getAccountService(processingNode);
-            putTransactions.forEach(accountService.updateAvailableBalance.bind(accountService));
+            putTransactions.forEach(accountService.addRelatedTransaction.bind(accountService));
             return [];
         } else if (event.message instanceof GetBlocksMessage) {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.getFirstBlockchain()))];

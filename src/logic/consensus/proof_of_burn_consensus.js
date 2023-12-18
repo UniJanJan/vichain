@@ -106,7 +106,7 @@ export class ProofOfBurnConsensus extends Consensus {
 
     isTransactionIdValid(transaction, lastTransactionIds) {
         if (transaction.transactionBody.sourceAddress) {
-            var lastId = lastTransactionIds.get(transaction.transactionBody.sourceAddress) || 0;
+            var lastId = lastTransactionIds.get(transaction.transactionBody.sourceAddress.toString(16)) || 0;
             return transaction.transactionBody.id > lastId;
         } else {
             return true;
@@ -185,6 +185,10 @@ export class ProofOfBurnConsensus extends Consensus {
                     element.lastTransactionIds.set(sourceAddress.toString(16), id);
                 }
             } else {
+                var lastTransactionId = element.lastTransactionIds.get(targetAddress.toString(16)) || 0;
+                if (id > lastTransactionId) {
+                    element.lastTransactionIds.set(targetAddress.toString(16), id);
+                }
                 element.spendableTokensSupply += amount;
             }
 

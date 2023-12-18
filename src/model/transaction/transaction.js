@@ -7,6 +7,10 @@ export class Transaction {
         Object.freeze(this);
     }
 
+    equals(transaction) {
+        return this === transaction || JSON.stringify(this) === JSON.stringify(transaction);
+    }
+
     clone() {
         return Object.assign(new Object(), this); // TODO
     }
