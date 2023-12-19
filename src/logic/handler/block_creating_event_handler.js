@@ -32,6 +32,7 @@ export class BlockCreatingEventHandler extends EventHandler {
             if (isAppended) {
                 transactionService.updateTransactionPool(nextLeadingBlock);
                 accountService.updateRelatedTransactions(nextLeadingBlock);
+                accountService.dropUnnecessaryAccountHistories();
             }
         }
 
