@@ -118,16 +118,15 @@
                                                 @click="copyToClipboard">{{ account.wallet.privateKey.toString(16)
                                                 }}</u></div>
                                         <div>Spendable token amount: {{
-                                            account.accountHistory.availableBalanceByLeadingBlockHash.get(leadingBlocks[0].block.blockHash.toString())
+                                            account.accountHistory.availableBalanceByLeadingBlockHash.get(leadingBlocks[0].block.blockHash)
                                             }}</div>
 
                                         <div v-if="account.accountHistory.transactions.length > 0">
                                             <ul class="list-group"
                                                 v-for="relatedTransaction in account.accountHistory.transactions">
                                                 <li class="list-group-item"
-                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === relatedTransaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
-                                                    <div
-                                                        v-if="relatedTransaction.transactionBody.sourceAddress">
+                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((account.accountHistory.isTransactionCommitted(relatedTransaction.transactionHash, leadingBlocks[0].block.blockHash)) ? 'red;' : 'darkgoldenrod;')">
+                                                    <div v-if="relatedTransaction.transactionBody.sourceAddress">
                                                         [{{ relatedTransaction.transactionBody.id }}]
                                                         {{ relatedTransaction.transactionBody.amount }}
                                                         token(s) transfer from
@@ -264,7 +263,7 @@
                                                 Block {{leadingBlock.block.blockBody.height}}
                                             </h6>
                                             <div style="text-overflow: ellipsis; overflow: hidden">
-                                                Hash: 0x{{leadingBlock.block.blockHash.toString()}}
+                                                Hash: 0x{{leadingBlock.block.blockHash}}
                                             </div>
                                             <ul class="list-group"
                                                 v-for="transaction in leadingBlock.block.blockBody.transactions">

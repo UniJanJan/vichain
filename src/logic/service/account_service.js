@@ -45,7 +45,7 @@ export class AccountService {
         var account = this.getManagedAccount(accountPublicKey.toString(16));
         if (account) {
             var currentLeadingBlocksAvailableBalances = this.blockchain.leadingBlocks
-                .map(leadingBlock => leadingBlock.block.blockHash.toString())
+                .map(leadingBlock => leadingBlock.block.blockHash)
                 .map(leadingBlock => account.accountHistory.getAvailableBalance(leadingBlock));
 
             return Math.min(currentLeadingBlocksAvailableBalances);
@@ -71,7 +71,7 @@ export class AccountService {
 
     addRelatedTransaction(transaction) {
         var managedAccount = this.getManagedAccountByTransaction(transaction);
-        if (managedAccount) {
+        if (managedAccount) { // TODO what if transaction is expired here?
             managedAccount.accountHistory.addUncommittedTransaction(transaction);
             if (transaction.transactionBody.sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
                 managedAccount.accountHistory.decreaseAvailableBalance(transaction.transactionBody.amount);
@@ -80,15 +80,17 @@ export class AccountService {
     }
 
     updateRelatedTransactions(leadingBlock) {
-        var leadingBlockHash = leadingBlock.block.blockHash.toString();
-        var previousBlockHash = leadingBlock.previousBlock ? leadingBlock.previousBlock.block.blockHash.toString() : "0";
+        var leadingBlockHash = leadingBlock.block.blockHash;
+        var previousBlockHash = leadingBlock.previousBlock ? leadingBlock.previousBlock.block.blockHash : "0";
 
         this.managedAccounts.accounts.forEach(managedAccount => {
-            var uncommittedTransactions = managedAccount.accountHistory.getUncommittedTransactions(previousBlockHash) || [];
-            var expiredTransactions = managedAccount.accountHistory.getExpiredTransactions(previousBlockHash) || [];
+            var uncommittedTransactions = managedAccount.accountHistory.getUncommittedTransactionsHashes(leadingBlockHash);
+            var committedTransactions = managedAccount.accountHistory.getCommittedTransactionsHashes(leadingBlockHash);
+            var expiredTransactions = managedAccount.accountHistory.getExpiredTransactionsHashes(leadingBlockHash);
 
-            managedAccount.accountHistory.uncommittedTransactionsByLeadingBlockHash.set(leadingBlockHash, [...uncommittedTransactions]);
-            managedAccount.accountHistory.expiredTransactionsByLeadingBlockHash.set(leadingBlockHash, [...expiredTransactions]);
+            managedAccount.accountHistory.getUncommittedTransactionsHashes(previousBlockHash).forEach(oldHash => uncommittedTransactions.add(oldHash));
+            managedAccount.accountHistory.getCommittedTransactionsHashes(previousBlockHash).forEach(oldHash => committedTransactions.add(oldHash));
+            managedAccount.accountHistory.getExpiredTransactionsHashes(previousBlockHash).forEach(oldHash => expiredTransactions.add(oldHash));
 
             var blockchainBalance = leadingBlock.accountMap.get(managedAccount.wallet.publicKey.toString(16)) || 0;
             managedAccount.accountHistory.setAvailableBalance(leadingBlockHash, blockchainBalance);
@@ -97,23 +99,17 @@ export class AccountService {
         leadingBlock.block.blockBody.transactions.forEach(committedTransaction => {
             var managedAccount = this.getManagedAccountByTransaction(committedTransaction);
             if (managedAccount) {
-
-                var uncommittedRelatedTransaction = _.find(
-                    managedAccount.accountHistory.getUncommittedTransactions(leadingBlockHash),
-                    relatedTransaction => relatedTransaction.equals(committedTransaction)
-                );
-
-                if (uncommittedRelatedTransaction) {
-                    managedAccount.accountHistory.commitTransaction(leadingBlockHash, uncommittedRelatedTransaction);
+                if (managedAccount.accountHistory.isTransactionUncommitted(committedTransaction.transactionHash, leadingBlockHash)) {
+                    managedAccount.accountHistory.commitTransaction(committedTransaction.transactionHash, leadingBlockHash);
                 } else {
-                    managedAccount.accountHistory.addCommittedTransaction(committedTransaction);
+                    managedAccount.accountHistory.addCommittedTransaction(committedTransaction, leadingBlockHash);
                 }
             }
         });
 
 
         var leadingBlockCreationTimestamp = leadingBlock.block.blockBody.creationTimestamp;
-        // var remainingBlockHashes = this.node.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.block.blockHash.toString());
+        // var remainingBlockHashes = this.node.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.block.blockHash);
         // remainingBlockHashes.push(previousBlockHash);
 
         this.managedAccounts.accounts.forEach(managedAccount => {
@@ -121,8 +117,10 @@ export class AccountService {
             managedAccount.accountHistory.getUncommittedTransactions(leadingBlockHash).forEach(uncommittedTransaction => {
                 var { validTo, amount, sourceAddress } = uncommittedTransaction.transactionBody;
                 if (validTo < leadingBlockCreationTimestamp) {
-                    managedAccount.accountHistory.expireTransaction(uncommittedTransaction);
-                    managedAccount.accountHistory.increaseAvailableBalance(amount, leadingBlockHash);
+                    managedAccount.accountHistory.expireTransaction(uncommittedTransaction.transactionHash, leadingBlockHash);
+                    if (sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
+                        managedAccount.accountHistory.increaseAvailableBalance(amount, leadingBlockHash);
+                    }
                 } else if (sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
                     managedAccount.accountHistory.decreaseAvailableBalance(amount, leadingBlockHash);
                 }

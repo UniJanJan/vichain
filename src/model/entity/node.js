@@ -90,7 +90,7 @@ export class Node {
                 graphics.beginPath();
                 graphics.moveTo(this.x, this.y);
                 graphics.arc(this.x, this.y, this.radius - 2, -Math.PI / 2 + 2 * Math.PI * percent * index, -Math.PI / 2 + 2 * Math.PI * percent * (index + 1), false);
-                graphics.fillStyle = '#' + leadingBlock.block.blockHash.toString().slice(0, 6);
+                graphics.fillStyle = '#' + leadingBlock.block.blockHash.slice(0, 6);
                 graphics.fill();
             });
         }
