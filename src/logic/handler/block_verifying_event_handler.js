@@ -30,6 +30,7 @@ export class BlockVerifyingEventHandler extends EventHandler {
             if (isAppended) {
                 var transactionService = this.serviceDispositor.getTransactionService(processingNode);
                 transactionService.updateTransactionPool(insertableBlock);
+                accountService.dropUnnecessaryAccountHistories();
 
                 if (blockchainHeight > 0) {
                     nextProcessableEvents.push(

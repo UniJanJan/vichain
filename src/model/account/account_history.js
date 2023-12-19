@@ -66,6 +66,10 @@ export class AccountHistory {
         }
     }
 
+    addExpiredTransaction(transaction, leadingBlockHash) {
+        this.addTransactionWithStatus(transaction, leadingBlockHash, AccountHistoryTransactionStatus.EXPIRED);
+    }
+
     changeTransactionStatus(transactionHash, leadingBlockHash, sourceStatus, targetStatus) {
         var sourceStatusTransactions = this.getTransactionsWithStatus(leadingBlockHash, sourceStatus);
 

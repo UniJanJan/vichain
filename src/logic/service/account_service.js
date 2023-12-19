@@ -109,8 +109,6 @@ export class AccountService {
 
 
         var leadingBlockCreationTimestamp = leadingBlock.block.blockBody.creationTimestamp;
-        // var remainingBlockHashes = this.node.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.block.blockHash);
-        // remainingBlockHashes.push(previousBlockHash);
 
         this.managedAccounts.accounts.forEach(managedAccount => {
 
@@ -127,8 +125,30 @@ export class AccountService {
             })
 
         });
+    }
 
+    dropUnnecessaryAccountHistories() {
+        var currentlyLeadingBlocks = this.node.blockchain.leadingBlocks;
+        var blockHashesToRemain = new Set(["0"]);
+        if (currentlyLeadingBlocks[0].previousBlock) {
+            blockHashesToRemain.add(currentlyLeadingBlocks[0].previousBlock.block.blockHash);
+        }
+        currentlyLeadingBlocks.forEach(leadingBlock => blockHashesToRemain.add(leadingBlock.block.blockHash));
+        this.managedAccounts.accounts.forEach(managedAccount => {
 
+            managedAccount.accountHistory.availableBalanceByLeadingBlockHash.forEach((_, leadingBlockHash) => {
+                if (!blockHashesToRemain.has(leadingBlockHash)) {
+                    managedAccount.accountHistory.availableBalanceByLeadingBlockHash.delete(leadingBlockHash);
+                }
+            });
+
+            managedAccount.accountHistory.statusMaps.forEach((_, leadingBlockHash) => {
+                if (!blockHashesToRemain.has(leadingBlockHash)) {
+                    managedAccount.accountHistory.statusMaps.delete(leadingBlockHash);
+                }
+            });
+
+        });
     }
 
 }
