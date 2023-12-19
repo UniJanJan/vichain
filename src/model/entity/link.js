@@ -1,4 +1,4 @@
-import { Utils } from '../../common.js';
+import { Utils } from '../../common/common.js';
 import { EventPool } from '../event/event_pool.js';
 
 export const LinkStatus = {

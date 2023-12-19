@@ -1,4 +1,4 @@
-import { Utils } from "./common.js";
+import { Utils } from "./common/common.js";
 import { LinkStatus } from "./model/entity/link.js";
 const { isProxy, toRaw } = Vue;
 

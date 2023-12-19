@@ -1,5 +1,5 @@
 import { app } from './app.js';
-import { Utils } from './common.js';
+import { Utils } from './common/common.js';
 
 const canvas = document.querySelector('#visualisation-canvas');
 const networkManager = app._instance.ctx.networkManager._value;

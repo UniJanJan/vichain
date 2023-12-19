@@ -20,7 +20,6 @@ export class EventFactory {
     }
 
     createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount) {
-        // needs validation (but not here?)
         return {
             target: processingNode,
             event: new TransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount)
