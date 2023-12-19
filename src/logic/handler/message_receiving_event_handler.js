@@ -82,11 +82,7 @@ export class MessageReceivingEventHandler extends EventHandler {
             transactionService.dropStaleTransactions();
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetTransactionsResponseMessage(processingNode.transactionPool.transactions))];
         } else if (event.message instanceof GetTransactionsResponseMessage) {
-            var transactionService = this.serviceDispositor.getTransactionService(processingNode);
-            var putTransactions = transactionService.putUncommittedTransactions(event.message.transactions);
-            var accountService = this.serviceDispositor.getAccountService(processingNode);
-            putTransactions.forEach(accountService.addRelatedTransaction.bind(accountService));
-            return [];
+            return event.message.transactions.map(transaction => this.eventFactory.createTransactionVerifyingEvent(processingNode, transaction, event.nodeFrom));
         } else if (event.message instanceof GetBlocksMessage) {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.getFirstBlockchain()))];
         } else if (event.message instanceof GetBlocksResponseMessage) {
