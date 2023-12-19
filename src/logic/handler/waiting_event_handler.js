@@ -62,7 +62,7 @@ export class WaitingEventHandler extends EventHandler {
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
                 var sourceAccount = accountService.getRandomManagedAccount();
                 var targetAddress = accountService.getRandomNonManagedAddress();
-                var maxSpendableAmount = Math.min(Array.from(sourceAccount.accountHistory.availableBalanceByLeadingBlockHash.values()));
+                var maxSpendableAmount = accountService.getSafeAvailableBalance(sourceAccount.wallet.publicKey);
 
                 if (maxSpendableAmount > 0) {
                     var amount = Math.ceil(Math.random() * maxSpendableAmount);

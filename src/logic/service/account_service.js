@@ -41,6 +41,19 @@ export class AccountService {
         return Utils.getRandomElement(nonManagedAddresses);
     }
 
+    getSafeAvailableBalance(accountPublicKey) {
+        var account = this.getManagedAccount(accountPublicKey.toString(16));
+        if (account) {
+            var currentLeadingBlocksAvailableBalances = this.blockchain.leadingBlocks
+                .map(leadingBlock => leadingBlock.block.blockHash.toString())
+                .map(leadingBlock => account.accountHistory.getAvailableBalance(leadingBlock));
+
+            return Math.min(currentLeadingBlocksAvailableBalances);
+        } else {
+            return null;
+        }
+    }
+
     getManagedAccountByTransaction(transaction) {
         var { sourceAddress, targetAddress } = transaction.transactionBody;
 
@@ -60,7 +73,9 @@ export class AccountService {
         var managedAccount = this.getManagedAccountByTransaction(transaction);
         if (managedAccount) {
             managedAccount.accountHistory.addUncommittedTransaction(transaction);
-            managedAccount.accountHistory.decreaseAvailableBalance(transaction.transactionBody.amount);
+            if (transaction.transactionBody.sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
+                managedAccount.accountHistory.decreaseAvailableBalance(transaction.transactionBody.amount);
+            }
         }
     }
 
@@ -104,11 +119,11 @@ export class AccountService {
         this.managedAccounts.accounts.forEach(managedAccount => {
 
             managedAccount.accountHistory.getUncommittedTransactions(leadingBlockHash).forEach(uncommittedTransaction => {
-                var { validTo, amount } = uncommittedTransaction.transactionBody;
+                var { validTo, amount, sourceAddress } = uncommittedTransaction.transactionBody;
                 if (validTo < leadingBlockCreationTimestamp) {
                     managedAccount.accountHistory.expireTransaction(uncommittedTransaction);
                     managedAccount.accountHistory.increaseAvailableBalance(amount, leadingBlockHash);
-                } else {
+                } else if (sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
                     managedAccount.accountHistory.decreaseAvailableBalance(amount, leadingBlockHash);
                 }
             })
