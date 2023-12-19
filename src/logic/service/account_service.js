@@ -1,4 +1,4 @@
-import { Utils } from "../../common.js";
+import { Utils } from "../../common/common.js";
 import { Account } from "../../model/account/account.js";
 
 export class AccountService {
