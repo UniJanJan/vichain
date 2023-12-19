@@ -18,11 +18,11 @@ export class NetworkManager {
             isRunning: false,
             events: {
                 'MessageSendingEvent': {
-                    isVisible: false,
+                    isVisible: true,
                     color: 'rgb(0, 0, 128)'
                 },
                 'MessageReceivingEvent': {
-                    isVisible: false,
+                    isVisible: true,
                     color: 'rgb(0, 0, 64)'
                 },
                 'TransactionCreatingEvent': {
@@ -30,7 +30,7 @@ export class NetworkManager {
                     color: 'rgb(212,175,55)'
                 },
                 'TransactionVerifyingEvent': {
-                    isVisible: false,
+                    isVisible: true,
                     color: 'rgb(192,192,192)'
                 },
                 'BlockCreatingEvent': {
@@ -38,7 +38,7 @@ export class NetworkManager {
                     color: 'rgb(165,165,11)'
                 },
                 'BlockVerifyingEvent': {
-                    isVisible: false,
+                    isVisible: true,
                     color: 'rgb(165,165,78)'
                 },
                 'WaitingEvent': {
