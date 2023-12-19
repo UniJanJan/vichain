@@ -1,4 +1,4 @@
-import { Utils } from "./common.js";
+import { Utils } from "./common/common.js";
 import { EventManager } from "./logic/event_manager.js";
 import { EventFactory } from "./logic/factory/event_factory.js";
 import { Network } from "./model/entity/network.js";
