@@ -48,7 +48,7 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     isBlockHashValid(block) {
-        return CryptoJS.SHA256(JSON.stringify(block.blockBody)).toString() === block.blockHash.toString();
+        return CryptoJS.SHA256(JSON.stringify(block.blockBody)).toString() === block.blockHash;
     }
 
     areTransactionsValid(transactions, blockCreationTimestamp, previousBlock) {
@@ -114,7 +114,7 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     isTransactionHashValid(transaction) {
-        return CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash.toString();
+        return CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash;
     }
 
     isTransactionSignatureValid(transaction) {
@@ -140,7 +140,7 @@ export class ProofOfBurnConsensus extends Consensus {
 
         var seedInputBlocks = lastBlocks.slice(0, minersPerRound);
 
-        var seed = seedInputBlocks.map(block => parseInt(block.blockHash.toString()[1], 16) % 2).join('')
+        var seed = seedInputBlocks.map(block => parseInt(block.blockHash[1], 16) % 2).join('')
             + seedInputBlocks[seedInputBlocks.length - 1].blockBody.height;
 
 

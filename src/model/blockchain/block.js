@@ -1,7 +1,7 @@
 export class Block {
     constructor(blockBody, blockHash) {
         this.blockBody = blockBody;
-        this.blockHash = blockHash;
+        this.blockHash = blockHash.toString();
 
         Object.freeze(this);
     }

@@ -1,9 +1,9 @@
 export class Transaction {
-    
+
     constructor(transactionBody, signature, transactionHash) {
         this.transactionBody = transactionBody;
         this.signature = signature;
-        this.transactionHash = transactionHash;
+        this.transactionHash = transactionHash.toString();
         Object.freeze(this);
     }
 
