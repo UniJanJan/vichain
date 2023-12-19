@@ -74,6 +74,7 @@ export class ProofOfBurnConsensus extends Consensus {
         return transactions.every((transaction, index) => this.isTransactionValid(transaction, index === awardTransactionIndex, blockCreationTimestamp, previousBlock.lastTransactionIds));
     }
 
+    //TODO check if transactions amounts not exceed limit
     isTransactionValid(transaction, asAwardTransaction, blockCreationTimestamp, lastTransactionIds) {
         return this.isTransactionAmountValid(transaction)
             && this.isTransactionTimestampValid(transaction, blockCreationTimestamp)

@@ -116,9 +116,6 @@ export class AccountService {
                 var { validTo, amount, sourceAddress } = uncommittedTransaction.transactionBody;
                 if (validTo < leadingBlockCreationTimestamp) {
                     managedAccount.accountHistory.expireTransaction(uncommittedTransaction.transactionHash, leadingBlockHash);
-                    if (sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
-                        managedAccount.accountHistory.increaseAvailableBalance(amount, leadingBlockHash);
-                    }
                 } else if (sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
                     managedAccount.accountHistory.decreaseAvailableBalance(amount, leadingBlockHash);
                 }
