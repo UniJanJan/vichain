@@ -99,6 +99,12 @@ canvas.addEventListener('mouseup', event => {
 });
 
 
+document.addEventListener('keydown', event => {
+    if (event.code === 'Space') {
+        event.preventDefault();
+    }
+})
+
 document.addEventListener('keyup', event => {
     if (event.code === 'Space') {
         networkManager.settings.isRunning = !networkManager.settings.isRunning;

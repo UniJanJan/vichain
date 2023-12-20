@@ -30,9 +30,9 @@ export class EventProcessor {
         if (event.status === EventStatus.PROCESSABLE) {
             event.enqueuingTimestamp = this.timer.currentTimestamp;
             if (event.loadSize === 0 || event.prioritized) {
-                this.processableEvents.unshift(event);
+                this.processableEvents.enqueueWithPriority(event);
             } else {
-                this.processableEvents.push(event);
+                this.processableEvents.enqueue(event);
             }
         } else {
             throw new Error("Event isn't PROCESSABLE. Cannot enqueue its execution!", event);
@@ -52,8 +52,8 @@ export class EventProcessor {
 
     /* updates events and returns newly processed events */
     update(elapsedTime) {
-        while (this.processableEvents.length > 0 && this.isEventLoadable(this.processableEvents[0])) {
-            var processableEvent = this.processableEvents.splice(0, 1)[0];
+        while (this.processableEvents.isNotEmpty() && this.isEventLoadable(this.processableEvents.check())) {
+            var processableEvent = this.processableEvents.dequeue();
             this.startExecution(processableEvent);
         }
 

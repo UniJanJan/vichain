@@ -23,7 +23,7 @@ const app = createApp({
             return Promise(() => this.networkManager.selectedNode);
         },
         processableEvents() {
-            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processableEvents : [];
+            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processableEvents.toArray() : [];
         },
         processingEvents() {
             return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processingEvents : [];
