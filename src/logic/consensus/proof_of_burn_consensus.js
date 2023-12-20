@@ -66,7 +66,7 @@ export class ProofOfBurnConsensus extends Consensus {
 
         var miners = this.getMiners(previousBlock, blockCreationTimestamp);
         var currentMiner = miners.get(blockCreationTimestamp % roundTime);
-        if (currentMiner !== awardTransactions[0].transactionBody.targetAddress.toString(16)) {
+        if (currentMiner !== awardTransactions[0].transactionBody.targetAddress) {
             return false;
         }
 
@@ -78,10 +78,10 @@ export class ProofOfBurnConsensus extends Consensus {
     isTransactionValid(transaction, asAwardTransaction, blockCreationTimestamp, lastTransactionIds) {
         return this.isTransactionAmountValid(transaction)
             && this.isTransactionTimestampValid(transaction, blockCreationTimestamp)
-            && this.isTransactionAddressesValid(transaction, asAwardTransaction)
+            && this.areTransactionAddressesValid(transaction, asAwardTransaction)
             && this.isTransactionIdValid(transaction, lastTransactionIds)
             && this.isTransactionHashValid(transaction)
-            && this.isTransactionSignatureValid(transaction);
+            && this.isTransactionSignatureValid(transaction, asAwardTransaction);
     }
 
     isTransactionAmountValid(transaction) {
@@ -92,7 +92,7 @@ export class ProofOfBurnConsensus extends Consensus {
         return transaction.transactionBody.validTo >= blockCreationTimestamp;
     }
 
-    isTransactionAddressesValid(transaction, asAwardTransaction) {
+    areTransactionAddressesValid(transaction, asAwardTransaction) {
         var { sourceAddress, targetAddress } = transaction.transactionBody;
         var burnAddress = this.network.walletPool.getBurnAddress();
 
@@ -100,14 +100,14 @@ export class ProofOfBurnConsensus extends Consensus {
             return sourceAddress === null;
         } else {
             return sourceAddress !== null
-                && sourceAddress.toString(16) !== targetAddress.toString(16)
-                && sourceAddress.toString(16) !== burnAddress.toString(16);
+                && sourceAddress !== targetAddress
+                && sourceAddress !== burnAddress;
         }
     }
 
     isTransactionIdValid(transaction, lastTransactionIds) {
         if (transaction.transactionBody.sourceAddress) {
-            var lastId = lastTransactionIds.get(transaction.transactionBody.sourceAddress.toString(16)) || 0;
+            var lastId = lastTransactionIds.get(transaction.transactionBody.sourceAddress) || 0;
             return transaction.transactionBody.id > lastId;
         } else {
             return true;
@@ -118,8 +118,12 @@ export class ProofOfBurnConsensus extends Consensus {
         return CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash;
     }
 
-    isTransactionSignatureValid(transaction) {
-        return RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress || transaction.transactionBody.targetAddress)
+    isTransactionSignatureValid(transaction, asAwardTransaction) {
+        if (asAwardTransaction) {
+            return RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.targetAddress);
+        } else {
+            return RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress);
+        }
     }
 
     getMiners(currentlyLeadingBlock, nextBlockCreationTimestamp) {
@@ -171,33 +175,33 @@ export class ProofOfBurnConsensus extends Consensus {
         block.blockBody.transactions.forEach(transaction => {
             var { id, sourceAddress, targetAddress, amount } = transaction.transactionBody;
 
-            if (targetAddress.equals(burnAddress)) {
-                element.burnMap.push(amount, sourceAddress.toString(16));
+            if (targetAddress === burnAddress) {
+                element.burnMap.push(amount, sourceAddress);
                 element.spendableTokensSupply -= amount;
             }
 
 
             if (sourceAddress) {
-                var inputBalance = element.accountMap.get(sourceAddress.toString(16)) || 0;
-                element.accountMap.set(sourceAddress.toString(16), inputBalance - amount);
+                var inputBalance = element.accountMap.get(sourceAddress) || 0;
+                element.accountMap.set(sourceAddress, inputBalance - amount);
 
-                var lastTransactionId = element.lastTransactionIds.get(sourceAddress.toString(16)) || 0;
+                var lastTransactionId = element.lastTransactionIds.get(sourceAddress) || 0;
                 if (id > lastTransactionId) {
-                    element.lastTransactionIds.set(sourceAddress.toString(16), id);
+                    element.lastTransactionIds.set(sourceAddress, id);
                 }
             } else {
-                var lastTransactionId = element.lastTransactionIds.get(targetAddress.toString(16)) || 0;
+                var lastTransactionId = element.lastTransactionIds.get(targetAddress) || 0;
                 if (id > lastTransactionId) {
-                    element.lastTransactionIds.set(targetAddress.toString(16), id);
+                    element.lastTransactionIds.set(targetAddress, id);
                 }
                 element.spendableTokensSupply += amount;
             }
 
-            var outputBalance = element.accountMap.get(targetAddress.toString(16)) || 0;
-            element.accountMap.set(targetAddress.toString(16), outputBalance + amount);
+            var outputBalance = element.accountMap.get(targetAddress) || 0;
+            element.accountMap.set(targetAddress, outputBalance + amount);
         });
 
-        element.accountMap.delete(burnAddress.toString(16));
+        element.accountMap.delete(burnAddress);
 
         element.nextRoundMiners = this.calculateMiners(element);
 

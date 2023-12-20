@@ -1,4 +1,5 @@
 import { Utils } from "./common/common.js";
+import { RSA } from "./common/rsa.js";
 import { EventManager } from "./logic/event_manager.js";
 import { EventFactory } from "./logic/factory/event_factory.js";
 import { Network } from "./model/entity/network.js";
@@ -92,7 +93,9 @@ export class NetworkManager {
     }
 
     postTransaction(request) {
-        this.eventManager.enqueueExecution(this.eventFactory.createTransactionCreatingEvent(this.selectedNode, new Wallet(bigInt(request.sourceAddresPrivateKey, 16), bigInt(request.sourceAddres, 16)), bigInt(request.targetAddress, 16), request.amount));
+        var privateKey = bigInt(request.sourceAddresPrivateKey, 16);
+        var publicKey = bigInt(request.sourceAddres, 16);
+        this.eventManager.enqueueExecution(this.eventFactory.createTransactionCreatingEvent(this.selectedNode, new Wallet(privateKey, publicKey, RSA.e), request.targetAddress, request.amount));
     }
 
     update(tFrame = 0) { // TODO maybe
