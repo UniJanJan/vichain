@@ -64,7 +64,7 @@ export class EventProcessor {
                 var processedEvent = this.processingEvents.splice(index, 1)[0];
                 this.currentLoad -= processedEvent.loadSize;
                 processedEvent.processingEndTimestamp = this.timer.currentTimestamp;
-                this.processedEvents.unshift(processedEvent);
+                this.processedEvents.push(processedEvent);
                 newlyProcessedEvents.push(processedEvent);
             }
         });
