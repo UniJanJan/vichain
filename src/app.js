@@ -39,6 +39,12 @@ const app = createApp({
         },
         leadingBlocks() {
             return this.networkManager.selectedNode ? this.networkManager.selectedNode.blockchain.leadingBlocks : [];
+        },
+        processedEventsPage() {
+            return this.networkManager.settings.processedEventsPage;
+        },
+        itemsPerPage() {
+            return this.networkManager.settings.itemsPerPage;
         }
     },
     methods: {
