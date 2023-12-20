@@ -45,7 +45,9 @@ export class NetworkManager {
                     isVisible: null,
                     color: 'rgb(165,42,42)'
                 }
-            }
+            },
+            processedEventsPage: 0,
+            itemsPerPage: 10,
         }
     }
 
@@ -75,6 +77,7 @@ export class NetworkManager {
             this.selectedNode.isSelected = false;
         this.selectedNode = node;
         node.isSelected = true;
+        this.settings.processedEventsPage = 0;
     }
 
     unselectNode() {

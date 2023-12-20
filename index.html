@@ -84,8 +84,10 @@
                             </div>
 
                             Processed events
-                            <div v-if="processedEvents.length > 0">
-                                <ul class="list-group" v-for="event in processedEvents">
+                            <div v-if="processedEvents.length > 0"
+                                :set="maxPages = Math.ceil(processedEvents.length/itemsPerPage)">
+                                <ul class="list-group"
+                                    v-for="event in processedEvents.slice(Math.max(0, processedEvents.length-(processedEventsPage+1)*itemsPerPage), processedEvents.length-processedEventsPage*itemsPerPage).reverse()">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white`">
                                         <span style="float: left; margin-left: 10;">{{translateEventClassName(event)}}
@@ -94,6 +96,17 @@
                                             style="float: right; margin-right: 10;">{{event.processingEndTimestamp.toFixed(0)}}</span>
                                     </li>
                                 </ul>
+
+                                <div class="pt-2">
+                                    <button class="btn btn-secondary btn-sm" :disabled="processedEventsPage === 0"
+                                        @click="() => networkManager.settings.processedEventsPage--"
+                                        style="float: left;">Newer events</button>
+                                    <button class="btn btn-secondary btn-sm"
+                                        :disabled="processedEventsPage >= maxPages-1"
+                                        @click="() => networkManager.settings.processedEventsPage++"
+                                        style="float: right;">Older events</button>
+                                </div>
+
                             </div>
                             <div v-else>
                                 <ul class="list-group">
