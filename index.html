@@ -124,12 +124,11 @@
                                     <li class="list-group-item">
                                         <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                             Public key: 0x<u style="text-decoration-style: dashed; cursor: pointer;"
-                                                @click="copyToClipboard">{{ account.wallet.publicKey.toString(16) }}</u>
+                                                @click="copyToClipboard">{{ account.wallet.publicKey }}</u>
                                         </div>
                                         <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                             Private key: 0x<u style="text-decoration-style: dashed; cursor: pointer;"
-                                                @click="copyToClipboard">{{ account.wallet.privateKey.toString(16)
-                                                }}</u></div>
+                                                @click="copyToClipboard">{{ account.wallet.privateKey }}</u></div>
                                         <div>Spendable token amount: {{
                                             account.accountHistory.availableBalanceByLeadingBlockHash.get(leadingBlocks[0].block.blockHash)
                                             }}</div>
@@ -144,11 +143,11 @@
                                                         {{ relatedTransaction.transactionBody.amount }}
                                                         token(s) transfer from
                                                         0x{{
-                                                        relatedTransaction.transactionBody.sourceAddress.toString(16).slice(0,8)
+                                                        relatedTransaction.transactionBody.sourceAddress.slice(0,8)
                                                         }}...
                                                         to
                                                         0x{{
-                                                        relatedTransaction.transactionBody.targetAddress.toString(16).slice(0,8)
+                                                        relatedTransaction.transactionBody.targetAddress.slice(0,8)
                                                         }}...
                                                     </div>
                                                     <div v-else>
@@ -156,7 +155,7 @@
                                                         {{ relatedTransaction.transactionBody.amount }}
                                                         token(s) generation for
                                                         0x{{
-                                                        relatedTransaction.transactionBody.targetAddress.toString(16).slice(0,8)
+                                                        relatedTransaction.transactionBody.targetAddress.slice(0,8)
                                                         }}...
                                                     </div>
                                                 </li>
@@ -245,11 +244,11 @@
                             <div v-if="pooledTransactions.length > 0">
                                 <ul class="list-group" v-for="transaction in pooledTransactions">
                                     <li class="list-group-item"
-                                        :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === transaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
+                                        :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress() === transaction.transactionBody.targetAddress) ? 'red;' : 'darkgoldenrod;')">
                                         [{{ transaction.transactionBody.id }}]
                                         {{ transaction.transactionBody.amount }} from
-                                        0x{{ transaction.transactionBody.sourceAddress.toString(16).slice(0,8) }}... to
-                                        0x{{ transaction.transactionBody.targetAddress.toString(16).slice(0,8) }}...
+                                        0x{{ transaction.transactionBody.sourceAddress.slice(0,8) }}... to
+                                        0x{{ transaction.transactionBody.targetAddress.slice(0,8) }}...
                                     </li>
                                 </ul>
                             </div>
@@ -281,23 +280,23 @@
                                             <ul class="list-group"
                                                 v-for="transaction in leadingBlock.block.blockBody.transactions">
                                                 <li class="list-group-item"
-                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress().toString(16) === transaction.transactionBody.targetAddress.toString(16)) ? 'red;' : 'darkgoldenrod;')">
+                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress() === transaction.transactionBody.targetAddress) ? 'red;' : 'darkgoldenrod;')">
                                                     <div v-if="transaction.transactionBody.sourceAddress">
                                                         [{{ transaction.transactionBody.id }}]
                                                         {{ transaction.transactionBody.amount }} token(s) transfer from
                                                         0x{{
-                                                        transaction.transactionBody.sourceAddress.toString(16).slice(0,8)
+                                                        transaction.transactionBody.sourceAddress.slice(0,8)
                                                         }}...
                                                         to
                                                         0x{{
-                                                        transaction.transactionBody.targetAddress.toString(16).slice(0,8)
+                                                        transaction.transactionBody.targetAddress.slice(0,8)
                                                         }}...
                                                     </div>
                                                     <div v-else>
                                                         [{{ transaction.transactionBody.id }}]
                                                         {{ transaction.transactionBody.amount }} token(s) generation for
                                                         0x{{
-                                                        transaction.transactionBody.targetAddress.toString(16).slice(0,8)
+                                                        transaction.transactionBody.targetAddress.slice(0,8)
                                                         }}...
                                                     </div>
                                                 </li>
@@ -506,7 +505,7 @@
                                 has to be created!</span>
                             <div v-if="networkManager.network.settings.isBlockchainInstalled"
                                 style="overflow: hidden; text-overflow: ellipsis;">Burn address:
-                                0x{{networkManager.network.walletPool.getBurnAddress().toString(16) }}</div>
+                                0x{{networkManager.network.walletPool.getBurnAddress() }}</div>
                         </div>
                     </div>
                 </div>

@@ -92,9 +92,9 @@ export class WaitingEventHandler extends EventHandler {
                 var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
                 processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
                     managedAddresses.forEach(managedAddress => {
-                        if (blockchainService.canAddressConstructNewBlock(leadingBlock, managedAddress.wallet.publicKey.toString(16), currentTimestamp)) {
+                        if (blockchainService.canAddressConstructNewBlock(leadingBlock, managedAddress.wallet.publicKey, currentTimestamp)) {
                             nextProcessableEvents.push(
-                                this.eventFactory.createBlockCreatingEvent(processingNode, leadingBlock, managedAddress.wallet.publicKey.toString(16))
+                                this.eventFactory.createBlockCreatingEvent(processingNode, leadingBlock, managedAddress.wallet.publicKey)
                             );
                         }
                     })

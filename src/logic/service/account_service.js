@@ -18,7 +18,7 @@ export class AccountService {
         }
 
         var account = new Account(wallet, 0);
-        this.managedAccounts.accounts.set(wallet.publicKey.toString(16), account);
+        this.managedAccounts.accounts.set(wallet.publicKey, account);
         return account;
     }
 
@@ -37,12 +37,12 @@ export class AccountService {
     getRandomNonManagedAddress() {
         var managedAddresses = Array.from(this.managedAccounts.accounts.keys());
         var nonManagedAddresses = this.walletPool.getAllAddresses()
-            .filter(address => !managedAddresses.includes(address.toString(16)));
+            .filter(address => !managedAddresses.includes(address));
         return Utils.getRandomElement(nonManagedAddresses);
     }
 
     getSafeAvailableBalance(accountPublicKey) {
-        var account = this.getManagedAccount(accountPublicKey.toString(16));
+        var account = this.getManagedAccount(accountPublicKey);
         if (account) {
             var currentLeadingBlocksAvailableBalances = this.blockchain.leadingBlocks
                 .map(leadingBlock => leadingBlock.block.blockHash)
@@ -59,11 +59,11 @@ export class AccountService {
 
         var account = null;
         if (sourceAddress !== null) {
-            account = this.getManagedAccount(sourceAddress.toString(16));
+            account = this.getManagedAccount(sourceAddress);
         }
 
         if (!account) {
-            account = this.getManagedAccount(targetAddress.toString(16));
+            account = this.getManagedAccount(targetAddress);
         }
 
         return account;
@@ -73,7 +73,7 @@ export class AccountService {
         var managedAccount = this.getManagedAccountByTransaction(transaction);
         if (managedAccount) { // TODO what if transaction is expired here?
             managedAccount.accountHistory.addUncommittedTransaction(transaction);
-            if (transaction.transactionBody.sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
+            if (transaction.transactionBody.sourceAddress === managedAccount.wallet.publicKey) {
                 managedAccount.accountHistory.decreaseAvailableBalance(transaction.transactionBody.amount);
             }
         }
@@ -92,7 +92,7 @@ export class AccountService {
             managedAccount.accountHistory.getCommittedTransactionsHashes(previousBlockHash).forEach(oldHash => committedTransactions.add(oldHash));
             managedAccount.accountHistory.getExpiredTransactionsHashes(previousBlockHash).forEach(oldHash => expiredTransactions.add(oldHash));
 
-            var blockchainBalance = leadingBlock.accountMap.get(managedAccount.wallet.publicKey.toString(16)) || 0;
+            var blockchainBalance = leadingBlock.accountMap.get(managedAccount.wallet.publicKey) || 0;
             managedAccount.accountHistory.setAvailableBalance(leadingBlockHash, blockchainBalance);
         });
 
@@ -116,7 +116,7 @@ export class AccountService {
                 var { validTo, amount, sourceAddress } = uncommittedTransaction.transactionBody;
                 if (validTo < leadingBlockCreationTimestamp) {
                     managedAccount.accountHistory.expireTransaction(uncommittedTransaction.transactionHash, leadingBlockHash);
-                } else if (sourceAddress.toString(16) === managedAccount.wallet.publicKey.toString(16)) {
+                } else if (sourceAddress === managedAccount.wallet.publicKey) {
                     managedAccount.accountHistory.decreaseAvailableBalance(amount, leadingBlockHash);
                 }
             })

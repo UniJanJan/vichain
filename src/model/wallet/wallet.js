@@ -2,9 +2,10 @@ import { RSA } from "../../common/rsa.js";
 
 export class Wallet {
     constructor(privateKey, publicKey, publicExponent) {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
-        this.publicExponent = publicExponent;
+        this.privateKey = privateKey.toString(16);
+        this.publicKey = publicKey.toString(16);
+        this.publicExponent = publicExponent.toString(16);
+
         Object.freeze(this);
     }
 

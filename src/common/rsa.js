@@ -74,11 +74,11 @@ export class RSA {
     static createSignature(data, privateKey, publicKey) {
         var hashedData = CryptoJS.SHA256(JSON.stringify(data)).toString().slice(0, 30);
         var encodedData = RSA.encode(hashedData);
-        return RSA.encrypt(encodedData, publicKey, privateKey);
+        return RSA.encrypt(encodedData, bigInt(publicKey, 16), bigInt(privateKey, 16)).toString(16);
     }
 
     static verifySignature(data, signature, publicKey) {
-        var decryptedData = RSA.decrypt(signature, RSA.e, publicKey);
+        var decryptedData = RSA.decrypt(bigInt(signature, 16), RSA.e, bigInt(publicKey, 16));
         var hashedData = CryptoJS.SHA256(JSON.stringify(data)).toString().slice(0, 30);
         var encodedData = RSA.encode(hashedData);
         return encodedData.equals(decryptedData);

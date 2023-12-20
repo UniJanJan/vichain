@@ -16,24 +16,24 @@ export class TransactionService {
         ]);
     }
 
-    createTransaction(sourceWallet, targetAddress, amount) {
+    createTransaction(sourceWallet, targetAddress, amount, transactionId) {
         var currentTimestamp = this.network.timer.currentTimestamp;
         var transactionValidityDuration = this.network.settings.transactionValidityDuration;
-        var transactionId = this.pickNextTransactionId(sourceWallet.publicKey);
+        transactionId = transactionId || this.getNextTransactionId(sourceWallet.publicKey);
 
         var transactionBody = new TransactionBody(transactionId, sourceWallet.publicKey, targetAddress, amount, currentTimestamp, transactionValidityDuration);
         return this.createSignedTransaction(transactionBody, sourceWallet);
     }
 
-    createBurnTransaction(sourceWallet, amount) {
+    createBurnTransaction(sourceWallet, amount, transactionId) {
         var burnAddress = this.network.walletPool.getBurnAddress();
-        return this.createTransaction(sourceWallet, burnAddress, amount);
+        return this.createTransaction(sourceWallet, burnAddress, amount, transactionId);
     }
 
-    createAwardTransaction(targetWallet, awardAmount) {
+    createAwardTransaction(targetWallet, awardAmount, transactionId) {
         var currentTimestamp = this.network.timer.currentTimestamp;
         awardAmount = awardAmount || this.network.settings.miningAward;
-        var transactionId = this.pickNextTransactionId(targetWallet.publicKey);
+        transactionId = transactionId || this.getNextTransactionId(targetWallet.publicKey);
 
         var transactionBody = new TransactionBody(transactionId, null, targetWallet.publicKey, awardAmount, currentTimestamp, 0);
         return this.createSignedTransaction(transactionBody, targetWallet);
@@ -45,11 +45,8 @@ export class TransactionService {
         return new Transaction(transactionBody, signature, transactionHash);
     }
 
-    pickNextTransactionId(address) {
-        var lastTransactionId = this.transactionPool.lastUncommittedTransactionIds.get(address.toString(16)) || 0;
-        var nextTransactionId = lastTransactionId + 1;
-        this.transactionPool.lastUncommittedTransactionIds.set(address.toString(16), nextTransactionId);
-        return nextTransactionId;
+    getNextTransactionId(address) {
+        return this.getLastUncommittedTransactionId(address) + 1;
     }
 
     postTransaction(sourceAddress, targetAddress, amount) {
@@ -69,25 +66,25 @@ export class TransactionService {
         });
     }
 
-    getLastUncommittedTransactionsId(address) {
-        return this.transactionPool.lastUncommittedTransactionIds.get(address.toString(16)) || 0;
+    getLastUncommittedTransactionId(address) {
+        return this.transactionPool.lastUncommittedTransactionIds.get(address) || 0;
     }
 
     getLastCommittedTransactionsId(address) {
-        return this.transactionPool.lastCommittedTransactionIds.get(address.toString(16)) || 0;
+        return this.transactionPool.lastCommittedTransactionIds.get(address) || 0;
     }
 
     updateLastUncommittedTransactionsId(address, uncommittedTransactionId) {
-        var currentLastUncommittedTransactionId = this.getLastUncommittedTransactionsId(address);
+        var currentLastUncommittedTransactionId = this.getLastUncommittedTransactionId(address);
         if (uncommittedTransactionId > currentLastUncommittedTransactionId) {
-            this.transactionPool.lastUncommittedTransactionIds.set(address.toString(16), uncommittedTransactionId);
+            this.transactionPool.lastUncommittedTransactionIds.set(address, uncommittedTransactionId);
         }
     }
 
     updateLastCommittedTransactionsId(address, committedTransactionId) {
         var currentLastCommittedTransactionId = this.getLastCommittedTransactionsId(address);
         if (committedTransactionId > currentLastCommittedTransactionId) {
-            this.transactionPool.lastCommittedTransactionIds.set(address.toString(16), committedTransactionId);
+            this.transactionPool.lastCommittedTransactionIds.set(address, committedTransactionId);
         }
 
         this.updateLastUncommittedTransactionsId(address, committedTransactionId);
@@ -109,7 +106,7 @@ export class TransactionService {
         this.transactionPool.transactions.forEach((transaction, index) => {
             var { id, sourceAddress, validTo } = transaction.transactionBody;
 
-            var lastTransactionId = this.transactionPool.lastCommittedTransactionIds.get(sourceAddress.toString(16)) || 0;
+            var lastTransactionId = this.transactionPool.lastCommittedTransactionIds.get(sourceAddress) || 0;
             if (id <= lastTransactionId || validTo < currentTimestamp) {
                 droppedTransactions.push(transaction);
                 this.transactionPool.transactions.splice(index, 1);
@@ -139,11 +136,11 @@ export class TransactionService {
         var transactionsByAddress = new Map();
         transactions.forEach(transaction => {
             var sourceAddress = transaction.transactionBody.sourceAddress;
-            var transactionsOfAddress = transactionsByAddress.get(sourceAddress.toString());
+            var transactionsOfAddress = transactionsByAddress.get(sourceAddress);
             if (transactionsOfAddress) {
                 transactionsOfAddress.push(transaction);
             } else {
-                transactionsByAddress.set(sourceAddress.toString(), [transaction]);
+                transactionsByAddress.set(sourceAddress, [transaction]);
             }
         })
 
@@ -153,9 +150,9 @@ export class TransactionService {
             transactions.forEach(transaction => {
                 var { id, validTo } = transaction.transactionBody;
 
-                var lastTransactionId = this.transactionPool.lastUncommittedTransactionIds.get(sourceAddress.toString(16)) || 0;
+                var lastTransactionId = this.transactionPool.lastUncommittedTransactionIds.get(sourceAddress) || 0;
                 if (id > lastTransactionId) {
-                    this.transactionPool.lastUncommittedTransactionIds.set(sourceAddress.toString(16), id);
+                    this.transactionPool.lastUncommittedTransactionIds.set(sourceAddress, id);
                     if (!putTransactionsIds.has(id) && validTo > currentTimestamp) {
                         this.transactionPool.transactions.push(transaction);
                         putTransactions.push(transaction);
