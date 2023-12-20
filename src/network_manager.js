@@ -13,6 +13,8 @@ export class NetworkManager {
         // this.canvas = canvas;
 
         this.selectedNode = null;
+        this.currentBlocks = null;
+        this.processedEventsPage = 0;
 
         // this.nodePositionsMap = {};
         this.settings = {
@@ -47,8 +49,7 @@ export class NetworkManager {
                     color: 'rgb(165,42,42)'
                 }
             },
-            processedEventsPage: 0,
-            itemsPerPage: 10,
+            itemsPerPage: 10
         }
     }
 
@@ -78,7 +79,8 @@ export class NetworkManager {
             this.selectedNode.isSelected = false;
         this.selectedNode = node;
         node.isSelected = true;
-        this.settings.processedEventsPage = 0;
+        this.processedEventsPage = 0;
+        this.currentBlocks = [...node.blockchain.leadingBlocks];
     }
 
     unselectNode() {

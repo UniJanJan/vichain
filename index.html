@@ -99,12 +99,12 @@
 
                                 <div class="pt-2">
                                     <button class="btn btn-secondary btn-sm" :disabled="processedEventsPage === 0"
-                                        @click="() => networkManager.settings.processedEventsPage--"
-                                        style="float: left;">Newer events</button>
+                                        @click="() => networkManager.processedEventsPage--" style="float: left;">Newer
+                                        events</button>
                                     <button class="btn btn-secondary btn-sm"
                                         :disabled="processedEventsPage >= maxPages-1"
-                                        @click="() => networkManager.settings.processedEventsPage++"
-                                        style="float: right;">Older events</button>
+                                        @click="() => networkManager.processedEventsPage++" style="float: right;">Older
+                                        events</button>
                                 </div>
 
                             </div>
@@ -265,20 +265,20 @@
 
 
 
-                            <div v-if="leadingBlocks.length > 0">
+                            <div v-if="networkManager.currentBlocks.length > 0">
 
                                 <div id="forksCarousel" class="carousel carousel-dark slide">
                                     <div class="carousel-inner">
-                                        <div v-for="(leadingBlock, index) in leadingBlocks"
+                                        <div v-for="(block, index) in networkManager.currentBlocks"
                                             :class="'carousel-item' + (index === 0 ? ' active' : '')">
                                             <h6>
-                                                Block {{leadingBlock.block.blockBody.height}}
+                                                Block {{block.block.blockBody.height}}
                                             </h6>
                                             <div style="text-overflow: ellipsis; overflow: hidden">
-                                                Hash: 0x{{leadingBlock.block.blockHash}}
+                                                Hash: 0x{{block.block.blockHash}}
                                             </div>
                                             <ul class="list-group"
-                                                v-for="transaction in leadingBlock.block.blockBody.transactions">
+                                                v-for="transaction in block.block.blockBody.transactions">
                                                 <li class="list-group-item"
                                                     :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress() === transaction.transactionBody.targetAddress) ? 'red;' : 'darkgoldenrod;')">
                                                     <div v-if="transaction.transactionBody.sourceAddress">
@@ -302,6 +302,13 @@
                                                 </li>
                                             </ul>
 
+                                            <div class="pt-2">
+                                                <button :disabled="block.previousBlock === null"
+                                                    class="btn btn-secondary btn-sm"
+                                                    @click="() => networkManager.currentBlocks.splice(index, 1, block.previousBlock)">Previous
+                                                    block</button>
+                                            </div>
+
                                             <hr />
 
                                             <h6>
@@ -319,35 +326,35 @@
                                                 <tbody style="font-size: small;">
                                                     <tr>
                                                         <td scope="col">All</td>
-                                                        <td scope="col">{{ leadingBlock.spendableTokensSupply }}</td>
-                                                        <td scope="col">{{ leadingBlock.burnMap.summedInvervalsSize }}
+                                                        <td scope="col">{{ block.spendableTokensSupply }}</td>
+                                                        <td scope="col">{{ block.burnMap.summedInvervalsSize }}
                                                         </td>
                                                         <td scope="col"></td>
                                                     </tr>
-                                                    <tr v-for="address in leadingBlock.accountMap.keys()">
+                                                    <tr v-for="address in block.accountMap.keys()">
                                                         <td>0x{{ address.slice(0,8) }}...</td>
-                                                        <td>{{ leadingBlock.accountMap.get(address) }}
+                                                        <td>{{ block.accountMap.get(address) }}
                                                         </td>
-                                                        <td>{{ leadingBlock.burnMap.getObjectIntervalsSize(address) || 0
+                                                        <td>{{ block.burnMap.getObjectIntervalsSize(address) || 0
                                                             }}
                                                         </td>
                                                         <td>{{
-                                                            ((leadingBlock.burnMap.getObjectIntervalsSize(address) ||
-                                                            0)*100/leadingBlock.burnMap.summedInvervalsSize).toFixed(2)
+                                                            ((block.burnMap.getObjectIntervalsSize(address) ||
+                                                            0)*100/block.burnMap.summedInvervalsSize).toFixed(2)
                                                             }}%</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                    <button v-if="leadingBlocks.length > 1" class="carousel-control-prev" type="button"
-                                        data-bs-target="#forksCarousel" data-bs-slide="prev"
+                                    <button v-if="networkManager.currentBlocks.length > 1" class="carousel-control-prev"
+                                        type="button" data-bs-target="#forksCarousel" data-bs-slide="prev"
                                         style="align-items: start; padding-top: 0.5rem;">
                                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Previous</span>
                                     </button>
-                                    <button v-if="leadingBlocks.length > 1" class="carousel-control-next" type="button"
-                                        data-bs-target="#forksCarousel" data-bs-slide="next"
+                                    <button v-if="networkManager.currentBlocks.length > 1" class="carousel-control-next"
+                                        type="button" data-bs-target="#forksCarousel" data-bs-slide="next"
                                         style="align-items: start; padding-top: 0.5rem;">
                                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Next</span>
