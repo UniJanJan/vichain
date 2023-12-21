@@ -13,7 +13,13 @@ export class IntervalMap {
 
     /* intervalSize should be natural number */
     push(intervalSize, object) {
-        this.intervals.push(new Interval(this.summedInvervalsSize, intervalSize, object));
+        var lastInterval = this.intervals.at(-1);
+        if (lastInterval && _.isEqual(lastInterval.object, object)) {
+            lastInterval.extend(intervalSize);
+        } else {
+            this.intervals.push(new Interval(this.summedInvervalsSize, intervalSize, object));
+        }
+
         this.summedInvervalsSize += intervalSize;
         var keySummedInvervalsSize = this.summaryMap.get(object) || 0;
         this.summaryMap.set(object, keySummedInvervalsSize + intervalSize);
@@ -34,6 +40,10 @@ export class IntervalMap {
     getObjectIntervalsSize(object) {
         return this.summaryMap.get(object);
     }
+
+    getIntervals() {
+        return this.intervals;
+    }
 }
 
 class Interval {
@@ -43,4 +53,10 @@ class Interval {
         this.end = start + size;
         this.object = object;
     }
+
+    extend(extensionSize) {
+        this.end += extensionSize;
+        this.size += extensionSize;
+    }
+
 }
