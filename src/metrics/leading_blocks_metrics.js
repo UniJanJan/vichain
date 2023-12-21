@@ -5,7 +5,7 @@ export class LeadingBlocksMetrics {
     constructor(network) {
         this.network = network;
         this.leadingBlocksMetrics = new Map();
-        this.metricsRetentionTime = 100000; 
+        this.metricsRetentionTime = 100000;
     }
 
     collectMetrics(elapsedTime) {
@@ -23,32 +23,33 @@ export class LeadingBlocksMetrics {
 
     draw(graphics, startX, startY, width, height) {
         var nodeMetricsHeight = height / this.leadingBlocksMetrics.size;
-        var maxMetricsWidth = width * 1000;
+        var widthToTimeFactor = width / this.metricsRetentionTime;
+
         this.leadingBlocksMetrics.forEach((metrics, nodeId) => {
             var intervals = metrics.getIntervals();
 
             var currentIntervalIndex = intervals.length - 1;
-            var currentMetricsWidth = 0;
+            var currentMetricsTotalTime = 0;
 
-            while (currentIntervalIndex >= 0 && currentMetricsWidth < maxMetricsWidth) {
+            while (currentIntervalIndex >= 0 && currentMetricsTotalTime < this.metricsRetentionTime) {
                 var currentInterval = intervals[currentIntervalIndex];
 
-                var intervalWidth = currentInterval.size;
-                if (currentMetricsWidth + intervalWidth > maxMetricsWidth) {
-                    intervalWidth = maxMetricsWidth - currentMetricsWidth;
+                var intervalTime = currentInterval.size;
+                if (currentMetricsTotalTime + intervalTime > this.metricsRetentionTime) {
+                    intervalTime = this.metricsRetentionTime - currentMetricsTotalTime;
                 }
 
                 graphics.beginPath();
-                graphics.rect(startX + currentMetricsWidth / 1000, startY + (nodeId - 1) * nodeMetricsHeight, intervalWidth / 1000, nodeMetricsHeight);
+                graphics.rect(startX + currentMetricsTotalTime * widthToTimeFactor, startY + (nodeId - 1) * nodeMetricsHeight, intervalTime * widthToTimeFactor, nodeMetricsHeight);
                 graphics.fillStyle = currentInterval.object.length > 0 ? currentInterval.object[0] : '#ffffff';
                 graphics.fill();
 
                 currentIntervalIndex -= 1;
-                currentMetricsWidth += intervalWidth;
+                currentMetricsTotalTime += intervalTime;
             }
 
-
         });
+
     }
 
 }
