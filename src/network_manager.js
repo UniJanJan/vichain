@@ -2,6 +2,7 @@ import { Utils } from "./common/common.js";
 import { RSA } from "./common/rsa.js";
 import { EventManager } from "./logic/event_manager.js";
 import { EventFactory } from "./logic/factory/event_factory.js";
+import { MetricsManager } from "./metrics/metrics_manager.js";
 import { Network } from "./model/entity/network.js";
 import { Wallet } from "./model/wallet/wallet.js";
 
@@ -10,6 +11,7 @@ export class NetworkManager {
         this.network = network || new Network();
         this.eventFactory = new EventFactory(this.network.settings);
         this.eventManager = new EventManager(this.network, this.eventFactory);
+        this.metricsManager = new MetricsManager(this.network);
         // this.canvas = canvas;
 
         this.selectedNode = null;
@@ -105,6 +107,7 @@ export class NetworkManager {
         if (this.settings.isRunning) {
             this.network.update(elapsedTime);
             this.eventManager.update(elapsedTime);
+            this.metricsManager.collectMetrics(elapsedTime);
         }
     }
 
