@@ -34,10 +34,17 @@ export class LeadingBlocksMetrics {
                     intervalSize = this.metricsRetentionTime - currentMetricsTotalTime;
                 }
 
-                graphics.beginPath();
-                graphics.rect(startX + (this.metricsRetentionTime - currentMetricsTotalTime - intervalSize) * widthToTimeFactor, startY + (nodeId - 1) * nodeMetricsHeight, intervalSize * widthToTimeFactor, nodeMetricsHeight);
-                graphics.fillStyle = interval.object.length > 0 ? interval.object[0] : '#ffffff';
-                graphics.fill();
+                var leadingBlocksColorsNumber = interval.object.length;
+                var leadingBlocksColors = leadingBlocksColorsNumber > 0 ? interval.object : ['#ffffff'];
+
+                leadingBlocksColors.forEach((leadingBlockColor, index) => {
+                    var segmentHeight = nodeMetricsHeight / leadingBlocksColorsNumber;
+
+                    graphics.beginPath();
+                    graphics.rect(startX + (this.metricsRetentionTime - currentMetricsTotalTime - intervalSize) * widthToTimeFactor, startY + (nodeId - 1) * nodeMetricsHeight + index * segmentHeight, intervalSize * widthToTimeFactor, segmentHeight);
+                    graphics.fillStyle = leadingBlockColor;
+                    graphics.fill();
+                })
 
                 return shouldStop;
             });
