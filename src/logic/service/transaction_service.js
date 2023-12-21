@@ -116,8 +116,29 @@ export class TransactionService {
         return droppedTransactions;
     }
 
-    pickUncommittedTransactions(transactionsNumber = 1) {
-        return this.transactionPool.transactions.splice(0, transactionsNumber);
+    pickUncommittedTransactions(balanceMap, transactionsNumber = 1) {
+        var operationalBalanceMap = new Map(balanceMap);
+        var pickedTransactions = [];
+        var transactionsToReturnIntoTransactionPool = []
+
+        while (pickedTransactions.length < transactionsNumber && this.transactionPool.transactions.length > 0) {
+            var transaction = this.transactionPool.transactions.pop();
+            var { sourceAddress, targetAddress, amount } = transaction.transactionBody;
+            var sourceAddressBalance = operationalBalanceMap.get(sourceAddress) || 0;
+            if (amount <= sourceAddressBalance) {
+                operationalBalanceMap.set(sourceAddress, sourceAddressBalance - amount);
+                var targetAddressBalance = operationalBalanceMap.get(targetAddress) || 0;
+                operationalBalanceMap.set(targetAddress, targetAddressBalance + amount);
+                pickedTransactions.push(transaction);
+            } else {
+                transactionsToReturnIntoTransactionPool.push(transaction);
+            }
+        }
+
+        transactionsToReturnIntoTransactionPool
+            .forEach(transaction => this.transactionPool.transactions.push(transaction));
+
+        return pickedTransactions;
     }
 
     putUncommittedTransaction(transaction) {
