@@ -168,7 +168,7 @@ export class ProofOfBurnConsensus extends Consensus {
         var burnAddress = this.network.walletPool.getBurnAddress();
 
         var element = new BlockchainElement(block, previousBlockchainElement);
-        element.burnMap = previousBlockchainElement ? new IntervalMap(previousBlockchainElement.burnMap) : new IntervalMap();
+        element.burnMap = previousBlockchainElement ? previousBlockchainElement.burnMap.clone() : new IntervalMap();
         element.accountMap = previousBlockchainElement ? new Map(previousBlockchainElement.accountMap) : new Map();
         element.spendableTokensSupply = previousBlockchainElement ? previousBlockchainElement.spendableTokensSupply : 0;
         element.lastTransactionIds = previousBlockchainElement ? new Map(previousBlockchainElement.lastTransactionIds) : new Map();
