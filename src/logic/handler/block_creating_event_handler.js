@@ -19,7 +19,7 @@ export class BlockCreatingEventHandler extends EventHandler {
 
         var accountService = this.serviceDispositor.getAccountService(processingNode);
         var minerAccount = accountService.getManagedAccount(processedEvent.selectedAddress);
-        var transactions = transactionService.pickUncommittedTransactions(this.network.settings.maxTransactionsPerBlock - 1);
+        var transactions = transactionService.pickUncommittedTransactions(leadingBlock.accountMap, this.network.settings.maxTransactionsPerBlock - 1);
         var awardTransaction = transactionService.createAwardTransaction(minerAccount.wallet);
         transactions.push(awardTransaction);
 
