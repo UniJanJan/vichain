@@ -2,6 +2,7 @@ import { Utils } from "./common/common.js";
 import { RSA } from "./common/rsa.js";
 import { EventManager } from "./logic/event_manager.js";
 import { EventFactory } from "./logic/factory/event_factory.js";
+import { LeadingBlocksMetrics } from "./metrics/leading_blocks_metrics.js";
 import { MetricsManager } from "./metrics/metrics_manager.js";
 import { Network } from "./model/entity/network.js";
 import { Wallet } from "./model/wallet/wallet.js";
@@ -17,6 +18,7 @@ export class NetworkManager {
         this.selectedNode = null;
         this.currentBlocks = null;
         this.processedEventsPage = 0;
+        this.selectedMetrics = this.metricsManager.getMetrics(LeadingBlocksMetrics.name);
 
         // this.nodePositionsMap = {};
         this.settings = {
@@ -112,7 +114,7 @@ export class NetworkManager {
     }
 
     draw(graphics) { //TODO
-        this.network.draw(graphics, this.settings);
+        this.network.draw(graphics, this.settings, this.selectedMetrics);
         this.network.links.forEach(link => link.draw(graphics));
         this.network.nodes.forEach(node => node.draw(graphics, this.settings));
     }

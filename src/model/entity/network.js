@@ -77,7 +77,7 @@ export class Network {
         this.links.forEach(link => link.update(elapsedTime));
     }
 
-    draw(graphics, settings) {
+    draw(graphics, settings, selectedMetrics) {
         graphics.beginPath();
         graphics.arc(40, 40, 20, -Math.PI / 2, 3 / 2 * Math.PI, false);
         graphics.strokeStyle = 'grey';
@@ -121,6 +121,17 @@ export class Network {
             graphics.rect(41, 30, 7, 18);
             graphics.fillStyle = 'red'
             graphics.fill();
+        }
+
+
+        if (selectedMetrics) {
+            graphics.beginPath();
+            graphics.rect(100, 100, 240, 140);
+            graphics.strokeStyle = 'black'
+            graphics.lineWidth = 2;
+            graphics.stroke();
+
+            selectedMetrics.draw(graphics, 100, 100, 240, 140);
         }
     }
 
