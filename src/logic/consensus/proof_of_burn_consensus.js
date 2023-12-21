@@ -11,7 +11,8 @@ export class ProofOfBurnConsensus extends Consensus {
 
     constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock) {
         if (this.isBlockValid(currentlyLeadingBlock, potentialyNextBlock)) {
-            return this.createBlockchainElement(currentlyLeadingBlock, potentialyNextBlock);
+            var blockchainElement = this.createBlockchainElement(currentlyLeadingBlock, potentialyNextBlock);
+            return this.areAddressBalancesValid(blockchainElement.accountMap) ? blockchainElement : null;
         } else {
             return null;
         }
@@ -74,7 +75,6 @@ export class ProofOfBurnConsensus extends Consensus {
         return transactions.every((transaction, index) => this.isTransactionValid(transaction, index === awardTransactionIndex, blockCreationTimestamp, previousBlock.lastTransactionIds));
     }
 
-    //TODO check if transactions amounts not exceed limit
     isTransactionValid(transaction, asAwardTransaction, blockCreationTimestamp, lastTransactionIds) {
         return this.isTransactionAmountValid(transaction)
             && this.isTransactionTimestampValid(transaction, blockCreationTimestamp)
@@ -84,8 +84,9 @@ export class ProofOfBurnConsensus extends Consensus {
             && this.isTransactionSignatureValid(transaction, asAwardTransaction);
     }
 
-    isTransactionAmountValid(transaction) {
-        return transaction.transactionBody.amount > 0;
+    isTransactionAmountValid(transaction, balanceMap) {
+        var amount = transaction.transactionBody.amount;
+        return Number.isSafeInteger(amount) && amount > 0;
     }
 
     isTransactionTimestampValid(transaction, blockCreationTimestamp) {
@@ -212,6 +213,10 @@ export class ProofOfBurnConsensus extends Consensus {
         var { roundTime } = this.network.settings;
         return Math.floor(blockCreationTimestamp / roundTime) >
             Math.floor((previousBlockCreationTimestamp / roundTime));
+    }
+
+    areAddressBalancesValid(balanceMap) {
+        return Array.from(balanceMap.values()).every(balance => balance >= 0);
     }
 
 }
