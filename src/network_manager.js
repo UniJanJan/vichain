@@ -114,7 +114,7 @@ export class NetworkManager {
     }
 
     draw(graphics) { //TODO
-        this.network.draw(graphics, this.settings, this.selectedMetrics);
+        this.network.draw(graphics, this.settings, this.selectedMetrics, this.canvas);
         this.network.links.forEach(link => link.draw(graphics));
         this.network.nodes.forEach(node => node.draw(graphics, this.settings));
     }
