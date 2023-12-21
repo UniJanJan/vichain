@@ -1,4 +1,3 @@
-import { RSA } from "../../common/rsa.js";
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionVerifyingEventHandler extends EventHandler {
