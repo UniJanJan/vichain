@@ -1,4 +1,4 @@
-import { DiscreteIntervalMap } from "../../common/interval_map.js";
+import { IntervalMap } from "../../common/interval_map.js";
 import { RSA } from "../../common/rsa.js";
 import { BlockchainElement } from "../../model/blockchain/blockchain.js";
 import { Consensus } from "./consensus.js";
@@ -151,7 +151,7 @@ export class ProofOfBurnConsensus extends Consensus {
 
 
         var timeQuantum = this.network.settings.roundTime / minersPerRound;
-        var minersMap = new DiscreteIntervalMap();
+        var minersMap = new IntervalMap();
 
         [...Array(minersPerRound).keys()]
             .map((_, index) => CryptoJS.SHA256(seed + index).toString())
@@ -168,7 +168,7 @@ export class ProofOfBurnConsensus extends Consensus {
         var burnAddress = this.network.walletPool.getBurnAddress();
 
         var element = new BlockchainElement(block, previousBlockchainElement);
-        element.burnMap = previousBlockchainElement ? new DiscreteIntervalMap(previousBlockchainElement.burnMap) : new DiscreteIntervalMap();
+        element.burnMap = previousBlockchainElement ? new IntervalMap(previousBlockchainElement.burnMap) : new IntervalMap();
         element.accountMap = previousBlockchainElement ? new Map(previousBlockchainElement.accountMap) : new Map();
         element.spendableTokensSupply = previousBlockchainElement ? previousBlockchainElement.spendableTokensSupply : 0;
         element.lastTransactionIds = previousBlockchainElement ? new Map(previousBlockchainElement.lastTransactionIds) : new Map();
