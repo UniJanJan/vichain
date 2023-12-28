@@ -189,7 +189,7 @@
 
 
                                 <div class="modal fade" tabindex="-1" id="postTransactionModal">
-                                    <div class="modal-dialog">
+                                    <div class="modal-dialog" style="min-width: 50%;">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">Transaction posting</h5>
@@ -197,39 +197,54 @@
                                                     aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <div class="form-floating mb-2">
+
+                                                <div class="input-group mb-2">
                                                     <span class="input-group-text" id="hex-addon1">0x</span>
-                                                    <input id="sourceAddresInput" type="text" class="form-control"
-                                                        v-model="postTransactionRequest.sourceAddres"
-                                                        aria-describedby="hex-addon1" />
-                                                    <label for="sourceAddresInput">Source address (public key)</label>
+                                                    <div class="form-floating">
+                                                        <input id="sourceAddresInput" type="text" class="form-control"
+                                                            style="font-size: small;"
+                                                            v-model="postTransactionRequest.sourceAddres"
+                                                            aria-describedby="hex-addon1" />
+                                                        <label for="sourceAddresInput">Source address (public
+                                                            key)</label>
+                                                    </div>
                                                 </div>
-                                                <div class="form-floating mb-2">
+
+                                                <div class="input-group mb-2">
                                                     <span class="input-group-text" id="hex-addon2">0x</span>
-                                                    <input id="sourceAddresPrivateKeyInput" type="text"
-                                                        class="form-control"
-                                                        v-model="postTransactionRequest.sourceAddresPrivateKey"
-                                                        aria-describedby="hex-addon2" />
-                                                    <label for="sourceAddresPrivateKeyInput">Source address (private
-                                                        key)</label>
+                                                    <div class="form-floating">
+                                                        <input id="sourceAddresPrivateKeyInput" type="text"
+                                                            class="form-control" style="font-size: small;"
+                                                            v-model="postTransactionRequest.sourceAddresPrivateKey"
+                                                            aria-describedby="hex-addon2" />
+                                                        <label for="sourceAddresPrivateKeyInput">Source address (private
+                                                            key)</label>
+                                                    </div>
                                                 </div>
-                                                <div class="form-floating mb-2">
+
+                                                <div class="input-group mb-2">
                                                     <span class="input-group-text" id="hex-addon3">0x</span>
-                                                    <input id="targetAddressInput" type="text" class="form-control"
-                                                        v-model="postTransactionRequest.targetAddress"
-                                                        aria-describedby="hex-addon3" />
-                                                    <label for="targetAddressInput">Target address (public key)</label>
+                                                    <div class="form-floating">
+                                                        <input id="targetAddressInput" type="text" class="form-control"
+                                                            style="font-size: small;"
+                                                            v-model="postTransactionRequest.targetAddress"
+                                                            aria-describedby="hex-addon3" />
+                                                        <label for="targetAddressInput">Target address (public
+                                                            key)</label>
+                                                    </div>
                                                 </div>
+
                                                 <div class="form-floating mb-2">
                                                     <input id="amountInput" type="number" class="form-control"
                                                         v-model="postTransactionRequest.amount" />
                                                     <label for="amountInput">Amount</label>
                                                 </div>
+
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary"
+                                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
                                                     @click="postTransaction">Post transaction</button>
                                             </div>
                                         </div>
