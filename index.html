@@ -314,13 +314,13 @@
                                             <h6>
                                                 Current blockchain state
                                             </h6>
-                                            <table class="table">
+                                            <table class="table" style="table-layout: fixed; width: 100%;">
                                                 <thead>
                                                     <tr>
-                                                        <td scope="col">Address</td>
-                                                        <td scope="col">Balance</td>
-                                                        <td scope="col">Burnt tokens</td>
-                                                        <td scope="col">Mining chance</td>
+                                                        <td scope="col" class="col-3">Address</td>
+                                                        <td scope="col" class="col-2">Balance</td>
+                                                        <td scope="col" class="col-2">Burnt tokens</td>
+                                                        <td scope="col" class="col-2">Mining chance</td>
                                                     </tr>
                                                 </thead>
                                                 <tbody style="font-size: small;">
@@ -332,7 +332,10 @@
                                                         <td scope="col"></td>
                                                     </tr>
                                                     <tr v-for="address in block.accountMap.keys()">
-                                                        <td>0x{{ address.slice(0,8) }}...</td>
+                                                        <td
+                                                            style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                            0x<u style="text-decoration-style: dashed; cursor: pointer;"
+                                                                @click="copyToClipboard">{{ address }}</u></td>
                                                         <td>{{ block.accountMap.get(address) }}
                                                         </td>
                                                         <td>{{ block.burnMap.getObjectIntervalsSize(address) || 0
@@ -513,7 +516,9 @@
                             <div v-if="networkManager.network.settings.isBlockchainInstalled"
                                 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 Burn address:
-                                0x<u style="text-decoration-style: dashed; cursor: pointer;" @click="copyToClipboard">{{networkManager.network.walletPool.getBurnAddress() }}</u></div>
+                                0x<u style="text-decoration-style: dashed; cursor: pointer;"
+                                    @click="copyToClipboard">{{networkManager.network.walletPool.getBurnAddress() }}</u>
+                            </div>
                         </div>
                     </div>
                 </div>
