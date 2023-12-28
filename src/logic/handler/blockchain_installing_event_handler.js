@@ -17,6 +17,8 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             throw new Error("Lack of nodes to install blockchain on!");
         }
 
+        this.network.settings.isBlockchainInstalled = true;
+
         var transactions = [];
 
         processedEvent.nodes.forEach(node => {
@@ -40,7 +42,6 @@ export class BlockchainInstallingEventHandler extends EventHandler {
         var genesisBlockBody = new BlockBody(0, null, transactions, currentTimestamp);
         var genesisBlock = new Block(genesisBlockBody, CryptoJS.SHA256(JSON.stringify(genesisBlockBody)), null);
 
-        this.network.settings.isBlockchainInstalled = true;
         this.network.settings.genesisBlock = genesisBlock;
 
         var { roundTime } = this.network.settings;

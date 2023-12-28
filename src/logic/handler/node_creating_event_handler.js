@@ -21,10 +21,10 @@ export class NodeCreatingEventHandler extends EventHandler {
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.PEERS_DISCOVERY, 1000)
         ];
 
-        if (processingNetwork.settings.isBlockchainInstalled) {
-            var accountService = this.serviceDispositor.getAccountService(node);
-            accountService.createAccount();
+        var accountService = this.serviceDispositor.getAccountService(node);
+        accountService.createAccount();
 
+        if (processingNetwork.settings.isBlockchainInstalled) {
             var currentTimestamp = this.network.timer.currentTimestamp;
             var { roundTime } = this.network.settings;
             var timeToNextRound = roundTime - (currentTimestamp % roundTime) + 1000;
