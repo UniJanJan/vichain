@@ -511,8 +511,9 @@
                                 v-if="networkManager.network.nodes.length === 0">To install blockchain at least one node
                                 has to be created!</span>
                             <div v-if="networkManager.network.settings.isBlockchainInstalled"
-                                style="overflow: hidden; text-overflow: ellipsis;">Burn address:
-                                0x{{networkManager.network.walletPool.getBurnAddress() }}</div>
+                                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                Burn address:
+                                0x<u style="text-decoration-style: dashed; cursor: pointer;" @click="copyToClipboard">{{networkManager.network.walletPool.getBurnAddress() }}</u></div>
                         </div>
                     </div>
                 </div>
