@@ -12,14 +12,15 @@ export class AccountService {
         this.walletPool = this.network.walletPool;
     }
 
-    createAccount(wallet) {
-        if (!wallet) {
-            wallet = this.walletPool.addRandomWallet();
+    createAccount() {
+        if (this.network.settings.isBlockchainInstalled) {
+            var wallet = this.walletPool.pickFreeWallet();
+            var account = new Account(wallet, 0);
+            this.managedAccounts.accounts.set(wallet.publicKey, account);
+            return account;
+        } else {
+            this.walletPool.addRandomWallet();
         }
-
-        var account = new Account(wallet, 0);
-        this.managedAccounts.accounts.set(wallet.publicKey, account);
-        return account;
     }
 
     getManagedAccount(publicKey) {

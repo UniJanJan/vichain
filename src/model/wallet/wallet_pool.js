@@ -18,9 +18,11 @@ export class WalletPool {
     }
 
     pickFreeWallet() {
-        if (this.hasAnyFreeWallet.bind(this)()) {
-            return this.walletPool[this.nextFreeWalletIndex++];
+        if (!this.hasAnyFreeWallet()) {
+            this.addRandomWallet();
         }
+
+        return this.walletPool[this.nextFreeWalletIndex++];
     }
 
     getAllAddresses() {

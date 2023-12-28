@@ -60,8 +60,7 @@ export class ProofOfBurnConsensus extends Consensus {
         }
 
         var awardTransactions = transactions.filter(transaction => transaction.transactionBody.sourceAddress === null)
-        if (awardTransactions.length !== 1
-            || awardTransactions[0].transactionBody.amount !== miningAward) {
+        if (awardTransactions.length !== 1) {
             return false;
         }
 
@@ -76,7 +75,7 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     isTransactionValid(transaction, asAwardTransaction, blockCreationTimestamp, lastTransactionIds) {
-        return this.isTransactionAmountValid(transaction)
+        return this.isTransactionAmountValid(transaction, asAwardTransaction)
             && this.isTransactionTimestampValid(transaction, blockCreationTimestamp)
             && this.areTransactionAddressesValid(transaction, asAwardTransaction)
             && this.isTransactionIdValid(transaction, lastTransactionIds)
@@ -84,9 +83,13 @@ export class ProofOfBurnConsensus extends Consensus {
             && this.isTransactionSignatureValid(transaction, asAwardTransaction);
     }
 
-    isTransactionAmountValid(transaction, balanceMap) {
+    isTransactionAmountValid(transaction, asAwardTransaction) {
         var amount = transaction.transactionBody.amount;
-        return Number.isSafeInteger(amount) && amount > 0;
+        if (asAwardTransaction) {
+            return amount === this.network.settings.miningAward;
+        } else {
+            return Number.isSafeInteger(amount) && amount > 0;
+        }
     }
 
     isTransactionTimestampValid(transaction, blockCreationTimestamp) {
