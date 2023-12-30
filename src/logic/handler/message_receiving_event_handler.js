@@ -91,8 +91,9 @@ export class MessageReceivingEventHandler extends EventHandler {
             var blocks = [...event.message.blocks];
 
             if (blockchainService.getBlockchainHeight() + 1 < blocks.length) {
+                var response = blockchainService.findHighestJointBlock(blocks);
                 return [
-                    this.eventFactory.createBlockVerifyingEvent(processingNode, [null], blocks, event.informatorNode)
+                    this.eventFactory.createBlockVerifyingEvent(processingNode, [response.jointBlock], response.blocksToVerify, event.informatorNode)
                 ];
             } else {
                 return [];

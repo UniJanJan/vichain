@@ -19,6 +19,33 @@ export class BlockchainService {
         return this.blockchain.leadingBlocks.length > 0 ? this.blockchain.leadingBlocks[0].block.blockBody.height : -1;
     }
 
+    findHighestJointBlock(blocks) {
+        var currentHeight = this.getBlockchainHeight();
+
+        var jointLeadingBlocks = this.blockchain.leadingBlocks.filter(leadingBlock => leadingBlock.block.blockHash === blocks[currentHeight].blockHash);
+
+        if (jointLeadingBlocks.length > 1) {
+            throw new Error("ERROR: findHighestJointBlock");
+        } else if (jointLeadingBlocks.length === 1) {
+            return {
+                jointBlock: jointLeadingBlocks[0],
+                blocksToVerify: blocks.slice(currentHeight + 1)
+            };
+        } else {
+            currentHeight--;
+            var currentBlock = this.blockchain.leadingBlocks[0].previousBlock;
+            while (currentBlock !== null && currentBlock.block.blockHash === blocks[currentHeight].blockHash) {
+                currentBlock = currentBlock.previousBlock;
+                currentHeight--;
+            }
+
+            return {
+                jointBlock: currentBlock,
+                blocksToVerify: blocks.slice(currentHeight + 1)
+            };
+        }
+    }
+
     createBlock(previousBlock, transactions) {
         var currentTimestamp = this.network.timer.currentTimestamp;
 
