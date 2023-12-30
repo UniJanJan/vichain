@@ -98,8 +98,8 @@ export class IntervalMap {
 
     forEach(fn) {
         var summedInvervalsSize = 0;
-        this.intervals.forEach(interval => {
-            var shouldStop = fn(interval, summedInvervalsSize);
+        this.intervals.forEach((interval, nextInterval) => {
+            var shouldStop = fn(interval, nextInterval, summedInvervalsSize);
             summedInvervalsSize += interval.size;
             return shouldStop;
         });
@@ -107,8 +107,8 @@ export class IntervalMap {
 
     forEachReversed(fn) {
         var summedInvervalsSize = 0;
-        this.intervals.forEachReversed(interval => {
-            var shouldStop = fn(interval, summedInvervalsSize);
+        this.intervals.forEachReversed((interval, nextInterval) => {
+            var shouldStop = fn(interval, nextInterval, summedInvervalsSize);
             summedInvervalsSize += interval.size;
             return shouldStop;
         });

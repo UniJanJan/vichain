@@ -54,7 +54,7 @@ export class LinkedList {
     forEach(fn) {
         var iterator = this.getProgressiveIterator();
         while (iterator.isElementPresent()) {
-            var shouldStop = fn(iterator.getElement());
+            var shouldStop = fn(iterator.getElement(), iterator.getNextElement());
             if (shouldStop) {
                 return;
             } else {
@@ -66,7 +66,7 @@ export class LinkedList {
     forEachReversed(fn) {
         var iterator = this.getRegressiveIterator();
         while (iterator.isElementPresent()) {
-            var shouldStop = fn(iterator.getElement());
+            var shouldStop = fn(iterator.getElement(), iterator.getPreviousElement());
             if (shouldStop) {
                 return;
             } else {
@@ -88,6 +88,9 @@ export class LinkedList {
             toNextElement() {
                 this.currentElement = this.currentElement.nextElement;
             },
+            getNextElement() {
+                return this.currentElement.nextElement ? this.currentElement.nextElement.object : null;
+            },
             cutToHere() {
                 this.currentElement.previousElement = null;
                 this.list.firstElement = this.currentElement;
@@ -106,6 +109,9 @@ export class LinkedList {
             },
             toPreviousElement() {
                 this.currentElement = this.currentElement.previousElement;
+            },
+            getPreviousElement() {
+                return this.currentElement.previousElement ? this.currentElement.previousElement.object : null;
             },
             cutToHere() {
                 this.currentElement.nextElement = null;
