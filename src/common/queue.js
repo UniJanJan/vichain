@@ -3,6 +3,7 @@ export class Queue {
     constructor() {
         this.head = null;
         this.tail = null;
+        this.size = 0;
     }
 
     enqueue(object) {
@@ -14,6 +15,7 @@ export class Queue {
             this.tail.nextElement = newQueueElement;
             this.tail = newQueueElement;
         }
+        this.size++;
     }
 
     enqueueWithPriority(object) {
@@ -22,6 +24,7 @@ export class Queue {
         if (this.tail === null) {
             this.tail = newQueueElement;
         }
+        this.size++;
     }
 
     isNotEmpty() {
@@ -39,6 +42,7 @@ export class Queue {
             var object = this.head.object;
             this.head = this.head.nextElement;
             if (this.head === null) this.tail = null;
+            this.size--;
             return object;
         }
     }

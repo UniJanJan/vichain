@@ -5,9 +5,9 @@ export class LinkedList {
         this.lastElement = null;
     }
 
-    clone() {
+    clone(cloneObjects) {
         var clonedList = new LinkedList();
-        this.forEach(object => clonedList.push(object));
+        this.forEach(object => clonedList.push(cloneObjects ? object.clone() : object));
         return clonedList;
     }
 
