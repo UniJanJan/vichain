@@ -19,10 +19,10 @@ export class EventFactory {
     constructor() {
     }
 
-    createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount) {
+    createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount, prioritized = false) {
         return {
             target: processingNode,
-            event: new TransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount)
+            event: new TransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount).withPriority(prioritized)
         };
     }
 
