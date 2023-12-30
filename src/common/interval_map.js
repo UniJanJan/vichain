@@ -12,7 +12,7 @@ export class IntervalMap {
 
     clone() {
         var newIntervalMap = new IntervalMap(this.retentionSize, this.retentionSize);
-        newIntervalMap.intervals = this.intervals.clone();
+        newIntervalMap.intervals = this.intervals.clone(true);
         newIntervalMap.summedInvervalsSize = this.summedInvervalsSize;
         newIntervalMap.summaryMap = new Map(this.summaryMap);
         return newIntervalMap;
@@ -133,6 +133,14 @@ class Interval {
     cut(cutSize) {
         this.start += cutSize;
         this.size -= cutSize;
+    }
+
+    clone() {
+        return new Interval(
+            this.start,
+            this.size,
+            this.object
+        );
     }
 
 }
