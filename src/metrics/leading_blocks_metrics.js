@@ -1,11 +1,11 @@
 import { IntervalMap } from "../common/interval_map.js";
+import { Metrics } from "./metrics.js";
 
-export class LeadingBlocksMetrics {
+export class LeadingBlocksMetrics extends Metrics {
 
     constructor(network) {
-        this.network = network;
+        super(network);
         this.leadingBlocksMetrics = new Map();
-        this.metricsRetentionTime = 50000;
     }
 
     collectMetrics(elapsedTime) {
@@ -26,7 +26,7 @@ export class LeadingBlocksMetrics {
         var widthToTimeFactor = width / this.metricsRetentionTime;
 
         this.leadingBlocksMetrics.forEach((metrics, nodeId) => {
-            metrics.forEachReversed((interval, currentMetricsTotalTime) => {
+            metrics.forEachReversed((interval, _, currentMetricsTotalTime) => {
                 var shouldStop = false;
                 var intervalSize = interval.size;
                 if (currentMetricsTotalTime + intervalSize > this.metricsRetentionTime) {
