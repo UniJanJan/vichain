@@ -16,7 +16,7 @@ export class BlockVerifyingEventHandler extends EventHandler {
             if (validLeadingBlock !== null) {
                 if (processedEvent.blocksToVerify.length > 1) {
                     nextProcessableEvents.push(
-                        this.eventFactory.createBlockVerifyingEvent(processingNode, [validLeadingBlock], processedEvent.blocksToVerify.slice(1), processedEvent.informatorNode)
+                        this.eventFactory.createBlockVerifyingEvent(processingNode, [validLeadingBlock], processedEvent.blocksToVerify.slice(1), processedEvent.informedNodes)
                     );
                 }
             }
@@ -34,7 +34,7 @@ export class BlockVerifyingEventHandler extends EventHandler {
 
                 if (blockchainHeight > 0) {
                     nextProcessableEvents.push(
-                        this.eventFactory.createBlockBroadcastEvent(processingNode, insertableBlock.block)
+                        this.eventFactory.createBlockBroadcastEvent(processingNode, insertableBlock.block, processedEvent.informedNodes)
                     );
                 }
             }

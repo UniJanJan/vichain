@@ -16,8 +16,9 @@ export class TransactionVerifyingEventHandler extends EventHandler {
             }
 
             return [
-                this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction, [processedEvent.informatorNode])
+                this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction, processedEvent.informedNodes)
             ];
+
         } else {
             return [];
         }

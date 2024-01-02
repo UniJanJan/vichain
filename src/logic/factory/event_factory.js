@@ -26,10 +26,10 @@ export class EventFactory {
         };
     }
 
-    createTransactionVerifyingEvent(processingNode, transaction, informatorNode) {
+    createTransactionVerifyingEvent(processingNode, transaction, informedNodes) {
         return {
             target: processingNode,
-            event: new TransactionVerifyingEvent(processingNode, transaction, informatorNode)
+            event: new TransactionVerifyingEvent(processingNode, transaction, informedNodes)
         };
     }
 
@@ -44,12 +44,12 @@ export class EventFactory {
         return this.createMessagesSendingEvent(sourceNode, [targetNode], message);
     }
 
-    createTransactionBroadcastEvent(sourceNode, transaction, excludedNodes = []) {
-        return this.createMessageBroadcastEvent(sourceNode, new TrxMessage(transaction), excludedNodes);
+    createTransactionBroadcastEvent(sourceNode, transaction, informedNodes = []) {
+        return this.createMessageBroadcastEvent(sourceNode, new TrxMessage(transaction, [...informedNodes, sourceNode.id]), informedNodes);
     }
 
     createMessageBroadcastEvent(sourceNode, message, excludedNodes = [], prioritized) {
-        var targetNodes = sourceNode.networkInterface.getAllEstablishedLinkedNodes().filter(targetNode => !excludedNodes.includes(targetNode));
+        var targetNodes = sourceNode.networkInterface.getAllEstablishedLinkedNodes().filter(targetNode => !excludedNodes.includes(targetNode.id));
         return this.createMessagesSendingEvent(sourceNode, targetNodes, message, prioritized);
     }
 
@@ -151,10 +151,10 @@ export class EventFactory {
         };
     }
 
-    createBlockVerifyingEvent(processingNode, leadingBlocks, blocksToVerify, informatorNode) {
+    createBlockVerifyingEvent(processingNode, leadingBlocks, blocksToVerify, informedNodes) {
         return {
             target: processingNode,
-            event: new BlockVerifyingEvent(processingNode, leadingBlocks, blocksToVerify, informatorNode).withPriority()
+            event: new BlockVerifyingEvent(processingNode, leadingBlocks, blocksToVerify, informedNodes).withPriority()
         };
     }
 
@@ -165,8 +165,8 @@ export class EventFactory {
         };
     }
 
-    createBlockBroadcastEvent(sourceNode, block, excludedNodes = []) {
-        return this.createMessageBroadcastEvent(sourceNode, new BlockMessage(block), excludedNodes, true);
+    createBlockBroadcastEvent(sourceNode, block, informedNodes = []) {
+        return this.createMessageBroadcastEvent(sourceNode, new BlockMessage(block, [...informedNodes, sourceNode.id]), informedNodes, true);
     }
 
 }
