@@ -1,11 +1,11 @@
 import { Event } from "./event.js";
 
 export class TransactionVerifyingEvent extends Event {
-    constructor(processingNode, transaction, informatorNode) {
+    constructor(processingNode, transaction, informedNodes) {
         super(300);
         this.processingNode = processingNode;
         this.transaction = transaction;
-        this.informatorNode = informatorNode;
+        this.informedNodes = informedNodes || [];
     }
 
     draw(graphics, settings) {

@@ -62,7 +62,7 @@ export class MessageReceivingEventHandler extends EventHandler {
             event.message.linkedNodes.forEach(processingNode.networkInterface.rememberNode.bind(processingNode.networkInterface));
             return this.eventFactory.createLinksUpdateEvents(this.network, processingNode);
         } else if (event.message instanceof TrxMessage) {
-            return [this.eventFactory.createTransactionVerifyingEvent(processingNode, event.message.transaction, event.nodeFrom)];
+            return [this.eventFactory.createTransactionVerifyingEvent(processingNode, event.message.transaction, event.message.informedNodes)];
         } else if (event.message instanceof GetAddrMessage) {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new AddrMessage(processingNode.networkInterface.getAllLinkableNodes()))];
         } else if (event.message instanceof BlockMessage) {
@@ -71,9 +71,9 @@ export class MessageReceivingEventHandler extends EventHandler {
             if (blockchainHeight + 1 < event.message.block.blockBody.height) {
                 return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksMessage())];
             } else if (blockchainHeight + 1 === event.message.block.blockBody.height) {
-                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks, [event.message.block], event.nodeFrom)];
+                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks, [event.message.block], event.message.informedNodes)];
             } else if (blockchainHeight === event.message.block.blockBody.height) {
-                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.previousBlock), [event.message.block], event.nodeFrom)];
+                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.previousBlock), [event.message.block], event.message.informedNodes)];
             } else {
                 return [];
             }
@@ -82,7 +82,8 @@ export class MessageReceivingEventHandler extends EventHandler {
             transactionService.dropStaleTransactions();
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetTransactionsResponseMessage(processingNode.transactionPool.transactions))];
         } else if (event.message instanceof GetTransactionsResponseMessage) {
-            return event.message.transactions.map(transaction => this.eventFactory.createTransactionVerifyingEvent(processingNode, transaction, event.nodeFrom));
+            var allNodesIds = this.network.nodes.map(node => node.id);
+            return event.message.transactions.map(transaction => this.eventFactory.createTransactionVerifyingEvent(processingNode, transaction, allNodesIds));
         } else if (event.message instanceof GetBlocksMessage) {
             return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.getFirstBlockchain()))];
         } else if (event.message instanceof GetBlocksResponseMessage) {
@@ -92,8 +93,9 @@ export class MessageReceivingEventHandler extends EventHandler {
 
             if (blockchainService.getBlockchainHeight() + 1 < blocks.length) {
                 var response = blockchainService.findHighestJointBlock(blocks);
+                var allNodesIds = this.network.nodes.map(node => node.id);
                 return [
-                    this.eventFactory.createBlockVerifyingEvent(processingNode, [response.jointBlock], response.blocksToVerify, event.informatorNode)
+                    this.eventFactory.createBlockVerifyingEvent(processingNode, [response.jointBlock], response.blocksToVerify, allNodesIds)
                 ];
             } else {
                 return [];

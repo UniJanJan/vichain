@@ -48,7 +48,7 @@ export class BlockchainInstallingEventHandler extends EventHandler {
         var timeToNextRound = roundTime - (currentTimestamp % roundTime) + 1000;
 
         return processedEvent.nodes.flatMap(node => [
-            this.eventFactory.createBlockVerifyingEvent(node, [null], [genesisBlock], this.network.nodes),
+            this.eventFactory.createBlockVerifyingEvent(node, [null], [genesisBlock], this.network.nodes.map(node => node.id)),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, timeToNextRound)

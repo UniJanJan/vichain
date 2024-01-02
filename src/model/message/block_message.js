@@ -1,6 +1,8 @@
 export class BlockMessage {
-    constructor(block) {
+
+    constructor(block, informedNodes) {
         this.block = block;
+        this.informedNodes = informedNodes || [];
 
         this.prioritized = true;
 
@@ -8,6 +10,6 @@ export class BlockMessage {
     }
 
     clone() {
-        return Object.assign(new Object(), this);
+        return Object.assign(new Object(), [...this.informedNodes], this);
     }
 }
