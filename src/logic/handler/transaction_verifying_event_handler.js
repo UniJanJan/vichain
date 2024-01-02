@@ -13,11 +13,13 @@ export class TransactionVerifyingEventHandler extends EventHandler {
             if (transactionService.putUncommittedTransaction(transaction)) {
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
                 accountService.addRelatedTransaction(transaction);
-            }
 
-            return [
-                this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction, processedEvent.informedNodes)
-            ];
+                return [
+                    this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction, processedEvent.informedNodes)
+                ];
+            } else {
+                return [];
+            }
 
         } else {
             return [];
