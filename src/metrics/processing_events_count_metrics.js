@@ -44,6 +44,24 @@ export class ProcessingEventsCountMetrics extends Metrics {
 
             return shouldStop;
         });
+
+        graphics.beginPath();
+        graphics.moveTo(startX, startY + height / 2);
+        graphics.lineTo(startX + 5, startY + height / 2);
+        graphics.strokeStyle = 'blue';
+        graphics.stroke();
+
+        graphics.fillStyle = 'blue';
+        graphics.font = "12px arial";
+        graphics.fillText(Math.ceil(this.maxValue / 2), startX + 10, startY + height / 2 + 3);
+
+        graphics.beginPath();
+        graphics.setLineDash([3, 6]);
+        graphics.moveTo(startX + 30, startY + height / 2);
+        graphics.lineTo(startX + width, startY + height / 2);
+        graphics.strokeStyle = 'blue';
+        graphics.stroke();
+        graphics.setLineDash([]);
     }
 
 }
