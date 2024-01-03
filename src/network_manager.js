@@ -18,7 +18,9 @@ export class NetworkManager {
         this.selectedNode = null;
         this.currentBlocks = null;
         this.processedEventsPage = 0;
-        this.selectedMetrics = this.metricsManager.getMetrics(LeadingBlocksMetrics.name);
+
+        this.selectedMetrics = LeadingBlocksMetrics.name;
+        this.availableMetrics = this.metricsManager.getAvailableMetrics();
 
         // this.nodePositionsMap = {};
         this.settings = {
@@ -115,7 +117,7 @@ export class NetworkManager {
     }
 
     draw(graphics) { //TODO
-        this.network.draw(graphics, this.settings, this.selectedMetrics, this.canvas);
+        this.network.draw(graphics, this.settings, this.metricsManager.getMetrics(this.selectedMetrics), this.canvas);
         this.network.links.forEach(link => link.draw(graphics));
         this.network.nodes.forEach(node => node.draw(graphics, this.settings));
     }
