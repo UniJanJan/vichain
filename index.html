@@ -560,11 +560,25 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-4">
+            <div class="col-1">
                 <!-- <h3 v-if="network.currentFps">{{ network.currentFps }} FPS</h3> -->
                 <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
             </div>
-            <div class="col-4" style="text-align: right;">
+            <div class="col-4" style="align-self: center;">
+                <div class="btn-group dropstart mx-auto" style="float: right;">
+                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Metrics: {{ getTranslation(networkManager.selectedMetrics) }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li
+                            v-for="metrics in networkManager.availableMetrics">
+                            <a class="dropdown-item" href="#" @click="() => networkManager.selectedMetrics = metrics">{{ getTranslation(metrics) }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-3" style="text-align: right;">
                 <p class="font-monospace" style="font-size: small; margin: 0;">created by Jan Jankowicz</p>
                 <a class="font-monospace" style="font-size: x-small;" href="https://github.com/UniJanJan/vichain">GitHub
                     repository</a>

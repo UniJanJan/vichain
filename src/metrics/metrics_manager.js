@@ -13,12 +13,18 @@ export class MetricsManager {
     }
 
     collectMetrics(elapsedTime) {
-        this.metrics.get(LeadingBlocksMetrics.name).collectMetrics(elapsedTime);
-        // this.metrics.forEach(metrics => metrics.collectMetrics(elapsedTime));
+        // this.network.nodes.forEach(node =>
+        //     this.metrics.forEach(metrics => metrics.collectMetrics(elapsedTime, node))
+        // );
+        this.metrics.forEach(metrics => metrics.collectMetrics(elapsedTime));
     }
 
     getMetrics(metrics) {
         return this.metrics.get(metrics);
+    }
+
+    getAvailableMetrics() {
+        return Array.from(this.metrics.keys());
     }
 
 }
