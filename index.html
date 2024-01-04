@@ -50,8 +50,8 @@
                                 <ul class="list-group" v-for="event in processableEvents">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
-                                        {{translateEventClassName(event)}} ({{ event.message ?
-                                        event.message.constructor.name : '' }})</li>
+                                        {{translateEventClassName(event)}} {{ event.message ?
+                                        `(${getTranslation(event.message.constructor.name)})` : '' }}</li>
                                 </ul>
                             </div>
                             <div v-else>
@@ -67,9 +67,8 @@
                                     <div>
                                         <li class="list-group-item"
                                             :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
-                                            {{translateEventClassName(event)}} ({{ event.message ?
-                                            event.message.constructor.name : '' }})
-
+                                            {{translateEventClassName(event)}} {{ event.message ?
+                                            `(${getTranslation(event.message.constructor.name)})` : '' }}
                                         </li>
                                         <progress :value="event.progress" :max="event.duration"
                                             style="width: 99%; height: 3; margin-bottom: 5;"></progress>
@@ -91,7 +90,8 @@
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white`">
                                         <span style="float: left; margin-left: 10;">{{translateEventClassName(event)}}
-                                            ({{ event.message ? event.message.constructor.name : '' }})</span>
+                                            {{ event.message ? `(${getTranslation(event.message.constructor.name)})` :
+                                            '' }}</span>
                                         <span class="badge bg-secondary"
                                             style="float: right; margin-right: 10;">{{event.processingEndTimestamp.toFixed(0)}}</span>
                                     </li>
@@ -571,9 +571,9 @@
                         Metrics: {{ getTranslation(networkManager.selectedMetrics) }}
                     </button>
                     <ul class="dropdown-menu">
-                        <li
-                            v-for="metrics in networkManager.availableMetrics">
-                            <a class="dropdown-item" href="#" @click="() => networkManager.selectedMetrics = metrics">{{ getTranslation(metrics) }}</a>
+                        <li v-for="metrics in networkManager.availableMetrics">
+                            <a class="dropdown-item" href="#" @click="() => networkManager.selectedMetrics = metrics">{{
+                                getTranslation(metrics) }}</a>
                         </li>
                     </ul>
                 </div>
