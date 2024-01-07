@@ -559,17 +559,27 @@
                         </li>
                     </ul>
                 </div>
+
+                <div>
+                    <input type="range" id="simulationSpeedInput" name="volume" min="0" max="10" step="0.05" v-model="networkManager.settings.simulationSpeed" />
+                </div>
+
+                <div>
+                    <label for="simulationSpeedInput" style="font-size: small;">Simulation speed (x{{ networkManager.settings.simulationSpeed }})</label>
+                </div>
+
             </div>
             <div class="col-1">
                 <!-- <h3 v-if="network.currentFps">{{ network.currentFps }} FPS</h3> -->
-                <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
+                <div>
+                    <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
+                </div>
             </div>
             <div class="col-4" style="align-self: center;">
                 <div class="form-check form-switch" style="float: left;">
                     <input class="form-check-input" type="checkbox" id="showOnlyMetricsInput"
                         v-model="networkManager.settings.showOnlyMetrics">
-                    <label class="form-check-label" for="showOnlyMetricsInput"
-                        style="font-size: x-small;">Show only metrics</label>
+                    <label class="form-check-label" for="showOnlyMetricsInput">Show only metrics</label>
                 </div>
 
                 <div class="btn-group dropstart mx-auto" style="float: right;">
