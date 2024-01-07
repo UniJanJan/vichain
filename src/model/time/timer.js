@@ -5,8 +5,8 @@ export class Timer {
         this.runningTime = 0;
     }
 
-    update(updatedCurrentTimestamp, isRunning) {
-        var elapsedTime = updatedCurrentTimestamp - this.currentWindowTimestamp;
+    update(updatedCurrentTimestamp, isRunning, simulationSpeed) {
+        var elapsedTime = (updatedCurrentTimestamp - this.currentWindowTimestamp) * simulationSpeed;
         this.currentWindowTimestamp = updatedCurrentTimestamp;
         if (isRunning) this.currentTimestamp += elapsedTime;
         return elapsedTime;

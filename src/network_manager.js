@@ -26,6 +26,7 @@ export class NetworkManager {
         this.settings = {
             isRunning: false,
             showOnlyMetrics: false,
+            simulationSpeed: 1.0,
             events: {
                 'MessageSendingEvent': {
                     isVisible: true,
@@ -109,7 +110,7 @@ export class NetworkManager {
     }
 
     update(tFrame = 0) { // TODO maybe
-        var elapsedTime = this.network.timer.update(tFrame, this.settings.isRunning);
+        var elapsedTime = this.network.timer.update(tFrame, this.settings.isRunning, this.settings.simulationSpeed);
         if (this.settings.isRunning) {
             this.network.update(elapsedTime);
             this.eventManager.update(elapsedTime);
