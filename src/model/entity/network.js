@@ -78,60 +78,69 @@ export class Network {
     }
 
     draw(graphics, settings, selectedMetrics, canvas) {
-        graphics.beginPath();
-        graphics.arc(40, 40, 20, -Math.PI / 2, 3 / 2 * Math.PI, false);
-        graphics.strokeStyle = 'grey';
-        graphics.lineWidth = 8;
-        graphics.stroke();
-
-        graphics.beginPath();
-        graphics.arc(40, 40, 28, -Math.PI / 2, 3 / 2 * Math.PI, false);
-        graphics.strokeStyle = 'black';
-        graphics.lineWidth = 2;
-        graphics.stroke();
-
-        if (this.settings.isBlockchainInstalled) {
-            var currentTimestamp = this.timer.currentTimestamp;
-            var { roundTime, minersPerRound } = this.settings;
-
-            var timeQuantum = roundTime / minersPerRound;
-
-            const minerRoundProgressRatio = (currentTimestamp % timeQuantum) / timeQuantum;
-            const roundProgressRatio = (currentTimestamp % roundTime) / roundTime;
-
+        if (!settings.showOnlyMetrics) {
             graphics.beginPath();
-            graphics.arc(40, 40, 20, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * minerRoundProgressRatio, false);
-            graphics.strokeStyle = 'blue';
+            graphics.arc(40, 40, 20, -Math.PI / 2, 3 / 2 * Math.PI, false);
+            graphics.strokeStyle = 'grey';
             graphics.lineWidth = 8;
             graphics.stroke();
 
             graphics.beginPath();
-            graphics.arc(40, 40, 28, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * roundProgressRatio, false);
-            graphics.strokeStyle = 'darkblue';
-            graphics.lineWidth = 6;
+            graphics.arc(40, 40, 28, -Math.PI / 2, 3 / 2 * Math.PI, false);
+            graphics.strokeStyle = 'black';
+            graphics.lineWidth = 2;
             graphics.stroke();
-        }
 
-        if (!settings.isRunning) {
-            graphics.beginPath();
-            graphics.rect(32, 30, 7, 18);
-            graphics.fillStyle = 'red'
-            graphics.fill();
+            if (this.settings.isBlockchainInstalled) {
+                var currentTimestamp = this.timer.currentTimestamp;
+                var { roundTime, minersPerRound } = this.settings;
 
-            graphics.rect(41, 30, 7, 18);
-            graphics.fillStyle = 'red'
-            graphics.fill();
+                var timeQuantum = roundTime / minersPerRound;
+
+                const minerRoundProgressRatio = (currentTimestamp % timeQuantum) / timeQuantum;
+                const roundProgressRatio = (currentTimestamp % roundTime) / roundTime;
+
+                graphics.beginPath();
+                graphics.arc(40, 40, 20, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * minerRoundProgressRatio, false);
+                graphics.strokeStyle = 'blue';
+                graphics.lineWidth = 8;
+                graphics.stroke();
+
+                graphics.beginPath();
+                graphics.arc(40, 40, 28, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * roundProgressRatio, false);
+                graphics.strokeStyle = 'darkblue';
+                graphics.lineWidth = 6;
+                graphics.stroke();
+            }
+
+            if (!settings.isRunning) {
+                graphics.beginPath();
+                graphics.rect(32, 30, 7, 18);
+                graphics.fillStyle = 'red'
+                graphics.fill();
+
+                graphics.rect(41, 30, 7, 18);
+                graphics.fillStyle = 'red'
+                graphics.fill();
+            }
         }
 
 
         if (selectedMetrics && canvas) {
+            var metricsWindowWidth = 240;
+            var metricsWindowHeight = 140;
+            if (settings.showOnlyMetrics) {
+                metricsWindowWidth = canvas.width;
+                metricsWindowHeight = canvas.height;
+            }
+
             graphics.beginPath();
-            graphics.rect((canvas.width - 240), (canvas.height - 140), 240, 140);
+            graphics.rect((canvas.width - metricsWindowWidth), (canvas.height - metricsWindowHeight), metricsWindowWidth, metricsWindowHeight);
             graphics.strokeStyle = 'black'
             graphics.lineWidth = 2;
             graphics.stroke();
 
-            selectedMetrics.draw(graphics, (canvas.width - 240), (canvas.height - 140), 240, 140);
+            selectedMetrics.draw(graphics, (canvas.width - metricsWindowWidth), (canvas.height - metricsWindowHeight), metricsWindowWidth, metricsWindowHeight);
         }
     }
 

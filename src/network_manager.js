@@ -25,6 +25,7 @@ export class NetworkManager {
         // this.nodePositionsMap = {};
         this.settings = {
             isRunning: false,
+            showOnlyMetrics: false,
             events: {
                 'MessageSendingEvent': {
                     isVisible: true,
@@ -118,7 +119,9 @@ export class NetworkManager {
 
     draw(graphics) { //TODO
         this.network.draw(graphics, this.settings, this.metricsManager.getMetrics(this.selectedMetrics), this.canvas);
-        this.network.links.forEach(link => link.draw(graphics));
-        this.network.nodes.forEach(node => node.draw(graphics, this.settings));
+        if (!this.settings.showOnlyMetrics) {
+            this.network.links.forEach(link => link.draw(graphics));
+            this.network.nodes.forEach(node => node.draw(graphics, this.settings));
+        }
     }
 }

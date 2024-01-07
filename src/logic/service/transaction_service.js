@@ -95,25 +95,19 @@ export class TransactionService {
             this.updateLastCommittedTransactionsId(address, lastCommittedTransactionId);
         })
 
-        return this.dropStaleTransactions();
+        this.dropStaleTransactions();
     }
 
     /* drop transactions with lower ID than last committed transaction ID or with expired time */
     dropStaleTransactions() {
         var currentTimestamp = this.network.timer.currentTimestamp;
-        var droppedTransactions = []
 
-        this.transactionPool.transactions.forEach((transaction, index) => {
+        this.transactionPool.transactions = this.transactionPool.transactions.filter((transaction, index) => {
             var { id, sourceAddress, validTo } = transaction.transactionBody;
 
             var lastTransactionId = this.transactionPool.lastCommittedTransactionIds.get(sourceAddress) || 0;
-            if (id <= lastTransactionId || validTo < currentTimestamp) {
-                droppedTransactions.push(transaction);
-                this.transactionPool.transactions.splice(index, 1);
-            }
+            return id > lastTransactionId && validTo >= currentTimestamp;
         });
-
-        return droppedTransactions;
     }
 
     pickUncommittedTransactions(balanceMap, transactionsNumber = 1) {
