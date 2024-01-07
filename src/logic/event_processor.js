@@ -61,7 +61,7 @@ export class EventProcessor {
         this.processingEvents.forEach((processingEvent, index) => {
             this.updateEvent(processingEvent, elapsedTime);
             if (processingEvent.status === EventStatus.PROCESSED) {
-                var processedEvent = this.processingEvents.splice(index, 1)[0];
+                var processedEvent = this.processingEvents.splice(index, 1)[0]; //TODO
                 this.currentLoad -= processedEvent.loadSize;
                 processedEvent.processingEndTimestamp = this.timer.currentTimestamp;
                 this.processedEvents.push(processedEvent);
