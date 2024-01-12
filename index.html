@@ -410,6 +410,9 @@
                             <button class="nav-link active" id="nav-start-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-start" type="button" role="tab" aria-controls="nav-home"
                                 aria-selected="true">Start</button>
+                            <button class="nav-link" id="nav-network-overview-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-network-overview" type="button" role="tab"
+                                aria-controls="nav-network-overview" aria-selected="false">Network</button>
                             <button class="nav-link" id="nav-blockchain-overview-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-blockchain-overview" type="button" role="tab"
                                 aria-controls="nav-blockchain-overview" aria-selected="false">Blockchain</button>
@@ -484,6 +487,43 @@
                                 style="text-indent: 1rem;">
                                 And finally go to Blockchain tab!
                             </h6>
+                        </div>
+
+                        <div class="tab-pane fade mt-3" id="nav-network-overview" role="tabpanel"
+                            aria-labelledby="nav-network-overview-tab">
+                            <h5>Created nodes: {{networkManager.network.nodes.length}}</h5>
+                            <div>
+                                <div class="form-floating mb-2">
+                                    <input id="randomNodesToCreateNumberInput" type="number" class="form-control mb-0"
+                                        v-model="randomNodesToCreateNumber" />
+                                    <label for="randomNodesToCreateNumberInput">Random nodes to create</label>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    style="font-weight: bold;" @click="createRandomNodes">Create
+                                    random
+                                    nodes</button>
+                            </div>
+
+                            <hr class="mt-3 mb-3" />
+
+                            <div class="form-floating mb-2">
+                                <input id="minLinksPerNodeInput" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.minLinksPerNode" />
+                                <label for="minLinksPerNodeInput">Minimum links per node</label>
+                            </div>
+
+                            <div class="form-floating mb-2">
+                                <input id="maxLinksPerNodeInput" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.maxLinksPerNode" />
+                                <label for="maxLinksPerNodeInput">Maximum links per node</label>
+                            </div>
+
+                            <div class="form-floating mb-2">
+                                <input id="informativeNodesAppointingFrequencyInput" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.informativeNodesAppointingFrequency" />
+                                <label for="informativeNodesAppointingFrequencyInput">Informative nodes appointing frequency</label>
+                            </div>
+
                         </div>
 
                         <div class="tab-pane fade mt-3" id="nav-blockchain-overview" role="tabpanel"
