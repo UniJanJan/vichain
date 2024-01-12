@@ -10,7 +10,7 @@ export class Node {
 
     static brakingFactor = 0.95;
 
-    constructor(network, x, y) {
+    constructor(network, x, y, settings) {
         this.id = Node.nextId++;
         this.version = 1;
 
@@ -29,11 +29,18 @@ export class Node {
         this.velocityX = 0;
         this.velocityY = 0;
 
-        this.radius = 20;
+        this.settings = settings;
+
+        this._radius = null;
+
         this.isSelected = false;
 
         this.targetX = null;
         this.targetY = null;
+    }
+
+    get radius() {
+        return this._radius || this.settings.defaultNodeRadius;
     }
 
     updateVelocity(elapsedTime) {

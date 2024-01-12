@@ -8,7 +8,7 @@ export class NodeCreatingEventHandler extends EventHandler {
     }
 
     handle(processingNetwork, processedEvent) {
-        var node = new Node(processingNetwork, processedEvent.x, processedEvent.y);
+        var node = new Node(processingNetwork, processedEvent.x, processedEvent.y, processingNetwork.settings);
 
         node.networkInterface.rememberNodes(processingNetwork.informativeNodes);
         processingNetwork.addNode(node);

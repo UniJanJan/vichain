@@ -32,7 +32,9 @@ export class Network {
             maxTransactionsPerBlock: 10,
             miningAward: 100,
 
-            transactionValidityDuration: 100000
+            transactionValidityDuration: 100000,
+
+            defaultNodeRadius: 20
         }
     }
 
