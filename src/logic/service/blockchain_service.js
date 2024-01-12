@@ -34,7 +34,7 @@ export class BlockchainService {
         } else {
             currentHeight--;
             var currentBlock = this.blockchain.leadingBlocks[0].previousBlock;
-            while (currentBlock !== null && currentBlock.block.blockHash === blocks[currentHeight].blockHash) {
+            while (currentBlock !== null && currentBlock.block.blockHash !== blocks[currentHeight].blockHash) {
                 currentBlock = currentBlock.previousBlock;
                 currentHeight--;
             }
