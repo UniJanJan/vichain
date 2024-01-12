@@ -596,18 +596,21 @@
                 </div>
             </div>
             <div class="col-4" style="align-self: center;">
-                <div class="form-check form-switch" style="float: left;">
-                    <input class="form-check-input" type="checkbox" id="showOnlyMetricsInput"
-                        v-model="networkManager.settings.showOnlyMetrics" @input="showOnlyMetricsChangeHandler">
-                    <label class="form-check-label" for="showOnlyMetricsInput">Show only metrics</label>
-                </div>
-
                 <div class="btn-group dropstart mx-auto" style="float: right;">
                     <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Metrics: {{ getTranslation(networkManager.selectedMetrics) }}
                     </button>
                     <ul class="dropdown-menu">
+                        <li class="dropdown-item">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="showOnlyMetricsInput"
+                                    v-model="networkManager.settings.showOnlyMetrics"
+                                    @input="showOnlyMetricsChangeHandler">
+                                <label class="form-check-label" for="showOnlyMetricsInput">Show only metrics</label>
+                            </div>
+                        </li>
+                        <hr class="mt-2 mb-2" />
                         <li v-for="metrics in networkManager.availableMetrics">
                             <a class="dropdown-item" href="#" @click="() => networkManager.selectedMetrics = metrics">{{
                                 getTranslation(metrics) }}</a>
