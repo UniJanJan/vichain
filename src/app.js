@@ -24,8 +24,8 @@ const app = createApp({
 
                 'AddrMessage': 'peers list',
                 'BlockMessage': 'new block',
-                'GetBlocksMessage': 'blocks list',
-                'GetBlocksResponseMessage': 'request for blocks list',
+                'GetBlocksMessage': 'request for blocks list',
+                'GetBlocksResponseMessage': 'blocks list',
                 'GetTransactionsMessage': 'request for mempooled transactions',
                 'GetTransactionsResponseMessage': 'mempooled transactions',
                 'GetAddrMessage': 'request for peers list',
