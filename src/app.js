@@ -7,6 +7,7 @@ const app = createApp({
         return {
             networkManager: ref(new NetworkManager()),
             postTransactionRequest: this.getClearPostTransactionRequest(),
+            randomNodesToCreateNumber: 1,
             translations: {
                 'MessageSendingEvent': 'Message sending',
                 'MessageReceivingEvent': 'Message receiving',
@@ -74,15 +75,9 @@ const app = createApp({
         translateEventClassName(event) {
             return this.getTranslation(event.constructor.name) + (event.name ? this.getTranslation(event.name) : '');
         },
-        createRandomNode() {
-            if (this.networkManager.canvas) {
-                const randomValues = new Uint32Array(2);
-                window.crypto.getRandomValues(randomValues);
-                var randomX = randomValues[0];
-                var randomY = randomValues[1];
-                var x = randomX % (this.networkManager.canvas.width - 40) + 20;
-                var y = randomY % (this.networkManager.canvas.height - 40) + 20;
-                this.networkManager.addNode(x, y);
+        createRandomNodes() {
+            if (this.networkManager.canvas && Number.isSafeInteger(this.randomNodesToCreateNumber) && this.randomNodesToCreateNumber > 0) {
+                this.networkManager.addRandomNodes(this.randomNodesToCreateNumber);
             }
         },
         installBlockchain() {

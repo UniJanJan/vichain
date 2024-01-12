@@ -7,6 +7,7 @@ import { MessageReceivingEvent } from "../../model/event/message_receiving_event
 import { MessageSendingEvent } from "../../model/event/message_sending_event.js";
 import { MessageTransmissionEvent } from "../../model/event/message_transmission_event.js";
 import { NodeCreatingEvent } from "../../model/event/node_creating_event.js";
+import { RandomNodeCreatingEvent } from "../../model/event/random_node_creating_event.js";
 import { TransactionCreatingEvent } from "../../model/event/transaction_creating_event.js";
 import { TransactionVerifyingEvent } from "../../model/event/transaction_verifying_event.js";
 import { WaitingEvent } from "../../model/event/waiting_event.js";
@@ -88,10 +89,17 @@ export class EventFactory {
         };
     }
 
-    createNodeCreatingEvent(processingNetwork, x, y) {
+    createRandomNodeCreatingEvent(processingNetwork, maxX, maxY) {
         return {
             target: processingNetwork,
-            event: new NodeCreatingEvent(x, y)
+            event: new RandomNodeCreatingEvent(maxX, maxY)
+        };
+    }
+
+    createNodeCreatingEvent(processingNetwork, x, y, prioritized = false) {
+        return {
+            target: processingNetwork,
+            event: new NodeCreatingEvent(x, y).withPriority(prioritized)
         };
     }
 

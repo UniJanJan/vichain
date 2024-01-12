@@ -427,10 +427,15 @@
                                 <button type="button" class="btn btn-info disabled btn-sm"
                                     style="font-size: x-small; font-weight: bold;">Ctrl</button> to create
                                 new node or <button type="button" class="btn btn-primary btn-sm"
-                                    style="font-size: x-small; font-weight: bold;" @click="createRandomNode">Create
+                                    style="font-size: x-small; font-weight: bold;" @click="createRandomNodes">Create
                                     random
-                                    node</button>.
+                                    nodes</button>.
                             </h6>
+                            <div class="form-floating mb-2">
+                                <input id="randomNodesToCreateNumberInput" type="number" class="form-control mb-0"
+                                    v-model="randomNodesToCreateNumber" />
+                                <label for="randomNodesToCreateNumberInput">Random nodes to create</label>
+                            </div>
 
                             <hr class="mt-2 mb-2" />
 

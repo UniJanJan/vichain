@@ -5,6 +5,8 @@ export class NodeCreatingEvent extends Event {
         super(0); // TODO
         this.x = x;
         this.y = y;
+
+        this.loadSize = 0;
     }
 
     draw(graphics, settings) {

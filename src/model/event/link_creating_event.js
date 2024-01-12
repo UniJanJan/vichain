@@ -5,6 +5,8 @@ export class LinkCreatingEvent extends Event {
         super(0); // TODO
         this.initiatingNode = initiatingNode;
         this.targetNode = targetNode;
+
+        this.loadSize = 0;
     }
 
     draw(graphics, settings) {
