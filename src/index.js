@@ -51,50 +51,56 @@ const linkDraft = {
 var draggedNode = null;
 
 canvas.addEventListener('mousedown', event => {
-    const { x, y } = positionResolver.resolveMousePostion(event);
+    if (!networkManager.settings.showOnlyMetrics) {
+        const { x, y } = positionResolver.resolveMousePostion(event);
 
-    const node = networkManager.getNode(x, y);
+        const node = networkManager.getNode(x, y);
 
-    if (event.shiftKey && node !== null) {
-        linkDraft.isActive = true;
-        linkDraft.startNode = node;
-        linkDraft.endX = x;
-        linkDraft.endY = y;
-    } else if (event.ctrlKey && node === null) {
-        networkManager.addNode(x, y);
-    } else if (node !== null) {
-        networkManager.setSelectedNode(node);
-        draggedNode = node;
-    } else if (node === null) {
-        networkManager.unselectNode();
+        if (event.shiftKey && node !== null) {
+            linkDraft.isActive = true;
+            linkDraft.startNode = node;
+            linkDraft.endX = x;
+            linkDraft.endY = y;
+        } else if (event.ctrlKey && node === null) {
+            networkManager.addNode(x, y);
+        } else if (node !== null) {
+            networkManager.setSelectedNode(node);
+            draggedNode = node;
+        } else if (node === null) {
+            networkManager.unselectNode();
+        }
     }
 });
 
 canvas.addEventListener('mousemove', event => {
-    if (event.buttons === 1) {
-        const { x, y } = positionResolver.resolveMousePostion(event);
+    if (!networkManager.settings.showOnlyMetrics) {
+        if (event.buttons === 1) {
+            const { x, y } = positionResolver.resolveMousePostion(event);
 
-        if (linkDraft.isActive && event.shiftKey) {
-            linkDraft.endX = x;
-            linkDraft.endY = y;
-        } else if (draggedNode !== null) {
-            draggedNode.updateTargetPoint(x, y);
+            if (linkDraft.isActive && event.shiftKey) {
+                linkDraft.endX = x;
+                linkDraft.endY = y;
+            } else if (draggedNode !== null) {
+                draggedNode.updateTargetPoint(x, y);
+            }
         }
     }
 });
 
 canvas.addEventListener('mouseup', event => {
-    if (linkDraft.isActive) {
-        linkDraft.isActive = false;
-        const endNode = networkManager.getNode(linkDraft.endX, linkDraft.endY);
-        if (endNode !== null) {
-            networkManager.addLink(linkDraft.startNode, endNode);
+    if (!networkManager.settings.showOnlyMetrics) {
+        if (linkDraft.isActive) {
+            linkDraft.isActive = false;
+            const endNode = networkManager.getNode(linkDraft.endX, linkDraft.endY);
+            if (endNode !== null) {
+                networkManager.addLink(linkDraft.startNode, endNode);
+            }
         }
-    }
 
-    if (draggedNode !== null) {
-        draggedNode.abandonTargetPoint();
-        draggedNode = null;
+        if (draggedNode !== null) {
+            draggedNode.abandonTargetPoint();
+            draggedNode = null;
+        }
     }
 });
 
