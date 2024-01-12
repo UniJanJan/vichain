@@ -547,7 +547,7 @@
         </div>
         <div class="row">
             <div class="col-4" style="align-self: center;">
-                <div class="btn-group dropup mx-auto" style="float: left;">
+                <div class="btn-group dropup mx-auto pt-1" style="float: left;">
                     <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Visibility
@@ -595,8 +595,8 @@
                     <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
                 </div>
             </div>
-            <div class="col-4" style="align-self: center;">
-                <div class="btn-group dropstart mx-auto" style="float: right;">
+            <div class="col-4" style="align-self: center; height: 100%;">
+                <div class="btn-group dropstart mx-auto pt-1" style="float: right;">
                     <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Metrics: {{ getTranslation(networkManager.selectedMetrics) }}
