@@ -13,7 +13,7 @@ export class NodeCreatingEventHandler extends EventHandler {
         node.networkInterface.rememberNodes(processingNetwork.informativeNodes);
         processingNetwork.addNode(node);
 
-        if (!processingNetwork.hasInformativeNode()) {
+        if (processingNetwork.nodes.length % processingNetwork.settings.informativeNodesAppointingFrequency === 1) {
             processingNetwork.addInformativeNode(node);
         }
 
