@@ -27,6 +27,8 @@ import { BlockVerifyingEventHandler } from "./handler/block_verifying_event_hand
 import { BlockCreatingEvent } from "../model/event/block_creating_event.js";
 import { BlockCreatingEventHandler } from "./handler/block_creating_event_handler.js";
 import { ServiceDispositor } from "./service/service_dispositor.js";
+import { RandomNodeCreatingEventHandler } from "./handler/random_node_creating_event_handler.js";
+import { RandomNodeCreatingEvent } from "../model/event/random_node_creating_event.js";
 
 export class EventManager {
     constructor(network, eventFactory) {
@@ -37,7 +39,7 @@ export class EventManager {
         this.serviceDispositor = new ServiceDispositor(this.network);
 
         this.eventProcessors = new Map();
-        this.eventProcessors.set(this.network, new EventProcessor(this.timer, Infinity, this.network.events));
+        this.eventProcessors.set(this.network, new EventProcessor(this.timer, 1, this.network.events));
         this.network.nodes.forEach(node => {
             this.eventProcessors.set(node, new EventProcessor(this.timer, 1, node.events));
         });
@@ -49,6 +51,7 @@ export class EventManager {
         this.eventHandler = new Map([
             [Network.name, new Map([
                 [NodeCreatingEvent.name, new NodeCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
+                [RandomNodeCreatingEvent.name, new RandomNodeCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
                 [LinkCreatingEvent.name, new LinkCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
                 [LinkRemovingEvent.name, new LinkRemovingEventHandler(this.network, this.eventFactory, this.serviceDispositor)],
                 [BlockchainInstallingEvent.name, new BlockchainInstallingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]

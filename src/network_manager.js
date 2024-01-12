@@ -66,6 +66,14 @@ export class NetworkManager {
         this.settings.isRunning = true;
     }
 
+    addRandomNodes(number) {
+        for (var i = 0; i < number; i++) {
+            this.eventManager.enqueueExecution(this.eventFactory.createRandomNodeCreatingEvent(this.network, this.canvas.width, this.canvas.height));
+        }
+        this.settings.isRunning = true;
+    }
+
+
     addLink(initiatingNode, targetNode) {
         this.eventManager.enqueueExecution(this.eventFactory.createLinkCreatingEvent(this.network, initiatingNode, targetNode));
         this.settings.isRunning = true;

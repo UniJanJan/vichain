@@ -5,6 +5,8 @@ export class BlockchainInstallingEvent extends Event {
     constructor(nodes) {
         super(0); // TODO
         this.nodes = nodes;
+
+        this.loadSize = 1;
     }
 
     draw(graphics, settings) {
