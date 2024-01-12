@@ -97,6 +97,9 @@ const app = createApp({
         },
         copyToClipboard(event) {
             navigator.clipboard.writeText(event.target.innerText);
+        },
+        showOnlyMetricsChangeHandler() {
+            this.networkManager.unselectNode();
         }
     }
 });
