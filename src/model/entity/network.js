@@ -19,6 +19,7 @@ export class Network {
         this.settings = {
             minLinksPerNode: 3,
             maxLinksPerNode: 20,
+            informativeNodesAppointingFrequency: 10,
 
             isBlockchainInstalled: false,
             genesisBlock: null,
