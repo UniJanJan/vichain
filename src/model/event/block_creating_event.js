@@ -1,8 +1,8 @@
 import { Event } from "./event.js";
 
 export class BlockCreatingEvent extends Event {
-    constructor(processingNode, leadingBlock, selectedAddress) {
-        super(1500);
+    constructor(duration, processingNode, leadingBlock, selectedAddress) {
+        super(duration);
         this.processingNode = processingNode;
         this.leadingBlock = leadingBlock;
         this.selectedAddress = selectedAddress;

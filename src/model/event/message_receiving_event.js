@@ -1,8 +1,8 @@
 import { Event } from "./event.js";
 
 export class MessageReceivingEvent extends Event {
-    constructor(nodeFrom, nodeTo, message) {
-        super(250); // TODO
+    constructor(duration, nodeFrom, nodeTo, message) {
+        super(duration);
         this.nodeFrom = nodeFrom;
         this.nodeTo = nodeTo;
         this.message = message;

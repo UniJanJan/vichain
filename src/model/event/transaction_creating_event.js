@@ -1,8 +1,9 @@
 import { Event } from "./event.js";
 
 export class TransactionCreatingEvent extends Event {
-    constructor(processingNode, sourceWallet, targetAddress, amount) {
-        super(500);
+
+    constructor(duration, processingNode, sourceWallet, targetAddress, amount) {
+        super(duration);
         this.processingNode = processingNode;
         this.sourceWallet = sourceWallet;
         this.targetAddress = targetAddress;
