@@ -22,6 +22,10 @@ export class EventProcessor {
         return this.events.processedEvents;
     }
 
+    set processingEvents(events) {
+        this.events.processingEvents = events;
+    }
+
     isEventLoadable(event) {
         return this.currentLoad + event.loadSize <= this.maxLoad;
     }
@@ -57,17 +61,22 @@ export class EventProcessor {
             this.startExecution(processableEvent);
         }
 
+        var stillProcessingEvents = [];
         var newlyProcessedEvents = [];
-        this.processingEvents.forEach((processingEvent, index) => {
+
+        this.processingEvents.forEach(processingEvent => {
             this.updateEvent(processingEvent, elapsedTime);
             if (processingEvent.status === EventStatus.PROCESSED) {
-                var processedEvent = this.processingEvents.splice(index, 1)[0]; //TODO
-                this.currentLoad -= processedEvent.loadSize;
-                processedEvent.processingEndTimestamp = this.timer.currentTimestamp;
-                this.processedEvents.push(processedEvent);
-                newlyProcessedEvents.push(processedEvent);
+                this.currentLoad -= processingEvent.loadSize;
+                processingEvent.processingEndTimestamp = this.timer.currentTimestamp;
+                this.processedEvents.push(processingEvent);
+                newlyProcessedEvents.push(processingEvent);
+            } else {
+                stillProcessingEvents.push(processingEvent);
             }
         });
+
+        this.processingEvents = stillProcessingEvents;
 
         return newlyProcessedEvents;
     }
