@@ -37,7 +37,10 @@ export class Network {
 
             defaultNodeRadius: 20,
 
-            eventsDurations: {
+            eventsDurations: {},
+            eventsDurationMultipliers: {},
+
+            defaultEventsDurations: {
                 'MessageSendingEvent': 250,
                 'MessageReceivingEvent': 250,
                 'TransactionCreatingEvent': 500,
@@ -45,10 +48,13 @@ export class Network {
                 'BlockVerifyingEvent': 1000,
                 'BlockCreatingEvent': 1500
             },
-            eventsDurationMultipliers: {
+            defaultEventsDurationMultipliers: {
                 'MessageTransmissionEvent': 10
             }
         }
+
+        this.settings.eventsDurations = Object.assign({}, this.settings.defaultEventsDurations);
+        this.settings.eventsDurationMultipliers = Object.assign({}, this.settings.defaultEventsDurationMultipliers);
     }
 
     addNode(node) {

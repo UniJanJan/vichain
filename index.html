@@ -498,8 +498,8 @@
                                         v-model="randomNodesToCreateNumber" />
                                     <label for="randomNodesToCreateNumberInput">Random nodes to create</label>
                                 </div>
-                                <button type="button" class="btn btn-primary btn-sm"
-                                    style="font-weight: bold;" @click="createRandomNodes">Create
+                                <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold;"
+                                    @click="createRandomNodes">Create
                                     random
                                     nodes</button>
                             </div>
@@ -521,23 +521,34 @@
                             <div class="form-floating mb-2">
                                 <input id="informativeNodesAppointingFrequencyInput" type="number" class="form-control"
                                     v-model="networkManager.network.settings.informativeNodesAppointingFrequency" />
-                                <label for="informativeNodesAppointingFrequencyInput">Informative nodes appointing frequency</label>
+                                <label for="informativeNodesAppointingFrequencyInput">Informative nodes appointing
+                                    frequency</label>
                             </div>
 
                             <hr class="mt-3 mb-3" />
 
-                            <div class="form-floating mb-2" v-for="(duration, event) in networkManager.network.settings.eventsDurations">
+                            <div class="form-floating mb-2"
+                                v-for="(duration, event) in networkManager.network.settings.eventsDurations">
                                 <input :id="`${event}DurationInput`" type="number" class="form-control"
                                     v-model="networkManager.network.settings.eventsDurations[event]" />
                                 <label :for="`${event}DurationInput`">{{ getTranslation(event) }} duration (ms)</label>
                             </div>
 
-                            <div class="form-floating mb-2" v-for="(duration, event) in networkManager.network.settings.eventsDurationMultipliers">
+                            <div class="form-floating mb-2"
+                                v-for="(duration, event) in networkManager.network.settings.eventsDurationMultipliers">
                                 <input :id="`${event}DurationMultiplierInput`" type="number" class="form-control"
                                     v-model="networkManager.network.settings.eventsDurationMultipliers[event]" />
-                                <label :for="`${event}DurationMultiplierInput`">{{ getTranslation(event) }} duration multiplier</label>
+                                <label :for="`${event}DurationMultiplierInput`">{{ getTranslation(event) }} duration
+                                    multiplier</label>
                             </div>
 
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold;"
+                                    @click="zeroEventDurations">Zero events durations</button>
+
+                                <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold;"
+                                    @click="setDefaultEventDurations">Set default events durations</button>
+                            </div>
                         </div>
 
                         <div class="tab-pane fade mt-3" id="nav-blockchain-overview" role="tabpanel"
@@ -634,9 +645,8 @@
 
                 <div>
                     <input type="range" id="simulationSpeedInput" name="volume" min="0" max="10" step="0.05"
-                        v-model="networkManager.settings.simulationSpeed" 
-                        @input="() => networkManager.settings.simulationSpeed = Number(networkManager.settings.simulationSpeed)"
-                        />
+                        v-model="networkManager.settings.simulationSpeed"
+                        @input="() => networkManager.settings.simulationSpeed = Number(networkManager.settings.simulationSpeed)" />
                 </div>
 
                 <div>

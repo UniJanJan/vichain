@@ -101,6 +101,19 @@ const app = createApp({
         },
         showOnlyMetricsChangeHandler() {
             this.networkManager.unselectNode();
+        },
+        zeroEventDurations() {
+            Object.keys(this.networkManager.network.settings.eventsDurations).forEach(event => {
+                this.networkManager.network.settings.eventsDurations[event] = 0;
+            });
+
+            Object.keys(this.networkManager.network.settings.eventsDurationMultipliers).forEach(event => {
+                this.networkManager.network.settings.eventsDurationMultipliers[event] = 0;
+            });
+        },
+        setDefaultEventDurations() {
+            this.networkManager.network.settings.eventsDurations = Object.assign({}, this.networkManager.network.settings.defaultEventsDurations);
+            this.networkManager.network.settings.eventsDurationMultipliers = Object.assign({}, this.networkManager.network.settings.defaultEventsDurationMultipliers);
         }
     }
 });
