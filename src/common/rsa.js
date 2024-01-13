@@ -71,17 +71,26 @@ export class RSA {
         return string;
     }
 
-    static createSignature(data, privateKey, publicKey) {
-        var hashedData = CryptoJS.SHA256(JSON.stringify(data)).toString().slice(0, 30);
-        var encodedData = RSA.encode(hashedData);
+    static signatureValidityCache = new Map();
+
+    static createSignature(dataHash, privateKey, publicKey) {
+        var encodedData = RSA.encode(dataHash.toString().slice(0, 30));
         return RSA.encrypt(encodedData, bigInt(publicKey, 16), bigInt(privateKey, 16)).toString(16);
     }
 
-    static verifySignature(data, signature, publicKey) {
-        var decryptedData = RSA.decrypt(bigInt(signature, 16), RSA.e, bigInt(publicKey, 16));
-        var hashedData = CryptoJS.SHA256(JSON.stringify(data)).toString().slice(0, 30);
-        var encodedData = RSA.encode(hashedData);
-        return encodedData.equals(decryptedData);
+    static verifySignature(dataHash, signature, publicKey) {
+        var cacheKey = dataHash.toString() + signature.toString();
+        var cachedSignatureValidity = RSA.signatureValidityCache.get(cacheKey);
+
+        if (!cachedSignatureValidity) {
+            var decryptedData = RSA.decrypt(bigInt(signature, 16), RSA.e, bigInt(publicKey, 16));
+            var hashedData = dataHash.toString().slice(0, 30);
+            var encodedData = RSA.encode(hashedData);
+            cachedSignatureValidity = encodedData.equals(decryptedData);
+            RSA.signatureValidityCache.set(cacheKey, cachedSignatureValidity);
+        }
+
+        return cachedSignatureValidity;
     }
 
 }

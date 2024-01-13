@@ -124,9 +124,9 @@ export class ProofOfBurnConsensus extends Consensus {
 
     isTransactionSignatureValid(transaction, asAwardTransaction) {
         if (asAwardTransaction) {
-            return RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.targetAddress);
+            return RSA.verifySignature(transaction.transactionHash, transaction.signature, transaction.transactionBody.targetAddress);
         } else {
-            return RSA.verifySignature(transaction.transactionBody, transaction.signature, transaction.transactionBody.sourceAddress);
+            return RSA.verifySignature(transaction.transactionHash, transaction.signature, transaction.transactionBody.sourceAddress);
         }
     }
 
