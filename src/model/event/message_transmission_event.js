@@ -1,9 +1,9 @@
 import { Event } from "./event.js";
 
 export class MessageTransmissionEvent extends Event {
-    constructor(nodeFrom, nodeTo, message) {
+    constructor(durationMultiplier, nodeFrom, nodeTo, message) {
         var link = nodeFrom.networkInterface.getLinkWith(nodeTo);
-        super(link.distance * 10); // TODO
+        super(link.distance * durationMultiplier);
         this.link = link;
         this.nodeFrom = nodeFrom;
         this.nodeTo = nodeTo;

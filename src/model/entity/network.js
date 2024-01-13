@@ -35,7 +35,17 @@ export class Network {
 
             transactionValidityDuration: 100000,
 
-            defaultNodeRadius: 20
+            defaultNodeRadius: 20,
+
+            eventDurations: {
+                'MessageSendingEvent': 250,
+                'MessageReceivingEvent': 250,
+                'TransactionCreatingEvent': 500,
+                'TransactionVerifyingEvent': 300,
+                'BlockVerifyingEvent': 1000,
+                'BlockCreatingEvent': 1500,
+                'MessageTransmissionEvent': 10
+            }
         }
     }
 
