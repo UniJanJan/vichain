@@ -117,13 +117,28 @@ export class NetworkManager {
         this.settings.isRunning = true;
     }
 
-    update(tFrame = 0) { // TODO maybe
+    update(tFrame = 0) {
         var elapsedTime = this.network.timer.update(tFrame, this.settings.isRunning, this.settings.simulationSpeed);
         if (this.settings.isRunning) {
-            this.network.update(elapsedTime);
-            this.eventManager.update(elapsedTime);
-            this.metricsManager.collectMetrics(elapsedTime);
+
+            var elapsedTimeQuantum = elapsedTime / this.settings.simulationSpeed;
+            var toSimulate = this.settings.simulationSpeed;
+
+            for (; toSimulate >= 1; toSimulate--) {
+                this.singleUpdate(elapsedTimeQuantum);
+            }
+
+            if (toSimulate > 0) {
+                var remainingElapsedTimeQuantum = elapsedTimeQuantum * toSimulate;
+                this.singleUpdate(remainingElapsedTimeQuantum);
+            }
         }
+    }
+
+    singleUpdate(elapsedTime) {
+        this.network.update(elapsedTime);
+        this.eventManager.update(elapsedTime);
+        this.metricsManager.collectMetrics(elapsedTime);
     }
 
     draw(graphics) { //TODO
