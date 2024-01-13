@@ -23,7 +23,7 @@ export class EventFactory {
     }
 
     createTransactionCreatingEvent(processingNode, sourceWallet, targetAddress, amount, prioritized = false) {
-        var duration = this.settings.eventDurations[TransactionCreatingEvent.name];
+        var duration = this.settings.eventsDurations[TransactionCreatingEvent.name];
         return {
             target: processingNode,
             event: new TransactionCreatingEvent(duration, processingNode, sourceWallet, targetAddress, amount).withPriority(prioritized)
@@ -31,7 +31,7 @@ export class EventFactory {
     }
 
     createTransactionVerifyingEvent(processingNode, transaction, informedNodes) {
-        var duration = this.settings.eventDurations[TransactionVerifyingEvent.name];
+        var duration = this.settings.eventsDurations[TransactionVerifyingEvent.name];
         return {
             target: processingNode,
             event: new TransactionVerifyingEvent(duration, processingNode, transaction, informedNodes)
@@ -39,7 +39,7 @@ export class EventFactory {
     }
 
     createMessagesSendingEvent(sourceNode, targetNodes, message, prioritized = false) {
-        var duration = this.settings.eventDurations[MessageSendingEvent.name];
+        var duration = this.settings.eventsDurations[MessageSendingEvent.name];
         return {
             target: sourceNode,
             event: new MessageSendingEvent(duration, sourceNode, targetNodes, message).withPriority(prioritized)
@@ -60,7 +60,7 @@ export class EventFactory {
     }
 
     createMessageTransmissionEvent(link, sourceNode, targetNode, message) {
-        var durationMultiplier = this.settings.eventDurations[MessageTransmissionEvent.name];
+        var durationMultiplier = this.settings.eventsDurationMultipliers[MessageTransmissionEvent.name];
         return {
             target: link,
             event: new MessageTransmissionEvent(durationMultiplier, sourceNode, targetNode, message)
@@ -68,7 +68,7 @@ export class EventFactory {
     }
 
     createMessageReceivingEvent(sourceNode, targetNode, message) {
-        var duration = this.settings.eventDurations[MessageReceivingEvent.name];
+        var duration = this.settings.eventsDurations[MessageReceivingEvent.name];
         return {
             target: targetNode,
             event: new MessageReceivingEvent(duration, sourceNode, targetNode, message).withPriority(message.prioritized)
@@ -167,7 +167,7 @@ export class EventFactory {
     }
 
     createBlockVerifyingEvent(processingNode, leadingBlocks, blocksToVerify, informedNodes) {
-        var duration = this.settings.eventDurations[BlockVerifyingEvent.name];
+        var duration = this.settings.eventsDurations[BlockVerifyingEvent.name];
         return {
             target: processingNode,
             event: new BlockVerifyingEvent(duration, processingNode, leadingBlocks, blocksToVerify, informedNodes).withPriority()
@@ -175,7 +175,7 @@ export class EventFactory {
     }
 
     createBlockCreatingEvent(processingNode, leadingBlock, selectedAddress) {
-        var duration = this.settings.eventDurations[BlockCreatingEvent.name];
+        var duration = this.settings.eventsDurations[BlockCreatingEvent.name];
         return {
             target: processingNode,
             event: new BlockCreatingEvent(duration, processingNode, leadingBlock, selectedAddress).withPriority()

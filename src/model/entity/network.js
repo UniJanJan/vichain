@@ -37,13 +37,15 @@ export class Network {
 
             defaultNodeRadius: 20,
 
-            eventDurations: {
+            eventsDurations: {
                 'MessageSendingEvent': 250,
                 'MessageReceivingEvent': 250,
                 'TransactionCreatingEvent': 500,
                 'TransactionVerifyingEvent': 300,
                 'BlockVerifyingEvent': 1000,
-                'BlockCreatingEvent': 1500,
+                'BlockCreatingEvent': 1500
+            },
+            eventsDurationMultipliers: {
                 'MessageTransmissionEvent': 10
             }
         }
