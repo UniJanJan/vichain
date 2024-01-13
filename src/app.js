@@ -11,6 +11,7 @@ const app = createApp({
             translations: {
                 'MessageSendingEvent': 'Message sending',
                 'MessageReceivingEvent': 'Message receiving',
+                'MessageTransmissionEvent': 'Message transmission',
                 'TransactionCreatingEvent': 'Transaction creation',
                 'TransactionVerifyingEvent': 'Transaction verification',
                 'BlockVerifyingEvent': 'Block verification',
