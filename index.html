@@ -98,7 +98,8 @@
                                 </ul>
 
                                 <div class="pt-2">
-                                    <button class="btn btn-secondary btn-sm" :disabled="selectedNode.processedEventsPage === 0"
+                                    <button class="btn btn-secondary btn-sm"
+                                        :disabled="selectedNode.processedEventsPage === 0"
                                         @click="() => selectedNode.processedEventsPage--" style="float: left;">Newer
                                         events</button>
                                     <button class="btn btn-secondary btn-sm"
@@ -591,19 +592,32 @@
                                 <label for="maxTransactionsPerBlockInput">Maximum transactions per block</label>
                             </div>
 
-                            <button v-if="!networkManager.network.settings.isBlockchainInstalled"
-                                :disabled="networkManager.network.nodes.length === 0" type="button"
-                                class="btn btn-primary btn-sm" style="width: 100%" @click="installBlockchain">Install
-                                blockchain on created nodes</button>
-                            <span style="font-size: x-small; color: red; font-weight: bold;"
-                                v-if="networkManager.network.nodes.length === 0">To install blockchain at least one node
-                                has to be created!</span>
-                            <div v-if="networkManager.network.settings.isBlockchainInstalled"
+                            <div class="mb-2" v-if="!networkManager.network.settings.isBlockchainInstalled">
+                                <button :disabled="networkManager.network.nodes.length === 0" type="button"
+                                    class="btn btn-primary btn-sm" style="width: 100%"
+                                    @click="installBlockchain">Install
+                                    blockchain on created nodes</button>
+                                <span style="font-size: x-small; color: red; font-weight: bold;"
+                                    v-if="networkManager.network.nodes.length === 0">To install blockchain at least one
+                                    node
+                                    has to be created!</span>
+                            </div>
+                            <div class="mb-2" v-if="networkManager.network.settings.isBlockchainInstalled"
                                 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 Burn address:
                                 0x<u style="text-decoration-style: dashed; cursor: pointer;"
                                     @click="copyToClipboard">{{networkManager.network.walletPool.getBurnAddress() }}</u>
                             </div>
+
+                            <hr class="mt-3 mb-3" />
+
+                            <div class="form-check form-switch mb-2">
+                                <input id="cacheBlockValidationSwitch" type="checkbox" class="form-check-input"
+                                    v-model="networkManager.network.settings.cacheBlockValidation" />
+                                <label class="form-check-label" for="cacheBlockValidationSwitch">Cache blocks
+                                    validation</label>
+                            </div>
+
                         </div>
                     </div>
                 </div>

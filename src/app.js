@@ -9,6 +9,7 @@ const app = createApp({
 
         networkManager.network.timer = reactive(networkManager.network.timer);
         networkManager.selectedNode = reactive(networkManager.selectedNode);
+        networkManager.settings = reactive(networkManager.settings);
 
         return {
             postTransactionRequest: this.getClearPostTransactionRequest(),
