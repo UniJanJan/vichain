@@ -50,7 +50,9 @@ export class Network {
             },
             defaultEventsDurationMultipliers: {
                 'MessageTransmissionEvent': 10
-            }
+            },
+
+            cacheBlockValidation: false
         }
 
         this.settings.eventsDurations = Object.assign({}, this.settings.defaultEventsDurations);
