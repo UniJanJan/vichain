@@ -15,10 +15,6 @@ export class NetworkManager {
         this.metricsManager = new MetricsManager(this.network);
         // this.canvas = canvas;
 
-        this.selectedNode = null;
-        this.currentBlocks = null;
-        this.processedEventsPage = 0;
-
         this.selectedMetrics = LeadingBlocksMetrics.name;
         this.availableMetrics = this.metricsManager.getAvailableMetrics();
 
@@ -58,6 +54,35 @@ export class NetworkManager {
                 }
             },
             itemsPerPage: 10
+        };
+
+
+        this.selectedNode = {
+            node: null,
+            currentBlocks: null,
+            processedEventsPage: 0,
+
+            get id() {
+                return this.node.id;
+            },
+            get processableEvents() {
+                return this.node.events.processableEvents.toArray();
+            },
+            get processingEvents() {
+                return this.node.events.processingEvents;
+            },
+            get processedEvents() {
+                return this.node.events.processedEvents;
+            },
+            get managedAccounts() {
+                return Array.from(this.node.managedAccounts.accounts.values())
+            },
+            get pooledTransactions() {
+                return this.node.transactionPool.transactions;
+            },
+            get leadingBlocks() {
+                return this.node.blockchain.leadingBlocks;
+            },
         }
     }
 
@@ -90,19 +115,20 @@ export class NetworkManager {
         return null;
     }
 
-    setSelectedNode(node) { //TODO
-        if (this.selectedNode !== null)
-            this.selectedNode.isSelected = false;
-        this.selectedNode = node;
-        node.isSelected = true;
-        this.processedEventsPage = 0;
-        this.currentBlocks = [...node.blockchain.leadingBlocks];
+    selectNode(node) {
+        if (this.selectedNode.node !== null)
+            this.selectedNode.node.isSelected = false;
+        node.isSelected = true; //TODO
+
+        this.selectedNode.node = node;
+        this.selectedNode.processedEventsPage = 0;
+        this.selectedNode.currentBlocks = [...node.blockchain.leadingBlocks];
     }
 
     unselectNode() {
-        if (this.selectedNode !== null)
-            this.selectedNode.isSelected = false;
-        this.selectedNode = null;
+        if (this.selectedNode.node !== null)
+            this.selectedNode.node.isSelected = false;
+        this.selectedNode.node = null;
     }
 
     installBlockchain() {
