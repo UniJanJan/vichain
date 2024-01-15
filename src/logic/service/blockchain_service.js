@@ -13,6 +13,8 @@ export class BlockchainService {
         this.consensuses = new Map([
             [ProofOfBurnConsensus.name, new ProofOfBurnConsensus(network)]
         ]);
+
+        this.constructValidLeadingBlockCache = new Map();
     }
 
     getBlockchainHeight() {
@@ -81,7 +83,17 @@ export class BlockchainService {
 
     constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock) {
         var consensusProtocol = this.consensuses.get(ProofOfBurnConsensus.name);
-        return consensusProtocol.constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock);
+        if (this.network.settings.cacheBlockValidation) {
+            var cacheKey = (currentlyLeadingBlock ? JSON.stringify(currentlyLeadingBlock.block) : "null") + JSON.stringify(potentialyNextBlock);
+            var cachedValue = this.constructValidLeadingBlockCache.get(cacheKey);
+            if (cachedValue === undefined) {
+                cachedValue = consensusProtocol.constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock);
+                this.constructValidLeadingBlockCache.set(cacheKey, cachedValue);
+            }
+            return cachedValue;
+        } else {
+            return consensusProtocol.constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock);
+        }
     }
 
     canAddressConstructNewBlock(currentlyLeadingBlock, potentialyConstructingAddress, timestamp) {
