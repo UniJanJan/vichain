@@ -23,8 +23,8 @@
                 <canvas id="visualisation-canvas" style="border-style: double; height: 100%; width: 100%;"></canvas>
             </div>
             <div class="col-3" style="align-self: start; max-height: 100%; overflow: scroll;">
-                <div v-if="networkManager.selectedNode">
-                    <h2>Node {{ networkManager.selectedNode.id }}</h2>
+                <div v-if="selectedNode.node">
+                    <h2>Node {{ selectedNode.id }}</h2>
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                             <button class="nav-link active" id="nav-events-tab" data-bs-toggle="tab"
@@ -46,8 +46,8 @@
                             id="nav-events" role="tabpanel" aria-labelledby="nav-events-tab">
 
                             Processable events
-                            <div v-if="processableEvents.length > 0">
-                                <ul class="list-group" v-for="event in processableEvents">
+                            <div v-if="selectedNode.processableEvents.length > 0">
+                                <ul class="list-group" v-for="event in selectedNode.processableEvents">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
                                         {{translateEventClassName(event)}} {{ event.message ?
@@ -62,8 +62,8 @@
                             </div>
 
                             Processing events
-                            <div v-if="processingEvents.length > 0">
-                                <ul class="list-group" v-for="event in processingEvents">
+                            <div v-if="selectedNode.processingEvents.length > 0">
+                                <ul class="list-group" v-for="event in selectedNode.processingEvents">
                                     <div>
                                         <li class="list-group-item"
                                             :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white;`">
@@ -83,10 +83,10 @@
                             </div>
 
                             Processed events
-                            <div v-if="processedEvents.length > 0"
-                                :set="maxPages = Math.ceil(processedEvents.length/itemsPerPage)">
+                            <div v-if="selectedNode.processedEvents.length > 0"
+                                :set="maxPages = Math.ceil(selectedNode.processedEvents.length/itemsPerPage)">
                                 <ul class="list-group"
-                                    v-for="event in processedEvents.slice(Math.max(0, processedEvents.length-(processedEventsPage+1)*itemsPerPage), processedEvents.length-processedEventsPage*itemsPerPage).reverse()">
+                                    v-for="event in selectedNode.processedEvents.slice(Math.max(0, selectedNode.processedEvents.length-(selectedNode.processedEventsPage+1)*itemsPerPage), selectedNode.processedEvents.length-selectedNode.processedEventsPage*itemsPerPage).reverse()">
                                     <li class="list-group-item"
                                         :style="`font-size: small; padding: 0; background-color: ${networkManager.settings.events[event.constructor.name].color}; color: white`">
                                         <span style="float: left; margin-left: 10;">{{translateEventClassName(event)}}
@@ -98,12 +98,12 @@
                                 </ul>
 
                                 <div class="pt-2">
-                                    <button class="btn btn-secondary btn-sm" :disabled="processedEventsPage === 0"
-                                        @click="() => networkManager.processedEventsPage--" style="float: left;">Newer
+                                    <button class="btn btn-secondary btn-sm" :disabled="selectedNode.processedEventsPage === 0"
+                                        @click="() => selectedNode.processedEventsPage--" style="float: left;">Newer
                                         events</button>
                                     <button class="btn btn-secondary btn-sm"
-                                        :disabled="processedEventsPage >= maxPages-1"
-                                        @click="() => networkManager.processedEventsPage++" style="float: right;">Older
+                                        :disabled="selectedNode.processedEventsPage >= maxPages-1"
+                                        @click="() => selectedNode.processedEventsPage++" style="float: right;">Older
                                         events</button>
                                 </div>
 
@@ -119,8 +119,8 @@
 
                         <div class="tab-pane fade" id="nav-wallets" role="tabpanel" aria-labelledby="nav-wallets-tab">
                             Managed wallets
-                            <div v-if="managedAccounts.length > 0">
-                                <ul class="list-group" v-for="account in managedAccounts">
+                            <div v-if="selectedNode.managedAccounts.length > 0">
+                                <ul class="list-group" v-for="account in selectedNode.managedAccounts">
                                     <li class="list-group-item">
                                         <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                             Public key: 0x<u style="text-decoration-style: dashed; cursor: pointer;"
@@ -130,14 +130,14 @@
                                             Private key: 0x<u style="text-decoration-style: dashed; cursor: pointer;"
                                                 @click="copyToClipboard">{{ account.wallet.privateKey }}</u></div>
                                         <div>Spendable token amount: {{
-                                            account.accountHistory.availableBalanceByLeadingBlockHash.get(leadingBlocks[0].block.blockHash)
+                                            account.accountHistory.availableBalanceByLeadingBlockHash.get(selectedNode.leadingBlocks[0].block.blockHash)
                                             }}</div>
 
                                         <div v-if="account.accountHistory.transactions.length > 0">
                                             <ul class="list-group"
                                                 v-for="relatedTransaction in account.accountHistory.transactions">
                                                 <li class="list-group-item"
-                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((account.accountHistory.isTransactionCommitted(relatedTransaction.transactionHash, leadingBlocks[0].block.blockHash)) ? 'red;' : 'darkgoldenrod;')">
+                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((account.accountHistory.isTransactionCommitted(relatedTransaction.transactionHash, selectedNode.leadingBlocks[0].block.blockHash)) ? 'red;' : 'darkgoldenrod;')">
                                                     <div v-if="relatedTransaction.transactionBody.sourceAddress">
                                                         [{{ relatedTransaction.transactionBody.id }}]
                                                         {{ relatedTransaction.transactionBody.amount }}
@@ -179,7 +179,7 @@
                                 </ul>
                             </div>
 
-                            <div v-if="networkManager.network.settings.isBlockchainInstalled">
+                            <div v-if="networkSettings.isBlockchainInstalled">
                                 <button type="button" class="btn btn-secondary btn-sm" style="width: 100%"
                                     data-bs-toggle="modal" data-bs-target="#postTransactionModal">Post
                                     transaction...</button>
@@ -256,8 +256,8 @@
                         </div>
 
                         <div class="tab-pane fade" id="nav-mempool" role="tabpanel" aria-labelledby="nav-mempool-tab">
-                            <div v-if="pooledTransactions.length > 0">
-                                <ul class="list-group" v-for="transaction in pooledTransactions">
+                            <div v-if="selectedNode.pooledTransactions.length > 0">
+                                <ul class="list-group" v-for="transaction in selectedNode.pooledTransactions">
                                     <li class="list-group-item"
                                         :style="'font-size: small; padding: 0; color: white; background-color: ' + ((networkManager.network.walletPool.getBurnAddress() === transaction.transactionBody.targetAddress) ? 'red;' : 'darkgoldenrod;')">
                                         [{{ transaction.transactionBody.id }}]
@@ -280,11 +280,11 @@
 
 
 
-                            <div v-if="networkManager.currentBlocks.length > 0">
+                            <div v-if="selectedNode.currentBlocks.length > 0">
 
                                 <div id="forksCarousel" class="carousel carousel-dark slide">
                                     <div class="carousel-inner">
-                                        <div v-for="(block, index) in networkManager.currentBlocks"
+                                        <div v-for="(block, index) in selectedNode.currentBlocks"
                                             :class="'carousel-item' + (index === 0 ? ' active' : '')">
                                             <h6>
                                                 Block {{block.block.blockBody.height}}
@@ -320,7 +320,7 @@
                                             <div class="pt-2">
                                                 <button :disabled="block.previousBlock === null"
                                                     class="btn btn-secondary btn-sm"
-                                                    @click="() => networkManager.currentBlocks.splice(index, 1, block.previousBlock)">Previous
+                                                    @click="() => selectedNode.currentBlocks.splice(index, 1, block.previousBlock)">Previous
                                                     block</button>
                                             </div>
 
@@ -365,13 +365,13 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <button v-if="networkManager.currentBlocks.length > 1" class="carousel-control-prev"
+                                    <button v-if="selectedNode.currentBlocks.length > 1" class="carousel-control-prev"
                                         type="button" data-bs-target="#forksCarousel" data-bs-slide="prev"
                                         style="align-items: start; padding-top: 0.5rem;">
                                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Previous</span>
                                     </button>
-                                    <button v-if="networkManager.currentBlocks.length > 1" class="carousel-control-next"
+                                    <button v-if="selectedNode.currentBlocks.length > 1" class="carousel-control-next"
                                         type="button" data-bs-target="#forksCarousel" data-bs-slide="next"
                                         style="align-items: start; padding-top: 0.5rem;">
                                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
@@ -658,7 +658,7 @@
             <div class="col-1">
                 <!-- <h3 v-if="network.currentFps">{{ network.currentFps }} FPS</h3> -->
                 <div>
-                    <h3>{{ (networkManager.network.timer.currentTimestamp/1000).toFixed(1) }}s</h3>
+                    <h3>{{ (timer.currentTimestamp/1000).toFixed(1) }}s</h3>
                 </div>
             </div>
             <div class="col-4" style="align-self: center; height: 100%;">

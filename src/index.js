@@ -2,7 +2,7 @@ import { app } from './app.js';
 import { Utils } from './common/common.js';
 
 const canvas = document.querySelector('#visualisation-canvas');
-const networkManager = app._instance.ctx.networkManager._value;
+const networkManager = app._instance.ctx.networkManager;
 
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
@@ -64,7 +64,7 @@ canvas.addEventListener('mousedown', event => {
         } else if (event.ctrlKey && node === null) {
             networkManager.addNode(x, y);
         } else if (node !== null) {
-            networkManager.setSelectedNode(node);
+            networkManager.selectNode(node);
             draggedNode = node;
         } else if (node === null) {
             networkManager.unselectNode();

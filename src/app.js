@@ -1,11 +1,16 @@
 import { NetworkManager } from './network_manager.js';
 
-const { createApp, ref } = Vue
+const { createApp, ref, reactive } = Vue
 
 const app = createApp({
     data() {
+        var networkManager = new NetworkManager();
+        this.networkManager = networkManager;
+
+        networkManager.network.timer = reactive(networkManager.network.timer);
+        networkManager.selectedNode = reactive(networkManager.selectedNode);
+
         return {
-            networkManager: ref(new NetworkManager()),
             postTransactionRequest: this.getClearPostTransactionRequest(),
             randomNodesToCreateNumber: 1,
             translations: {
@@ -37,31 +42,15 @@ const app = createApp({
 
                 'LeadingBlocksMetrics': 'Leading blocks',
                 'ProcessingEventsCountMetrics': 'Processing events count'
-            }
+            },
+
+            networkSettings: networkManager.network.settings,
+            timer: networkManager.network.timer,
+
+            selectedNode: networkManager.selectedNode,
         }
     },
     computed: {
-        selectedNode() {
-            return Promise(() => this.networkManager.selectedNode);
-        },
-        processableEvents() {
-            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processableEvents.toArray() : [];
-        },
-        processingEvents() {
-            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processingEvents : [];
-        },
-        processedEvents() {
-            return this.networkManager.selectedNode ? this.networkManager.eventManager.eventProcessors.get(this.networkManager.selectedNode).processedEvents : [];
-        },
-        managedAccounts() {
-            return this.networkManager.selectedNode ? Array.from(this.networkManager.selectedNode.managedAccounts.accounts.values()) : [];
-        },
-        pooledTransactions() {
-            return this.networkManager.selectedNode ? this.networkManager.selectedNode.transactionPool.transactions : [];
-        },
-        leadingBlocks() {
-            return this.networkManager.selectedNode ? this.networkManager.selectedNode.blockchain.leadingBlocks : [];
-        },
         processedEventsPage() {
             return this.networkManager.processedEventsPage;
         },
