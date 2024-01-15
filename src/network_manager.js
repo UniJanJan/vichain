@@ -139,7 +139,7 @@ export class NetworkManager {
     postTransaction(request) {
         var privateKey = bigInt(request.sourceAddresPrivateKey, 16);
         var publicKey = bigInt(request.sourceAddres, 16);
-        this.eventManager.enqueueExecution(this.eventFactory.createTransactionCreatingEvent(this.selectedNode.node, new Wallet(privateKey, publicKey, RSA.e), request.targetAddress, request.amount));
+        this.eventManager.enqueueExecution(this.eventFactory.createTransactionCreatingEvent(Vue.toRaw(this.selectedNode.node), new Wallet(privateKey, publicKey, RSA.e), request.targetAddress, request.amount));
         this.settings.isRunning = true;
     }
 
