@@ -679,7 +679,7 @@
                 <div class="btn-group dropstart mx-auto pt-1" style="float: right;">
                     <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Metrics: {{ getTranslation(networkManager.selectedMetrics) }}
+                        Metrics: {{ getTranslation(networkManager.settings.selectedMetrics) }}
                     </button>
                     <ul class="dropdown-menu">
                         <li class="dropdown-item">
@@ -692,7 +692,7 @@
                         </li>
                         <hr class="mt-2 mb-2" />
                         <li v-for="metrics in networkManager.availableMetrics">
-                            <a class="dropdown-item" href="#" @click="() => networkManager.selectedMetrics = metrics">{{
+                            <a class="dropdown-item" href="#" @click="() => networkManager.settings.selectedMetrics = metrics">{{
                                 getTranslation(metrics) }}</a>
                         </li>
                     </ul>

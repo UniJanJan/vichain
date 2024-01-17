@@ -6,7 +6,7 @@ export class ProcessingEventsCountMetrics extends Metrics {
     constructor(network) {
         super(network);
         this.processingEventsCountMetrics = new IntervalMap(false, this.metricsRetentionTime);
-        this.maxValue = 20;
+        this.maxValue = 5;
     }
 
     collectMetrics(elapsedTime) {
@@ -14,10 +14,11 @@ export class ProcessingEventsCountMetrics extends Metrics {
         this.network.nodes.forEach(node => {
             processingEventsCount += node.events.processableEvents.size;
         });
-        if ((processingEventsCount * 1.1) > this.maxValue) {
-            this.maxValue = processingEventsCount * 1.1;
+        var averageProcessingEvents = processingEventsCount / (this.network.nodes.length || 1);
+        if (Math.ceil(averageProcessingEvents * 1.1) > this.maxValue) {
+            this.maxValue = Math.ceil(averageProcessingEvents * 1.1);
         }
-        this.processingEventsCountMetrics.push(elapsedTime, processingEventsCount);
+        this.processingEventsCountMetrics.push(elapsedTime, averageProcessingEvents);
     }
 
     draw(graphics, startX, startY, width, height) {
