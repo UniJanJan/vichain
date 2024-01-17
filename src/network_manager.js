@@ -15,7 +15,6 @@ export class NetworkManager {
         this.metricsManager = new MetricsManager(this.network);
         // this.canvas = canvas;
 
-        this.selectedMetrics = LeadingBlocksMetrics.name;
         this.availableMetrics = this.metricsManager.getAvailableMetrics();
 
         // this.nodePositionsMap = {};
@@ -23,6 +22,7 @@ export class NetworkManager {
             isRunning: false,
             showOnlyMetrics: false,
             simulationSpeed: 1.0,
+            selectedMetrics: LeadingBlocksMetrics.name,
             events: {
                 'MessageSendingEvent': {
                     isVisible: true,
@@ -168,7 +168,7 @@ export class NetworkManager {
     }
 
     draw(graphics) { //TODO
-        this.network.draw(graphics, this.settings, this.metricsManager.getMetrics(this.selectedMetrics), this.canvas);
+        this.network.draw(graphics, this.settings, this.metricsManager.getMetrics(this.settings.selectedMetrics), this.canvas);
         if (!this.settings.showOnlyMetrics) {
             this.network.links.forEach(link => link.draw(graphics));
             this.network.nodes.forEach(node => node.draw(graphics, this.settings));
