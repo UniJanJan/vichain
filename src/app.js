@@ -42,7 +42,8 @@ const app = createApp({
                 'VersionMessage': 'handshake info',
 
                 'LeadingBlocksMetrics': 'Leading blocks',
-                'ProcessingEventsCountMetrics': 'Average processing events count'
+                'ProcessingEventsCountMetrics': 'Average processing events count',
+                'BlocksPropagationTimeMetrics': 'Blocks propagation durations'
             },
 
             networkSettings: networkManager.network.settings,

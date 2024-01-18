@@ -6,7 +6,7 @@ export class EventHandler {
     }
 
     /* handle processed event and returns map of next events to process*/
-    handle(processingEntity, processedEvent) {
+    handle(processingEntity, processedEvent, baton) {
         throw new Error(`[${processingEntity}]: Handling ${processedEvent} not implemented!`);
     }
 }
