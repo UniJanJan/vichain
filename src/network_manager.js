@@ -12,7 +12,7 @@ export class NetworkManager {
         this.network = network || new Network();
         this.eventFactory = new EventFactory(this.network.settings);
         this.eventManager = new EventManager(this.network, this.eventFactory);
-        this.metricsManager = new MetricsManager(this.network, this.eventManager);
+        this.metricsManager = new MetricsManager(this.network, this.eventManager.eventHandlerDispositor);
         // this.canvas = canvas;
 
         this.availableMetrics = this.metricsManager.getAvailableMetrics();

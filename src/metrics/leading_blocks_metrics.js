@@ -3,8 +3,8 @@ import { Metrics } from "./metrics.js";
 
 export class LeadingBlocksMetrics extends Metrics {
 
-    constructor(network) {
-        super(network);
+    constructor(network, eventHandlerDispositor) {
+        super(network, eventHandlerDispositor);
         this.leadingBlocksMetrics = new Map();
     }
 

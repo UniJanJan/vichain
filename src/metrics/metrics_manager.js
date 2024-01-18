@@ -4,14 +4,14 @@ import { ProcessingEventsCountMetrics } from "./processing_events_count_metrics.
 
 export class MetricsManager {
 
-    constructor(network, eventManager) {
+    constructor(network, eventHandlerDispositor) {
         this.network = network;
-        this.eventManager = eventManager;
+        this.eventHandlerDispositor = eventHandlerDispositor;
 
         this.metrics = new Map([
-            [LeadingBlocksMetrics.name, new LeadingBlocksMetrics(this.network)],
-            [ProcessingEventsCountMetrics.name, new ProcessingEventsCountMetrics(this.network)],
-            [BlocksPropagationTimeMetrics.name, new BlocksPropagationTimeMetrics(this.network, this.eventManager)]
+            [LeadingBlocksMetrics.name, new LeadingBlocksMetrics(this.network, this.eventHandlerDispositor)],
+            [ProcessingEventsCountMetrics.name, new ProcessingEventsCountMetrics(this.network, this.eventHandlerDispositor)],
+            [BlocksPropagationTimeMetrics.name, new BlocksPropagationTimeMetrics(this.network, this.eventHandlerDispositor)]
         ]);
     }
 

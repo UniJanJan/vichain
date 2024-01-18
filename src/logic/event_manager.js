@@ -29,7 +29,7 @@ import { BlockCreatingEventHandler } from "./handler/block_creating_event_handle
 import { ServiceDispositor } from "./service/service_dispositor.js";
 import { RandomNodeCreatingEventHandler } from "./handler/random_node_creating_event_handler.js";
 import { RandomNodeCreatingEvent } from "../model/event/random_node_creating_event.js";
-import { EventPreprocessorDispositor } from "./event_preprocessor_dispositor.js";
+import { EventHandlerDispositor } from "./handler/event_handler_dispositor.js";
 
 export class EventManager {
     constructor(network, eventFactory) {
@@ -49,31 +49,23 @@ export class EventManager {
         });
 
 
-        this.eventHandler = new Map([
-            [Network.name, new Map([
-                [NodeCreatingEvent.name, [new NodeCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [RandomNodeCreatingEvent.name, [new RandomNodeCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [LinkCreatingEvent.name, [new LinkCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [LinkRemovingEvent.name, [new LinkRemovingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [BlockchainInstallingEvent.name, [new BlockchainInstallingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]]
-            ])],
-            [Node.name, new Map([
-                [MessageSendingEvent.name, [new MessageSendingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [MessageReceivingEvent.name, [new MessageReceivingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [TransactionCreatingEvent.name, [new TransactionCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [TransactionVerifyingEvent.name, [new TransactionVerifyingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [BlockCreatingEvent.name, [new BlockCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [BlockVerifyingEvent.name, [new BlockVerifyingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]],
-                [WaitingEvent.name, [new WaitingEventHandler(this.network, this.eventFactory, this.serviceDispositor)]]
-            ])],
-            [Link.name, new Map([
-                [MessageTransmissionEvent.name, [new MessageTransmissionEventHandler(this.network, this.eventFactory, this.serviceDispositor)]]
-            ])]
-        ]);
-    }
+        this.eventHandlerDispositor = new EventHandlerDispositor();
 
-    registerEventHandler(processingEntityName, eventName, handler) {
-        this.eventHandler.get(processingEntityName).get(eventName).push(handler);
+        this.eventHandlerDispositor.registerEventHandler(Network.name, NodeCreatingEvent.name, new NodeCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Network.name, RandomNodeCreatingEvent.name, new RandomNodeCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Network.name, LinkCreatingEvent.name, new LinkCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Network.name, LinkRemovingEvent.name, new LinkRemovingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Network.name, BlockchainInstallingEvent.name, new BlockchainInstallingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+
+        this.eventHandlerDispositor.registerEventHandler(Node.name, MessageSendingEvent.name, new MessageSendingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Node.name, MessageReceivingEvent.name, new MessageReceivingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Node.name, TransactionCreatingEvent.name, new TransactionCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Node.name, TransactionVerifyingEvent.name, new TransactionVerifyingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Node.name, BlockCreatingEvent.name, new BlockCreatingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Node.name, BlockVerifyingEvent.name, new BlockVerifyingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+        this.eventHandlerDispositor.registerEventHandler(Node.name, WaitingEvent.name, new WaitingEventHandler(this.network, this.eventFactory, this.serviceDispositor));
+
+        this.eventHandlerDispositor.registerEventHandler(Link.name, MessageTransmissionEvent.name, new MessageTransmissionEventHandler(this.network, this.eventFactory, this.serviceDispositor));
     }
 
     update(elapsedTime) {
@@ -92,9 +84,8 @@ export class EventManager {
 
     handleProcessedEvent(processingEntity, newlyProcessedEvent) {
         var baton = {};
-        return this.eventHandler
-            .get(processingEntity.constructor.name)
-            .get(newlyProcessedEvent.constructor.name)
+        return this.eventHandlerDispositor
+            .getEventHandlers(processingEntity.constructor.name, newlyProcessedEvent.constructor.name)
             .flatMap(handler => handler.handle(processingEntity, newlyProcessedEvent, baton));
     }
 
