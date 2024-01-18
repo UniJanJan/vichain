@@ -5,7 +5,7 @@ export class BlockCreatingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent, baton) {
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
         var leadingBlock = processedEvent.leadingBlock;
         var isStillLeading = processingNode.blockchain.leadingBlocks.includes(leadingBlock);
@@ -36,9 +36,11 @@ export class BlockCreatingEventHandler extends EventHandler {
             }
         }
 
+        baton.createdBlock = newBlock;
+        baton.nextProcessableEvents = this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock);
 
         return [
-            this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock)
+            // this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock)
         ];
     }
 }

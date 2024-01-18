@@ -5,7 +5,7 @@ export class BlockVerifyingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent, baton) {
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
 
         var nextProcessableEvents = [];
@@ -41,7 +41,10 @@ export class BlockVerifyingEventHandler extends EventHandler {
 
         })
 
-        return nextProcessableEvents;
+        baton.verifiedBlock = nextBlock;
+        baton.nextProcessableEvents = nextProcessableEvents;
+
+        return []; //nextProcessableEvents;
     }
 
 }
