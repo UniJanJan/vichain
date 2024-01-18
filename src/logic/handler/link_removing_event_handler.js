@@ -5,8 +5,7 @@ export class LinkRemovingEventHandler extends EventHandler {
         super(network, eventFactory);
     }
 
-    handle(processingNetwork, processedEvent) {
+    handle(processingNetwork, processedEvent, baton) {
         processedEvent.initiatingNode.networkInterface.rejectLinkWith(processedEvent.targetNode);
-        return [];
     }
 }

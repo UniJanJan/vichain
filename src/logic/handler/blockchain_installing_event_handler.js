@@ -8,7 +8,7 @@ export class BlockchainInstallingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNetwork, processedEvent) {
+    handle(processingNetwork, processedEvent, baton) {
         if (this.network.settings.isBlockchainInstalled) {
             throw new Error("Blockchain has been installed yet!");
         }
@@ -47,11 +47,11 @@ export class BlockchainInstallingEventHandler extends EventHandler {
         var { roundTime } = this.network.settings;
         var timeToNextRound = roundTime - (currentTimestamp % roundTime) + 1000;
 
-        return processedEvent.nodes.flatMap(node => [
+        baton.nextProcessableEvents.push(...processedEvent.nodes.flatMap(node => [
             this.eventFactory.createBlockVerifyingEvent(node, [null], [genesisBlock], this.network.nodes.map(node => node.id)),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, timeToNextRound)
-        ]);
+        ]));
     }
 }

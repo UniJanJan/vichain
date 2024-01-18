@@ -8,14 +8,12 @@ export class BlockVerifyingEventHandler extends EventHandler {
     handle(processingNode, processedEvent, baton) {
         var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
 
-        var nextProcessableEvents = [];
-
         var nextBlock = processedEvent.blocksToVerify[0];
         processedEvent.leadingBlocks.forEach(leadingBlock => {
             var validLeadingBlock = blockchainService.constructValidLeadingBlock(leadingBlock, nextBlock);
             if (validLeadingBlock !== null) {
                 if (processedEvent.blocksToVerify.length > 1) {
-                    nextProcessableEvents.push(
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createBlockVerifyingEvent(processingNode, [validLeadingBlock], processedEvent.blocksToVerify.slice(1), processedEvent.informedNodes)
                     );
                 }
@@ -33,7 +31,7 @@ export class BlockVerifyingEventHandler extends EventHandler {
                 accountService.dropUnnecessaryAccountHistories();
 
                 if (blockchainHeight > 0) {
-                    nextProcessableEvents.push(
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createBlockBroadcastEvent(processingNode, insertableBlock.block, processedEvent.informedNodes)
                     );
                 }
@@ -44,9 +42,6 @@ export class BlockVerifyingEventHandler extends EventHandler {
 
         baton.verifiedBlock = nextBlock;
         baton.currentlyLeadingBlocks = blockchainService.getLeadingBlocks();
-        baton.nextProcessableEvents = nextProcessableEvents;
-
-        return []; //nextProcessableEvents;
     }
 
 }

@@ -83,10 +83,15 @@ export class EventManager {
     }
 
     handleProcessedEvent(processingEntity, newlyProcessedEvent) {
-        var baton = {};
-        return this.eventHandlerDispositor
+        var baton = {
+            nextProcessableEvents: []
+        };
+        
+        this.eventHandlerDispositor
             .getEventHandlers(processingEntity.constructor.name, newlyProcessedEvent.constructor.name)
-            .flatMap(handler => handler.handle(processingEntity, newlyProcessedEvent, baton));
+            .forEach(handler => handler.handle(processingEntity, newlyProcessedEvent, baton));
+
+        return baton.nextProcessableEvents;
     }
 
     enqueueExecution(processableEvent) {

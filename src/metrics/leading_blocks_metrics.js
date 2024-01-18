@@ -78,8 +78,6 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
                 hashes: baton.currentlyLeadingBlocks.map(leadingBlock => '#' + leadingBlock.blockHash.slice(0, 6))
             });
         }
-
-        return [];
     }
 
 }
@@ -104,8 +102,6 @@ class BlockVeryfingMetricsEventHandler extends EventHandler {
                 hashes: baton.currentlyLeadingBlocks.map(leadingBlock => '#' + leadingBlock.blockHash.slice(0, 6))
             });
         }
-
-        return [];
     }
 
 }

@@ -10,52 +10,56 @@ export class WaitingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent, baton) {
         switch (processedEvent.name) {
             case CyclicEventsName.SENDING_ADDRESS:
-                return [
+                baton.nextProcessableEvents.push(
                     this.eventFactory.createMessageBroadcastEvent(processingNode, new AddrMessage(this.networkInterface.getAllLinkableNodes())),
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.SENDING_ADDRESS, 360000)
-                ];
+                );
+                return;
             case CyclicEventsName.PEERS_DISCOVERY:
                 var waitTime = this.getPeersDiscoveryTimeInterval.bind(this)(processingNode);
 
                 if (processingNode.networkInterface.getAllEstablishedLinkedNodes().length > 0) {
-                    return [
+                    baton.nextProcessableEvents.push(
                         ...this.eventFactory.createLinksUpdateEvents(this.network, processingNode),
                         this.eventFactory.createMessageBroadcastEvent(processingNode, new GetAddrMessage()),
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.PEERS_DISCOVERY, waitTime)
-                    ];
+                    )
                 } else {
-                    return [
+                    baton.nextProcessableEvents.push(
                         ...this.eventFactory.createLinksUpdateEvents(this.network, processingNode),
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.PEERS_DISCOVERY, waitTime)
-                    ];
+                    )
                 }
+                return;
             case CyclicEventsName.TRANSACTIONS_DISCOVERY:
                 // var waitTime = this.getTimeInterval(this.network.settings.minTransactionsDiscoveryInterval, this.network.settings.avgTransactionsDiscoveryInterval);
 
                 if (processingNode.transactionPool.transactions.length < 3) {
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createMessageBroadcastEvent(processingNode, new GetTransactionsMessage()),
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTIONS_DISCOVERY, 20000)
-                    ]
+                    )
                 } else {
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTIONS_DISCOVERY, 10000)
-                    ]
+                    )
                 }
+                return;
             case CyclicEventsName.BLOCKS_DISCOVERY:
                 if (processingNode.blockchain.leadingBlocks.length > 0 && processingNode.blockchain.leadingBlocks[0].block.blockBody.height === 0) { // TODO
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createMessageBroadcastEvent(processingNode, new GetBlocksMessage()),
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.BLOCKS_DISCOVERY, 20000)
-                    ]
+                    )
                 } else {
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.BLOCKS_DISCOVERY, 10000)
-                    ]
+                    )
                 }
+                return;
             case CyclicEventsName.TRANSACTION_GENERATION:
                 var waitTime = this.getTimeInterval(this.network.settings.minTransactionCreationInterval, this.network.settings.avgTransactionCreationInterval);
 
@@ -67,24 +71,22 @@ export class WaitingEventHandler extends EventHandler {
                 if (maxSpendableAmount > 0) {
                     var amount = Math.ceil(Math.random() * maxSpendableAmount);
 
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount),
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
-                    ];
+                    )
                 } else {
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
-                    ];
+                    )
                 }
-
+                return;
             case CyclicEventsName.MINERS_SELECTION:
                 var { currentTimestamp } = this.network.timer;
                 var { roundTime, minersPerRound } = this.network.settings;
 
                 var timeQuantum = roundTime / minersPerRound;
                 var waitTime = timeQuantum - (currentTimestamp % timeQuantum) + 1000;
-
-                var nextProcessableEvents = [];
 
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
                 var managedAddresses = accountService.getManagedAccounts();
@@ -93,7 +95,7 @@ export class WaitingEventHandler extends EventHandler {
                 processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
                     managedAddresses.forEach(managedAddress => {
                         if (blockchainService.canAddressConstructNewBlock(leadingBlock, managedAddress.wallet.publicKey, currentTimestamp)) {
-                            nextProcessableEvents.push(
+                            baton.nextProcessableEvents.push(
                                 this.eventFactory.createBlockCreatingEvent(processingNode, leadingBlock, managedAddress.wallet.publicKey)
                             );
                         }
@@ -101,10 +103,10 @@ export class WaitingEventHandler extends EventHandler {
 
                 })
 
-                return [
-                    ...nextProcessableEvents,
+                baton.nextProcessableEvents.push(
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.MINERS_SELECTION, waitTime)
-                ];
+                )
+                return;
         }
     }
 
