@@ -82,8 +82,6 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
                 this.blockTrack.delete(baton.verifiedBlock.blockHash);
             }
         }
-
-        return baton.nextProcessableEvents;
     }
 
 }
@@ -113,7 +111,6 @@ class BlockVeryfingMetricsEventHandler extends EventHandler {
 
             }
         }
-        return baton.nextProcessableEvents;
     }
 
 }

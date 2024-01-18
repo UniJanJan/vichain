@@ -7,7 +7,7 @@ export class NodeCreatingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor)
     }
 
-    handle(processingNetwork, processedEvent) {
+    handle(processingNetwork, processedEvent, baton) {
         var node = new Node(processingNetwork, processedEvent.x, processedEvent.y, processingNetwork.settings);
 
         node.networkInterface.rememberNodes(processingNetwork.informativeNodes);
@@ -17,9 +17,9 @@ export class NodeCreatingEventHandler extends EventHandler {
             processingNetwork.addInformativeNode(node);
         }
 
-        var nextProcessableEvents = [
+        baton.nextProcessableEvents.push(
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.PEERS_DISCOVERY, 1000)
-        ];
+        );
 
         var accountService = this.serviceDispositor.getAccountService(node);
         accountService.createAccount();
@@ -29,12 +29,12 @@ export class NodeCreatingEventHandler extends EventHandler {
             var { roundTime } = this.network.settings;
             var timeToNextRound = roundTime - (currentTimestamp % roundTime) + 1000;
 
-            nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(node, [null], [processingNetwork.settings.genesisBlock], this.network.nodes.map(node => node.id)));
-            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0));
-            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, timeToNextRound));
-            nextProcessableEvents.push(this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000));
+            baton.nextProcessableEvents.push(
+                this.eventFactory.createBlockVerifyingEvent(node, [null], [processingNetwork.settings.genesisBlock], this.network.nodes.map(node => node.id)),
+                this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0),
+                this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, timeToNextRound),
+                this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTION_GENERATION, Math.random() * 10000)
+            );
         }
-
-        return nextProcessableEvents;
     }
 }

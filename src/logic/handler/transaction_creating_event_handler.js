@@ -1,11 +1,12 @@
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionCreatingEventHandler extends EventHandler {
+
     constructor(network, eventFactory, serviceDispositor) {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent, baton) {
         var accountService = this.serviceDispositor.getAccountService(processingNode);
         var transactionService = this.serviceDispositor.getTransactionService(processingNode);
 
@@ -16,9 +17,9 @@ export class TransactionCreatingEventHandler extends EventHandler {
             accountService.addRelatedTransaction(transaction);
         }
 
-        return [
+        baton.nextProcessableEvents.push(
             this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction)
-        ];
+        );
     }
 
 }

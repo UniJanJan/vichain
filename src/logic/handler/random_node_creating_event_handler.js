@@ -5,7 +5,7 @@ export class RandomNodeCreatingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor)
     }
 
-    handle(processingNetwork, processedEvent) {
+    handle(processingNetwork, processedEvent, baton) {
         const randomValues = new Uint32Array(2);
         window.crypto.getRandomValues(randomValues);
         var randomX = randomValues[0];
@@ -13,9 +13,9 @@ export class RandomNodeCreatingEventHandler extends EventHandler {
         var x = randomX % (processedEvent.maxX - 40) + 20;
         var y = randomY % (processedEvent.maxY - 40) + 20;
 
-        return [
+        baton.nextProcessableEvents.push(
             this.eventFactory.createNodeCreatingEvent(processingNetwork, x, y, true)
-        ];
+        );
     }
 
 }

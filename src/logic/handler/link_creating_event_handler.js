@@ -6,12 +6,12 @@ export class LinkCreatingEventHandler extends EventHandler {
         super(network, eventFactory);
     }
 
-    handle(processingNetwork, processedEvent) {
+    handle(processingNetwork, processedEvent, baton) {
         processedEvent.initiatingNode.networkInterface.rememberNode(processedEvent.targetNode);
         processingNetwork.addLink(processedEvent.initiatingNode, processedEvent.targetNode);
 
-        return [
+        baton.nextProcessableEvents.push(
             this.eventFactory.createMessageSendingEvent(processedEvent.initiatingNode, processedEvent.targetNode, new VersionMessage(processedEvent.initiatingNode.version))
-        ];
+        );
     }
 }

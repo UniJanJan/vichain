@@ -11,7 +11,7 @@ export class BlockCreatingEventHandler extends EventHandler {
         var isStillLeading = processingNode.blockchain.leadingBlocks.includes(leadingBlock);
         if (!isStillLeading) {
             //throw new Error('Leading block not found in blockchain of ' + processingNode);
-            return []
+            return
         }
 
         var transactionService = this.serviceDispositor.getTransactionService(processingNode);
@@ -39,10 +39,6 @@ export class BlockCreatingEventHandler extends EventHandler {
 
         baton.createdBlock = newBlock;
         baton.currentlyLeadingBlocks = blockchainService.getLeadingBlocks();
-        baton.nextProcessableEvents = this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock);
-
-        return [
-            // this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock)
-        ];
+        baton.nextProcessableEvents.push(this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock));
     }
 }

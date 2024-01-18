@@ -9,17 +9,17 @@ export class MessageSendingEventHandler extends EventHandler {
         super(network, eventFactory);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent, baton) {
         // TODO what if link has been destroyed?
         var message = Object.isFrozen(processedEvent.message) ? processedEvent.message : processedEvent.message.clone();
-        return processedEvent.nodesTo.map(targetNode => {
+        baton.nextProcessableEvents.push(...processedEvent.nodesTo.map(targetNode => {
             var link = processingNode.networkInterface.getLinkWith(targetNode);
             if (link && this.canLinkTransmitMessage(link, message)) {
                 return this.eventFactory.createMessageTransmissionEvent(link, processingNode, targetNode, message);
             } else {
                 return null;
             }
-        }).filter(processableEvents => processableEvents != null);
+        }).filter(processableEvents => processableEvents != null));
     }
 
     canLinkTransmitMessage(link, message) {

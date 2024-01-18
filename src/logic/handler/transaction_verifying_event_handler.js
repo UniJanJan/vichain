@@ -1,11 +1,12 @@
 import { EventHandler } from "./event_handler.js";
 
 export class TransactionVerifyingEventHandler extends EventHandler {
+    
     constructor(network, eventFactory, serviceDispositor) {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent, baton) {
         var transaction = processedEvent.transaction;
         var transactionService = this.serviceDispositor.getTransactionService(processingNode);
         if (transactionService.isTransactionValid(transaction, false)) {
@@ -14,15 +15,11 @@ export class TransactionVerifyingEventHandler extends EventHandler {
                 var accountService = this.serviceDispositor.getAccountService(processingNode);
                 accountService.addRelatedTransaction(transaction);
 
-                return [
+                baton.nextProcessableEvents.push(
                     this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction, processedEvent.informedNodes)
-                ];
-            } else {
-                return [];
+                )
             }
 
-        } else {
-            return [];
         }
     }
 

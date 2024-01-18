@@ -5,10 +5,10 @@ export class MessageTransmissionEventHandler extends EventHandler {
         super(network, eventFactory);
     }
 
-    handle(processingLink, processedEvent) {
+    handle(processingLink, processedEvent, baton) {
         // TODO what if link has been destroyed?
-        return [
+        baton.nextProcessableEvents.push(
             this.eventFactory.createMessageReceivingEvent(processedEvent.nodeFrom, processedEvent.nodeTo, processedEvent.message)
-        ];
+        );
     }
 }

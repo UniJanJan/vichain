@@ -17,12 +17,12 @@ export class MessageReceivingEventHandler extends EventHandler {
         super(network, eventFactory, serviceDispositor);
     }
 
-    handle(processingNode, processedEvent) {
+    handle(processingNode, processedEvent, baton) {
         // processingNode === processedEvent.nodeTo?
-        return this.dispatchMessage(processingNode, processedEvent);
+        return this.dispatchMessage(processingNode, processedEvent, baton);
     }
 
-    dispatchMessage(processingNode, event) {
+    dispatchMessage(processingNode, event, baton) {
         if (event.message instanceof VersionMessage) {
             processingNode.networkInterface.rememberNode(event.nodeFrom);
 
@@ -31,61 +31,66 @@ export class MessageReceivingEventHandler extends EventHandler {
                 var shouldBePrioritized = processingNode.networkInterface.shouldBePrioritized(event.nodeFrom);
                 if (link && link.status === LinkStatus.VIRTUAL) {
                     //TODO make prioritized?
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new VerAckMessage()),
                         this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new VersionMessage(processingNode.version, shouldBePrioritized))
-                    ];
+                    )
                 } else if (link && link.status === LinkStatus.HALF_ESTABLISHED) {
                     link.prioritizationByNode[event.nodeFrom] = event.message.shouldBePrioritized;
-                    return [
+                    baton.nextProcessableEvents.push(
                         this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new VerAckMessage())
-                    ];
+                    )
                 } else if (link && link.status === LinkStatus.ESTABLISHED) {
                     link.prioritizationByNode[event.nodeFrom] = event.message.shouldBePrioritized;
-                    return this.eventFactory.createLinksUpdateEvents(this.network, processingNode);
-                } else {
-                    return [];
+                    baton.nextProcessableEvents.push(
+                        ...this.eventFactory.createLinksUpdateEvents(this.network, processingNode)
+                    );
                 }
             } else {
-                return [
+                baton.nextProcessableEvents.push(
                     this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new RejectMessage())
-                ];
+                );
             }
         } else if (event.message instanceof VerAckMessage) {
             processingNode.networkInterface.confirmLinkWith(event.nodeFrom);
-            return [];
         } else if (event.message instanceof RejectMessage) {
             processingNode.networkInterface.rejectLinkWith(event.nodeFrom);
-            return [this.eventFactory.createLinkRemovingEvent(this.network, event.nodeFrom, event.nodeTo)];
+            baton.nextProcessableEvents.push(
+                this.eventFactory.createLinkRemovingEvent(this.network, event.nodeFrom, event.nodeTo)
+            );
         } else if (event.message instanceof AddrMessage) {
             // this.networkInterface.rememberNodes.bind(this.networkInterface)(event.message.linkedNodes)
             event.message.linkedNodes.forEach(processingNode.networkInterface.rememberNode.bind(processingNode.networkInterface));
-            return this.eventFactory.createLinksUpdateEvents(this.network, processingNode);
+            return baton.nextProcessableEvents.push(
+                ...this.eventFactory.createLinksUpdateEvents(this.network, processingNode)
+            );
         } else if (event.message instanceof TrxMessage) {
-            return [this.eventFactory.createTransactionVerifyingEvent(processingNode, event.message.transaction, event.message.informedNodes)];
+            return baton.nextProcessableEvents.push(
+                this.eventFactory.createTransactionVerifyingEvent(processingNode, event.message.transaction, event.message.informedNodes)
+            );
         } else if (event.message instanceof GetAddrMessage) {
-            return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new AddrMessage(processingNode.networkInterface.getAllLinkableNodes()))];
+            return baton.nextProcessableEvents.push(
+                this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new AddrMessage(processingNode.networkInterface.getAllLinkableNodes()))
+            );
         } else if (event.message instanceof BlockMessage) {
             var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
             var blockchainHeight = blockchainService.getBlockchainHeight();
             if (blockchainHeight + 1 < event.message.block.blockBody.height) {
-                return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksMessage())];
+                baton.nextProcessableEvents.push(this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksMessage()));
             } else if (blockchainHeight + 1 === event.message.block.blockBody.height) {
-                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks, [event.message.block], event.message.informedNodes)];
+                baton.nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks, [event.message.block], event.message.informedNodes));
             } else if (blockchainHeight === event.message.block.blockBody.height) {
-                return [this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.previousBlock), [event.message.block], event.message.informedNodes)];
-            } else {
-                return [];
+                baton.nextProcessableEvents.push(this.eventFactory.createBlockVerifyingEvent(processingNode, processingNode.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.previousBlock), [event.message.block], event.message.informedNodes));
             }
         } else if (event.message instanceof GetTransactionsMessage) {
             var transactionService = this.serviceDispositor.getTransactionService(processingNode);
             transactionService.dropStaleTransactions();
-            return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetTransactionsResponseMessage(processingNode.transactionPool.transactions))];
+            baton.nextProcessableEvents.push(this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetTransactionsResponseMessage(processingNode.transactionPool.transactions)));
         } else if (event.message instanceof GetTransactionsResponseMessage) {
             var allNodesIds = this.network.nodes.map(node => node.id);
-            return event.message.transactions.map(transaction => this.eventFactory.createTransactionVerifyingEvent(processingNode, transaction, allNodesIds));
+            baton.nextProcessableEvents.push(...event.message.transactions.map(transaction => this.eventFactory.createTransactionVerifyingEvent(processingNode, transaction, allNodesIds)));
         } else if (event.message instanceof GetBlocksMessage) {
-            return [this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.getFirstBlockchain()))];
+            baton.nextProcessableEvents.push(this.eventFactory.createMessageSendingEvent(processingNode, event.nodeFrom, new GetBlocksResponseMessage(processingNode.blockchain.getFirstBlockchain())));
         } else if (event.message instanceof GetBlocksResponseMessage) {
             var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
 
@@ -94,11 +99,9 @@ export class MessageReceivingEventHandler extends EventHandler {
             if (blockchainService.getBlockchainHeight() + 1 < blocks.length) {
                 var response = blockchainService.findHighestJointBlock(blocks);
                 var allNodesIds = this.network.nodes.map(node => node.id);
-                return [
+                baton.nextProcessableEvents.push(
                     this.eventFactory.createBlockVerifyingEvent(processingNode, [response.jointBlock], response.blocksToVerify, allNodesIds)
-                ];
-            } else {
-                return [];
+                );
             }
         }
     }
