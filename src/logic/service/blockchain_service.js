@@ -21,6 +21,10 @@ export class BlockchainService {
         return this.blockchain.leadingBlocks.length > 0 ? this.blockchain.leadingBlocks[0].block.blockBody.height : -1;
     }
 
+    getLeadingBlocks() {
+        return this.blockchain.leadingBlocks.map(leadingBlock => leadingBlock.block);
+    }
+
     findHighestJointBlock(blocks) {
         var currentHeight = this.getBlockchainHeight();
 

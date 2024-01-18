@@ -63,22 +63,24 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
         this.propagatedBlocksMetrics = propagatedBlocksMetrics;
     }
 
-    handle(processingEntity, processedEvent, baton) {
-        var propagationTrack = {
-            verifiedBy: new Set([processingEntity.id]),
-            creationTimestamp: baton.createdBlock.blockBody.creationTimestamp,
-            propagationCompletionTimestamp: null
-        };
+    handle(processingNode, processedEvent, baton) {
+        if (baton.createdBlock) {
+            var propagationTrack = {
+                verifiedBy: new Set([processingNode.id]),
+                creationTimestamp: baton.createdBlock.blockBody.creationTimestamp,
+                propagationCompletionTimestamp: null
+            };
 
-        this.blockTrack.set(baton.createdBlock.blockHash, propagationTrack);
+            this.blockTrack.set(baton.createdBlock.blockHash, propagationTrack);
 
-        if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.network.nodes.length) {
-            propagationTrack.propagationCompletionTimestamp = this.network.timer.currentTimestamp;
-            this.propagatedBlocksMetrics.push({
-                blockHash: baton.verifiedBlock.blockHash,
-                propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
-            })
-            this.blockTrack.delete(baton.verifiedBlock.blockHash);
+            if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.network.nodes.length) {
+                propagationTrack.propagationCompletionTimestamp = this.network.timer.currentTimestamp;
+                this.propagatedBlocksMetrics.push({
+                    blockHash: baton.verifiedBlock.blockHash,
+                    propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
+                })
+                this.blockTrack.delete(baton.verifiedBlock.blockHash);
+            }
         }
 
         return baton.nextProcessableEvents;
@@ -94,20 +96,22 @@ class BlockVeryfingMetricsEventHandler extends EventHandler {
         this.propagatedBlocksMetrics = propagatedBlocksMetrics;
     }
 
-    handle(processingEntity, processedEvent, baton) {
-        var propagationTrack = this.blockTrack.get(baton.verifiedBlock.blockHash);
-        if (propagationTrack) {
-            propagationTrack.verifiedBy.add(processingEntity.id);
+    handle(processingNode, processedEvent, baton) {
+        if (baton.verifiedBlock) {
+            var propagationTrack = this.blockTrack.get(baton.verifiedBlock.blockHash);
+            if (propagationTrack) {
+                propagationTrack.verifiedBy.add(processingNode.id);
 
-            if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.network.nodes.length) {
-                propagationTrack.propagationCompletionTimestamp = this.network.timer.currentTimestamp;
-                this.propagatedBlocksMetrics.push({
-                    blockHash: baton.verifiedBlock.blockHash,
-                    propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
-                })
-                this.blockTrack.delete(baton.verifiedBlock.blockHash);
+                if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.network.nodes.length) {
+                    propagationTrack.propagationCompletionTimestamp = this.network.timer.currentTimestamp;
+                    this.propagatedBlocksMetrics.push({
+                        blockHash: baton.verifiedBlock.blockHash,
+                        propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
+                    })
+                    this.blockTrack.delete(baton.verifiedBlock.blockHash);
+                }
+
             }
-
         }
         return baton.nextProcessableEvents;
     }

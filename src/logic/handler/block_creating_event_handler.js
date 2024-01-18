@@ -33,10 +33,12 @@ export class BlockCreatingEventHandler extends EventHandler {
                 transactionService.updateTransactionPool(nextLeadingBlock);
                 accountService.updateRelatedTransactions(nextLeadingBlock);
                 accountService.dropUnnecessaryAccountHistories();
+                baton.isBlockAppended = true;
             }
         }
 
         baton.createdBlock = newBlock;
+        baton.currentlyLeadingBlocks = blockchainService.getLeadingBlocks();
         baton.nextProcessableEvents = this.eventFactory.createBlockBroadcastEvent(processingNode, newBlock);
 
         return [
