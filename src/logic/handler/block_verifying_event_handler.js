@@ -37,11 +37,13 @@ export class BlockVerifyingEventHandler extends EventHandler {
                         this.eventFactory.createBlockBroadcastEvent(processingNode, insertableBlock.block, processedEvent.informedNodes)
                     );
                 }
+                baton.isBlockAppended = true;
             }
 
         })
 
         baton.verifiedBlock = nextBlock;
+        baton.currentlyLeadingBlocks = blockchainService.getLeadingBlocks();
         baton.nextProcessableEvents = nextProcessableEvents;
 
         return []; //nextProcessableEvents;
