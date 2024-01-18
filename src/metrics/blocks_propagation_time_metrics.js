@@ -1,64 +1,20 @@
-import { IntervalMap } from "../common/interval_map.js";
+import { EventHandler } from "../logic/handler/event_handler.js";
 import { BlockCreatingEvent } from "../model/event/block_creating_event.js";
 import { BlockVerifyingEvent } from "../model/event/block_verifying_event.js";
 import { Metrics } from "./metrics.js";
 
 export class BlocksPropagationTimeMetrics extends Metrics {
 
-    constructor(network, eventManager) {
-        super(network);
-        this.eventManager = eventManager;
-        this.propagatedBlocksMetrics = [];
+    constructor(network, eventHandlerDispositor) {
+        super(network, eventHandlerDispositor);
 
+        this.propagatedBlocksMetrics = [];
         this.blockTrack = new Map();
-        this.propagatedBlocks = [];
+
+        eventHandlerDispositor.registerEventHandler(Node.name, BlockCreatingEvent.name, new BlockCreatingMetricsEventHandler(this.network, this.blockTrack, this.propagatedBlocksMetrics));
+        eventHandlerDispositor.registerEventHandler(Node.name, BlockVerifyingEvent.name, new BlockVeryfingMetricsEventHandler(this.network, this.blockTrack, this.propagatedBlocksMetrics));
 
         this.maxValue = 10000;
-
-        this.eventManager.registerEventHandler(Node.name, BlockCreatingEvent.name, {
-            metrics: this,
-            handle(processingEntity, processedEvent, baton) {
-                var propagationTrack = {
-                    verifiedBy: new Set([processingEntity.id]),
-                    creationTimestamp: baton.createdBlock.blockBody.creationTimestamp,
-                    propagationCompletionTimestamp: null
-                };
-
-                this.metrics.blockTrack.set(baton.createdBlock.blockHash, propagationTrack);
-
-                if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.metrics.network.nodes.length) {
-                    propagationTrack.propagationCompletionTimestamp = this.metrics.network.timer.currentTimestamp;
-                    this.metrics.propagatedBlocksMetrics.push({
-                        blockHash: baton.verifiedBlock.blockHash,
-                        propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
-                    })
-                    this.metrics.blockTrack.delete(baton.verifiedBlock.blockHash);
-                }
-
-                return baton.nextProcessableEvents;
-            }
-        });
-
-        this.eventManager.registerEventHandler(Node.name, BlockVerifyingEvent.name, {
-            metrics: this,
-            handle(processingEntity, processedEvent, baton) {
-                var propagationTrack = this.metrics.blockTrack.get(baton.verifiedBlock.blockHash);
-                if (propagationTrack) {
-                    propagationTrack.verifiedBy.add(processingEntity.id);
-
-                    if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.metrics.network.nodes.length) {
-                        propagationTrack.propagationCompletionTimestamp = this.metrics.network.timer.currentTimestamp;
-                        this.metrics.propagatedBlocksMetrics.push({
-                            blockHash: baton.verifiedBlock.blockHash,
-                            propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
-                        })
-                        this.metrics.blockTrack.delete(baton.verifiedBlock.blockHash);
-                    }
-
-                }
-                return baton.nextProcessableEvents;
-            }
-        });
     }
 
     collectMetrics(elapsedTime) {
@@ -95,6 +51,65 @@ export class BlocksPropagationTimeMetrics extends Metrics {
         graphics.strokeStyle = 'blue';
         graphics.stroke();
         graphics.setLineDash([]);
+    }
+
+}
+
+class BlockCreatingMetricsEventHandler extends EventHandler {
+
+    constructor(network, blockTrack, propagatedBlocksMetrics) {
+        super(network);
+        this.blockTrack = blockTrack;
+        this.propagatedBlocksMetrics = propagatedBlocksMetrics;
+    }
+
+    handle(processingEntity, processedEvent, baton) {
+        var propagationTrack = {
+            verifiedBy: new Set([processingEntity.id]),
+            creationTimestamp: baton.createdBlock.blockBody.creationTimestamp,
+            propagationCompletionTimestamp: null
+        };
+
+        this.blockTrack.set(baton.createdBlock.blockHash, propagationTrack);
+
+        if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.network.nodes.length) {
+            propagationTrack.propagationCompletionTimestamp = this.network.timer.currentTimestamp;
+            this.propagatedBlocksMetrics.push({
+                blockHash: baton.verifiedBlock.blockHash,
+                propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
+            })
+            this.blockTrack.delete(baton.verifiedBlock.blockHash);
+        }
+
+        return baton.nextProcessableEvents;
+    }
+
+}
+
+class BlockVeryfingMetricsEventHandler extends EventHandler {
+
+    constructor(network, blockTrack, propagatedBlocksMetrics) {
+        super(network);
+        this.blockTrack = blockTrack;
+        this.propagatedBlocksMetrics = propagatedBlocksMetrics;
+    }
+
+    handle(processingEntity, processedEvent, baton) {
+        var propagationTrack = this.blockTrack.get(baton.verifiedBlock.blockHash);
+        if (propagationTrack) {
+            propagationTrack.verifiedBy.add(processingEntity.id);
+
+            if (propagationTrack.propagationCompletionTimestamp === null && propagationTrack.verifiedBy.size === this.network.nodes.length) {
+                propagationTrack.propagationCompletionTimestamp = this.network.timer.currentTimestamp;
+                this.propagatedBlocksMetrics.push({
+                    blockHash: baton.verifiedBlock.blockHash,
+                    propagationTime: propagationTrack.propagationCompletionTimestamp - propagationTrack.creationTimestamp
+                })
+                this.blockTrack.delete(baton.verifiedBlock.blockHash);
+            }
+
+        }
+        return baton.nextProcessableEvents;
     }
 
 }
