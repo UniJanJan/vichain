@@ -9,12 +9,16 @@ export class MetricsManager {
         this.network = network;
         this.eventHandlerDispositor = eventHandlerDispositor;
 
-        this.metrics = new Map([
-            [LeadingBlocksMetrics.name, new LeadingBlocksMetrics(this.network, this.eventHandlerDispositor)],
-            [ProcessingEventsCountMetrics.name, new ProcessingEventsCountMetrics(this.network, this.eventHandlerDispositor)],
-            [BlocksPropagationTimeMetrics.name, new BlocksPropagationTimeMetrics(this.network, this.eventHandlerDispositor)],
-            [TransactionsStateMetrics.name, new TransactionsStateMetrics(this.network, this.eventHandlerDispositor)]
-        ]);
+        this.availableMetrics = [
+            LeadingBlocksMetrics,
+            ProcessingEventsCountMetrics,
+            BlocksPropagationTimeMetrics,
+            TransactionsStateMetrics
+        ];
+
+        this.metrics = new Map(
+            this.availableMetrics.map(clazz => [clazz.name, new clazz(this.network, this.eventHandlerDispositor)])
+        );
     }
 
     collectMetrics(elapsedTime) {
@@ -29,7 +33,7 @@ export class MetricsManager {
     }
 
     getAvailableMetrics() {
-        return Array.from(this.metrics.keys());
+        return this.availableMetrics.map(metrics => metrics.name);
     }
 
 }
