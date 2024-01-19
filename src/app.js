@@ -43,7 +43,8 @@ const app = createApp({
 
                 'LeadingBlocksMetrics': 'Leading blocks',
                 'ProcessingEventsCountMetrics': 'Average processing events count',
-                'BlocksPropagationTimeMetrics': 'Blocks propagation durations'
+                'BlocksPropagationTimeMetrics': 'Blocks propagation durations',
+                'TransactionsStateMetrics': 'Transactions states'
             },
 
             networkSettings: networkManager.network.settings,
