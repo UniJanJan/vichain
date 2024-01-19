@@ -21,7 +21,7 @@ export class IntervalMap {
     /* intervalSize should be natural number */
     push(intervalSize, object) {
         if (this.intervals.isNotEmpty()) {
-            var lastInterval = this.intervals.getLastElement().object;
+            var lastInterval = this.intervals.getLastElement();
             if (lastInterval && _.isEqual(lastInterval.object, object)) {
                 lastInterval.extend(intervalSize);
             } else {

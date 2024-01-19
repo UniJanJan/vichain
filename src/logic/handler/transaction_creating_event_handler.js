@@ -17,6 +17,7 @@ export class TransactionCreatingEventHandler extends EventHandler {
             accountService.addRelatedTransaction(transaction);
         }
 
+        baton.createdTransaction = transaction;
         baton.nextProcessableEvents.push(
             this.eventFactory.createTransactionBroadcastEvent(processingNode, transaction)
         );

@@ -40,11 +40,11 @@ export class LinkedList {
     }
 
     getFirstElement() {
-        return this.firstElement;
+        return this.firstElement?.object;
     }
 
     getLastElement() {
-        return this.lastElement;
+        return this.lastElement?.object;
     }
 
     isNotEmpty() {
@@ -118,6 +118,15 @@ export class LinkedList {
                 this.list.lastElement = this.currentElement;
             }
         }
+    }
+
+    toArray() {
+        var array = [];
+        this.forEach(element => {
+            array.push(element);
+            return false;
+        });
+        return array;
     }
 
 }
