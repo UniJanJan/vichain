@@ -2,6 +2,7 @@ import { LinkedList } from "../common/linked_list.js";
 import { EventHandler } from "../logic/handler/event_handler.js";
 import { BlockCreatingEvent } from "../model/event/block_creating_event.js";
 import { TransactionCreatingEvent } from "../model/event/transaction_creating_event.js";
+import { PlotMetricsArchetype } from "./archetype/plot_metrics_archetype.js";
 import { Metrics } from "./metrics.js";
 
 export class TransactionsStateMetrics extends Metrics {
@@ -9,11 +10,7 @@ export class TransactionsStateMetrics extends Metrics {
     constructor(network, eventHandlerDispositor) {
         super(network, eventHandlerDispositor);
 
-        this.createdTransactionsMetrics = new LinkedList();
-        this.createdTransactionsMetrics.push({
-            timestamp: 0,
-            metricsValue: 0
-        })
+        this.createdTransactionsMetrics = new PlotMetricsArchetype();
 
         this.committedTransactionsMetrics = new Map();
 
@@ -36,7 +33,7 @@ export class TransactionsStateMetrics extends Metrics {
         var lastTimestamp = currentTimestamp;
         var currentMetricsTotalTime = 0;
         var previousMetricsValue = null;
-        this.createdTransactionsMetrics.forEachReversed(element => {
+        this.createdTransactionsMetrics.metrics.forEachReversed(element => {
             var shouldStop = false;
             var intervalSize = lastTimestamp - element.timestamp;
             if (currentMetricsTotalTime + intervalSize > this.metricsRetentionTime) {
@@ -44,7 +41,7 @@ export class TransactionsStateMetrics extends Metrics {
                 intervalSize = this.metricsRetentionTime - currentMetricsTotalTime;
             }
 
-            var metricsValue = element.metricsValue;
+            var metricsValue = element.value;
 
             if (Math.ceil(metricsValue * 1.1) > this.maxValue) {
                 this.maxValue = Math.ceil(metricsValue * 1.1);
@@ -88,25 +85,25 @@ export class TransactionsStateMetrics extends Metrics {
                     shouldStop = true;
                     intervalSize = this.metricsRetentionTime - currentMetricsTotalTime;
                 }
-    
+
                 var metricsValue = element.metricsValue;
-    
+
                 if (Math.ceil(metricsValue * 1.1) > this.maxValue) {
                     this.maxValue = Math.ceil(metricsValue * 1.1);
                 }
-    
+
                 graphics.beginPath();
                 graphics.rect(startX + (this.metricsRetentionTime - currentMetricsTotalTime - intervalSize) * widthToTimeFactor, startY + height - metricsValue * heightToMaxValue, intervalSize * widthToTimeFactor, metricsValue * heightToMaxValue);
                 graphics.fillStyle = 'red';
                 graphics.fill();
-    
+
                 graphics.beginPath();
                 graphics.moveTo(startX + (this.metricsRetentionTime - currentMetricsTotalTime) * widthToTimeFactor, startY + height - metricsValue * heightToMaxValue);
                 graphics.lineTo(startX + (this.metricsRetentionTime - currentMetricsTotalTime - intervalSize) * widthToTimeFactor, startY + height - metricsValue * heightToMaxValue);
                 graphics.strokeStyle = '#' + blockHash.slice(0, 6);
                 graphics.lineWidth = 3;
                 graphics.stroke();
-    
+
                 if (previousMetricsValue) {
                     graphics.beginPath();
                     graphics.moveTo(startX + (this.metricsRetentionTime - currentMetricsTotalTime) * widthToTimeFactor, startY + height - metricsValue * heightToMaxValue);
@@ -115,11 +112,11 @@ export class TransactionsStateMetrics extends Metrics {
                     graphics.lineWidth = 3;
                     graphics.stroke();
                 }
-    
+
                 lastTimestamp = element.timestamp;
                 currentMetricsTotalTime += intervalSize;
                 previousMetricsValue = metricsValue;
-    
+
                 return shouldStop;
             });
         })
@@ -155,11 +152,10 @@ class TransactionCreatingMetricsEventHandler extends EventHandler {
     }
 
     handle(processingNode, processedEvent, baton) {
-        var createdTransactionsSoFar = this.createdTransactionsMetrics.getLastElement().metricsValue;
-        this.createdTransactionsMetrics.push({
-            timestamp: baton.createdTransaction.transactionBody.creationTimestamp,
-            metricsValue: createdTransactionsSoFar + 1
-        });
+        var timestamp = baton.createdTransaction.transactionBody.creationTimestamp;
+        var createdTransactionsSoFar = this.createdTransactionsMetrics.getMetricsLastValue();
+
+        this.createdTransactionsMetrics.noteMetrics(timestamp, createdTransactionsSoFar + 1);
     }
 
 }
@@ -193,7 +189,7 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
 
             this.committedTransactionsMetrics.set(baton.createdBlock.blockHash, committedTransactionsForBlockMetrics);
             this.committedTransactionsMetrics.delete(baton.createdBlock.blockBody.previousBlockHash);
-            
+
         }
     }
 }
