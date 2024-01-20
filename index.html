@@ -134,6 +134,35 @@
                                             account.accountHistory.availableBalanceByLeadingBlockHash.get(selectedNode.leadingBlocks[0].block.blockHash)
                                             }}</div>
 
+                                        <hr class="mt-3 mb-3" />
+
+                                        <div class="form-check form-switch mb-2">
+                                            <input id="autoTransactionCreationSwitch" type="checkbox"
+                                                class="form-check-input"
+                                                v-model="selectedNode.node.autoTransactionCreation" />
+                                            <label class="form-check-label" style="font-size: smaller;"
+                                                for="autoTransactionCreationSwitch">Automatic transactions
+                                                creation</label>
+                                        </div>
+                                        <div class="form-floating mb-2">
+                                            <input id="minTransactionCreationIntervalInput" type="number"
+                                                class="form-control"
+                                                v-model="selectedNode.node.minTransactionCreationInterval" />
+                                            <label for="minTransactionCreationIntervalInput" style="font-size: smaller;">Minimal transaction
+                                                creation interval (ms)</label>
+                                        </div>
+                                        <div class="form-floating mb-2">
+                                            <input id="avgTransactionCreationIntervalInput" type="number"
+                                                class="form-control"
+                                                v-model="selectedNode.node.avgTransactionCreationInterval" />
+                                            <label for="avgTransactionCreationIntervalInput" style="font-size: smaller;">Average transaction
+                                                creation interval (ms)</label>
+                                        </div>
+
+                                        <hr class="mt-3 mb-3" />
+
+                                        Related transactions
+
                                         <div v-if="account.accountHistory.transactions.length > 0">
                                             <ul class="list-group"
                                                 v-for="relatedTransaction in account.accountHistory.transactions">
@@ -623,17 +652,20 @@
                             <div class="form-check form-switch mb-2">
                                 <input id="autoTransactionCreationSwitch" type="checkbox" class="form-check-input"
                                     v-model="networkManager.network.settings.autoTransactionCreation" />
-                                <label class="form-check-label" for="autoTransactionCreationSwitch">Automatic transactions creation</label>
+                                <label class="form-check-label" for="autoTransactionCreationSwitch">Automatic
+                                    transactions creation</label>
                             </div>
                             <div class="form-floating mb-2">
                                 <input id="minTransactionCreationIntervalInput" type="number" class="form-control"
                                     v-model="networkManager.network.settings.minTransactionCreationInterval" />
-                                <label for="minTransactionCreationIntervalInput">Minimal transaction creation interval (ms)</label>
+                                <label for="minTransactionCreationIntervalInput">Minimal transaction creation interval
+                                    (ms)</label>
                             </div>
                             <div class="form-floating mb-2">
                                 <input id="avgTransactionCreationIntervalInput" type="number" class="form-control"
                                     v-model="networkManager.network.settings.avgTransactionCreationInterval" />
-                                <label for="avgTransactionCreationIntervalInput">Average transaction creation interval (ms)</label>
+                                <label for="avgTransactionCreationIntervalInput">Average transaction creation interval
+                                    (ms)</label>
                             </div>
 
                         </div>
@@ -710,7 +742,8 @@
                         </li>
                         <hr class="mt-2 mb-2" />
                         <li v-for="metrics in networkManager.availableMetrics">
-                            <a class="dropdown-item" href="#" @click="() => networkManager.settings.selectedMetrics = metrics">{{
+                            <a class="dropdown-item" href="#"
+                                @click="() => networkManager.settings.selectedMetrics = metrics">{{
                                 getTranslation(metrics) }}</a>
                         </li>
                     </ul>
