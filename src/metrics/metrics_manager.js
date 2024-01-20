@@ -1,3 +1,4 @@
+import { BlockchainsHeightMetrics } from "./blockchains_height_metrics.js";
 import { BlocksPropagationTimeMetrics } from "./blocks_propagation_time_metrics.js";
 import { LeadingBlocksMetrics } from "./leading_blocks_metrics.js";
 import { ProcessingEventsCountMetrics } from "./processing_events_count_metrics.js";
@@ -13,7 +14,8 @@ export class MetricsManager {
             LeadingBlocksMetrics,
             ProcessingEventsCountMetrics,
             BlocksPropagationTimeMetrics,
-            TransactionsStateMetrics
+            TransactionsStateMetrics,
+            BlockchainsHeightMetrics
         ];
 
         this.metrics = new Map(
