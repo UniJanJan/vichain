@@ -51,11 +51,23 @@ export class Node {
     }
 
     get minTransactionCreationInterval() {
-        return this._minTransactionCreationInterval || this.settings.minTransactionCreationInterval;
+        return this._minTransactionCreationInterval === null ? this.settings.minTransactionCreationInterval : this._minTransactionCreationInterval;
     }
 
     get avgTransactionCreationInterval() {
-        return this._avgTransactionCreationInterval || this.settings.avgTransactionCreationInterval;
+        return this._avgTransactionCreationInterval === null ? this.settings.avgTransactionCreationInterval : this._avgTransactionCreationInterval;
+    }
+
+    set autoTransactionCreation(value) {
+        this._autoTransactionCreation = value;
+    }
+
+    set minTransactionCreationInterval(value) {
+        this._minTransactionCreationInterval = value;
+    }
+
+    set avgTransactionCreationInterval(value) {
+        this._avgTransactionCreationInterval = value;
     }
 
     updateVelocity(elapsedTime) {

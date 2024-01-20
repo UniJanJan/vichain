@@ -73,15 +73,15 @@ export class WaitingEventHandler extends EventHandler {
                         var amount = Math.ceil(Math.random() * maxSpendableAmount);
 
                         baton.nextProcessableEvents.push(
-                            this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount),
-                            this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
+                            this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount)
                         )
                     }
-                } else {
-                    baton.nextProcessableEvents.push(
-                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
-                    )
                 }
+                
+                baton.nextProcessableEvents.push(
+                    this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
+                )
+
                 return;
             case CyclicEventsName.MINERS_SELECTION:
                 var { currentTimestamp } = this.network.timer;
