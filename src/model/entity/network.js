@@ -24,6 +24,7 @@ export class Network {
             isBlockchainInstalled: false,
             genesisBlock: null,
 
+            autoTransactionCreation: true,
             minTransactionCreationInterval: 20000,
             avgTransactionCreationInterval: 100000,
 

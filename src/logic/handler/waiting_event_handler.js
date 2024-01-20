@@ -61,20 +61,22 @@ export class WaitingEventHandler extends EventHandler {
                 }
                 return;
             case CyclicEventsName.TRANSACTION_GENERATION:
-                var waitTime = this.getTimeInterval(this.network.settings.minTransactionCreationInterval, this.network.settings.avgTransactionCreationInterval);
+                var waitTime = this.getTimeInterval(processingNode.minTransactionCreationInterval, processingNode.avgTransactionCreationInterval);
 
-                var accountService = this.serviceDispositor.getAccountService(processingNode);
-                var sourceAccount = accountService.getRandomManagedAccount();
-                var targetAddress = accountService.getRandomNonManagedAddress();
-                var maxSpendableAmount = accountService.getSafeAvailableBalance(sourceAccount.wallet.publicKey);
+                if (processingNode.autoTransactionCreation) {
+                    var accountService = this.serviceDispositor.getAccountService(processingNode);
+                    var sourceAccount = accountService.getRandomManagedAccount();
+                    var targetAddress = accountService.getRandomNonManagedAddress();
+                    var maxSpendableAmount = accountService.getSafeAvailableBalance(sourceAccount.wallet.publicKey);
 
-                if (maxSpendableAmount > 0) {
-                    var amount = Math.ceil(Math.random() * maxSpendableAmount);
+                    if (maxSpendableAmount > 0) {
+                        var amount = Math.ceil(Math.random() * maxSpendableAmount);
 
-                    baton.nextProcessableEvents.push(
-                        this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount),
-                        this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
-                    )
+                        baton.nextProcessableEvents.push(
+                            this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount),
+                            this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
+                        )
+                    }
                 } else {
                     baton.nextProcessableEvents.push(
                         this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
