@@ -36,6 +36,9 @@ export class Node {
         this._minTransactionCreationInterval = null;
         this._avgTransactionCreationInterval = null;
 
+        this._minLinks = null;
+        this._maxLinks = null;
+
         this.isSelected = false;
 
         this.targetX = null;
@@ -58,6 +61,14 @@ export class Node {
         return this._avgTransactionCreationInterval === null ? this.settings.avgTransactionCreationInterval : this._avgTransactionCreationInterval;
     }
 
+    get maxLinks() {
+        return this._maxLinks === null ? this.settings.maxLinksPerNode : this._maxLinks;
+    }
+
+    get minLinks() {
+        return this._minLinks === null ? this.settings.minLinksPerNode : this._minLinks;
+    }
+
     set autoTransactionCreation(value) {
         this._autoTransactionCreation = value;
     }
@@ -68,6 +79,14 @@ export class Node {
 
     set avgTransactionCreationInterval(value) {
         this._avgTransactionCreationInterval = value;
+    }
+
+    set minLinks(value) {
+        this._minLinks = value;
+    }
+
+    set maxLinks(value) {
+        this._maxLinks = value;
     }
 
     updateVelocity(elapsedTime) {

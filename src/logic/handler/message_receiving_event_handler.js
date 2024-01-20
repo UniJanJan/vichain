@@ -26,7 +26,7 @@ export class MessageReceivingEventHandler extends EventHandler {
         if (event.message instanceof VersionMessage) {
             processingNode.networkInterface.rememberNode(event.nodeFrom);
 
-            if (processingNode.networkInterface.getAtLeastHalfEstablishedLinkedNodes().length < this.network.settings.maxLinksPerNode) {
+            if (processingNode.networkInterface.getAtLeastHalfEstablishedLinkedNodes().length < processingNode.maxLinks) {
                 var link = processingNode.networkInterface.getLinkWith(event.nodeFrom);
                 var shouldBePrioritized = processingNode.networkInterface.shouldBePrioritized(event.nodeFrom);
                 if (link && link.status === LinkStatus.VIRTUAL) {
