@@ -144,7 +144,7 @@ export class EventFactory {
         }
 
         node.networkInterface.getLinkableNodesSortedByDistance().forEach((linkableNode, index) => {
-            if (index < processingNetwork.settings.minLinksPerNode) {
+            if (index < node.minLinks) {
                 classification.toLink.push(linkableNode);
             } else {
                 var link = node.networkInterface.getLinkWith(linkableNode);

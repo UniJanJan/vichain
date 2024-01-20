@@ -94,7 +94,7 @@ export class NetworkInterface {
     shouldBePrioritized(node) {
         var nodeIndex = this.getLinkableNodesSortedByDistance().indexOf(node);
         if (nodeIndex >= 0) {
-            return nodeIndex < this.network.settings.minLinksPerNode; // TODO what if at least one node here has rejected this.node yet?
+            return nodeIndex < this.node.minLinks; // TODO what if at least one node here has rejected this.node yet?
         } else {
             throw new Error(`${node} is not linkable from ${this.node}!`);
         }

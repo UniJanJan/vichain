@@ -27,7 +27,10 @@
                     <h2>Node {{ selectedNode.id }}</h2>
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                            <button class="nav-link active" id="nav-events-tab" data-bs-toggle="tab"
+                            <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-general" type="button" role="tab" aria-controls="nav-general"
+                                aria-selected="true">General</button>
+                            <button class="nav-link" id="nav-events-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-events" type="button" role="tab" aria-controls="nav-events"
                                 aria-selected="true">Events</button>
                             <button class="nav-link" id="nav-wallets-tab" data-bs-toggle="tab"
@@ -41,8 +44,26 @@
                                 aria-selected="false">Blockchain</button>
                         </div>
                     </nav>
+
+    
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active overflow-scroll" style="max-height: fit-content;"
+                        <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab">
+                            General
+
+                            <div class="form-floating mb-2">
+                                <input id="minLinksInput" type="number" class="form-control"
+                                    v-model="selectedNode.node.minLinks" />
+                                <label for="minLinksInput">Minimum links</label>
+                            </div>
+
+                            <div class="form-floating mb-2">
+                                <input id="maxLinksInput" type="number" class="form-control"
+                                v-model="selectedNode.node.maxLinks"  />
+                                <label for="maxLinksInput">Maximum links</label>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade overflow-scroll" style="max-height: fit-content;"
                             id="nav-events" role="tabpanel" aria-labelledby="nav-events-tab">
 
                             Processable events
@@ -148,14 +169,16 @@
                                             <input id="minTransactionCreationIntervalInput" type="number"
                                                 class="form-control"
                                                 v-model="selectedNode.node.minTransactionCreationInterval" />
-                                            <label for="minTransactionCreationIntervalInput" style="font-size: smaller;">Minimal transaction
+                                            <label for="minTransactionCreationIntervalInput"
+                                                style="font-size: smaller;">Minimal transaction
                                                 creation interval (ms)</label>
                                         </div>
                                         <div class="form-floating mb-2">
                                             <input id="avgTransactionCreationIntervalInput" type="number"
                                                 class="form-control"
                                                 v-model="selectedNode.node.avgTransactionCreationInterval" />
-                                            <label for="avgTransactionCreationIntervalInput" style="font-size: smaller;">Average transaction
+                                            <label for="avgTransactionCreationIntervalInput"
+                                                style="font-size: smaller;">Average transaction
                                                 creation interval (ms)</label>
                                         </div>
 

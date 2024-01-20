@@ -77,7 +77,7 @@ export class WaitingEventHandler extends EventHandler {
                         )
                     }
                 }
-                
+
                 baton.nextProcessableEvents.push(
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.TRANSACTION_GENERATION, waitTime)
                 )
@@ -117,7 +117,7 @@ export class WaitingEventHandler extends EventHandler {
     }
 
     getPeersDiscoveryTimeInterval(processingNode) {
-        return processingNode.networkInterface.getLinksNumber() < this.network.settings.minLinksPerNode ?
+        return processingNode.networkInterface.getLinksNumber() < processingNode.minLinks ?
             15000 + Math.random() * 10000 :
             300000 + Math.random() * 50000;
     }
