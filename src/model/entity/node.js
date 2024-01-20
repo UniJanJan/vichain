@@ -32,6 +32,9 @@ export class Node {
         this.settings = settings;
 
         this._radius = null;
+        this._autoTransactionCreation = null;
+        this._minTransactionCreationInterval = null;
+        this._avgTransactionCreationInterval = null;
 
         this.isSelected = false;
 
@@ -41,6 +44,18 @@ export class Node {
 
     get radius() {
         return this._radius || this.settings.defaultNodeRadius;
+    }
+
+    get autoTransactionCreation() {
+        return this._autoTransactionCreation === null ? this.settings.autoTransactionCreation : this._autoTransactionCreation;
+    }
+
+    get minTransactionCreationInterval() {
+        return this._minTransactionCreationInterval || this.settings.minTransactionCreationInterval;
+    }
+
+    get avgTransactionCreationInterval() {
+        return this._avgTransactionCreationInterval || this.settings.avgTransactionCreationInterval;
     }
 
     updateVelocity(elapsedTime) {

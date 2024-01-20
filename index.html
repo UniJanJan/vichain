@@ -618,6 +618,24 @@
                                     validation</label>
                             </div>
 
+                            <hr class="mt-3 mb-3" />
+
+                            <div class="form-check form-switch mb-2">
+                                <input id="autoTransactionCreationSwitch" type="checkbox" class="form-check-input"
+                                    v-model="networkManager.network.settings.autoTransactionCreation" />
+                                <label class="form-check-label" for="autoTransactionCreationSwitch">Automatic transactions creation</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="minTransactionCreationIntervalInput" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.minTransactionCreationInterval" />
+                                <label for="minTransactionCreationIntervalInput">Minimal transaction creation interval (ms)</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="avgTransactionCreationIntervalInput" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.avgTransactionCreationInterval" />
+                                <label for="avgTransactionCreationIntervalInput">Average transaction creation interval (ms)</label>
+                            </div>
+
                         </div>
                     </div>
                 </div>
