@@ -2,6 +2,7 @@ import { Link } from './link.js';
 import { EventPool } from '../event/event_pool.js';
 import { Timer } from '../time/timer.js';
 import { WalletPool } from '../wallet/wallet_pool.js';
+import { EventProcessingSettings } from '../settings/event_processing_settings.js';
 
 export class Network {
     constructor() {
@@ -13,11 +14,6 @@ export class Network {
         this.timer = new Timer();
 
         this.events = new EventPool();
-        this.processingSettings = {
-            maxLoad: 1,
-            maxEventsBufferLength: Infinity,
-            processingPower: 1
-        }
 
         this.walletPool = new WalletPool();
 
@@ -58,11 +54,29 @@ export class Network {
                 'MessageTransmissionEvent': 10
             },
 
+            defaultNetworkProcessingSettings: {
+                maxLoad: 1,
+                maxEventsBufferLength: Infinity,
+                processingPower: 1
+            },
+            defaultNodeProcessingSettings: {
+                maxLoad: 1,
+                maxEventsBufferLength: Infinity,
+                processingPower: 1
+            },
+            defaultLinkProcessingSettings: {
+                maxLoad: Infinity,
+                maxEventsBufferLength: Infinity,
+                processingPower: 1
+            },
+
             cacheBlockValidation: false
         }
 
         this.settings.eventsDurations = Object.assign({}, this.settings.defaultEventsDurations);
         this.settings.eventsDurationMultipliers = Object.assign({}, this.settings.defaultEventsDurationMultipliers);
+
+        this.processingSettings = new EventProcessingSettings(this.settings.defaultNetworkProcessingSettings);
     }
 
     addNode(node) {

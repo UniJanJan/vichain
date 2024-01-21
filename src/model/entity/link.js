@@ -1,5 +1,6 @@
 import { Utils } from '../../common/common.js';
 import { EventPool } from '../event/event_pool.js';
+import { EventProcessingSettings } from '../settings/event_processing_settings.js';
 
 export const LinkStatus = {
     VIRTUAL: 0,
@@ -21,11 +22,7 @@ export class Link {
         this.node2 = node2;
 
         this.events = new EventPool();
-        this.processingSettings = {
-            maxLoad: Infinity,
-            maxEventsBufferLength: Infinity,
-            processingPower: 1
-        }
+        this.processingSettings = new EventProcessingSettings(this.network.settings.defaultLinkProcessingSettings);
 
         this.status = LinkStatus.VIRTUAL;
         this.confirmationsByNode = {};

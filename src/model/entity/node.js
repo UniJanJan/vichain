@@ -3,6 +3,7 @@ import { NetworkInterface } from '../../network_interface.js';
 import { EventPool } from '../event/event_pool.js';
 import { Blockchain } from '../blockchain/blockchain.js';
 import { AccountStore } from '../account/account_store.js';
+import { EventProcessingSettings } from '../settings/event_processing_settings.js';
 
 
 export class Node {
@@ -23,11 +24,7 @@ export class Node {
         this.blockchain = new Blockchain();
         this.managedAccounts = new AccountStore();
 
-        this.processingSettings = {
-            maxLoad: 1,
-            maxEventsBufferLength: Infinity,
-            processingPower: 1
-        }
+        this.processingSettings = new EventProcessingSettings(settings.defaultNodeProcessingSettings);
 
         this.x = x;
         this.y = y;
