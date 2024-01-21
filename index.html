@@ -45,9 +45,10 @@
                         </div>
                     </nav>
 
-    
+
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab">
+                        <div class="tab-pane fade show active" id="nav-general" role="tabpanel"
+                            aria-labelledby="nav-general-tab">
                             General
 
                             <div class="form-floating mb-2">
@@ -58,7 +59,7 @@
 
                             <div class="form-floating mb-2">
                                 <input id="maxLinksInput" type="number" class="form-control"
-                                v-model="selectedNode.node.maxLinks"  />
+                                    v-model="selectedNode.node.maxLinks" />
                                 <label for="maxLinksInput">Maximum links</label>
                             </div>
 
@@ -66,19 +67,22 @@
 
                             <div class="form-floating mb-2">
                                 <input id="maxEventsBufferLengthInput" type="number" class="form-control"
-                                v-model="selectedNode.node.processingSettings.maxEventsBufferLength"  />
+                                    v-model="selectedNode.node.processingSettings.maxEventsBufferLength" />
                                 <label for="maxEventsBufferLengthInput">Maximum events in buffer</label>
                             </div>
 
-                            <div class="form-floating mb-2">
-                                <input id="processingPowerInput" type="number" class="form-control"
-                                v-model="selectedNode.node.processingSettings.processingPower"  />
-                                <label for="processingPowerInput">Events processing power</label>
+                            <div>
+                                <input type="range" id="processingPowerInput" name="volume" min="0" max="10" step="0.05"
+                                    v-model="selectedNode.node.processingSettings.processingPower"
+                                    @input="() => selectedNode.node.processingSettings.processingPower = Number(selectedNode.node.processingSettings.processingPower)" />
+                                <label for="processingPowerInput" style="font-size: small;">Events processing power (x{{
+                                    selectedNode.node.processingSettings.processingPower }})</label>
                             </div>
+
                         </div>
 
-                        <div class="tab-pane fade overflow-scroll" style="max-height: fit-content;"
-                            id="nav-events" role="tabpanel" aria-labelledby="nav-events-tab">
+                        <div class="tab-pane fade overflow-scroll" style="max-height: fit-content;" id="nav-events"
+                            role="tabpanel" aria-labelledby="nav-events-tab">
 
                             Processable events
                             <div v-if="selectedNode.processableEvents.length > 0">
