@@ -79,6 +79,11 @@
                                     selectedNode.node.processingSettings.processingPower }})</label>
                             </div>
 
+                            <div>
+                                <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold; font-size: smaller;"
+                                    @click="setToGlobalNodeProcessingSettings">Set to global processing settings</button>
+                            </div>
+
                         </div>
 
                         <div class="tab-pane fade overflow-scroll" style="max-height: fit-content;" id="nav-events"
@@ -609,7 +614,8 @@
                                     v-model="networkManager.network.settings.defaultNodeProcessingSettings.processingPower"
                                     @input="() => networkManager.network.settings.defaultNodeProcessingSettings.processingPower = Number(networkManager.network.settings.defaultNodeProcessingSettings.processingPower)" />
                                 <label for="processingPowerInput" style="font-size: small;">Events processing power (x{{
-                                    networkManager.network.settings.defaultNodeProcessingSettings.processingPower }})</label>
+                                    networkManager.network.settings.defaultNodeProcessingSettings.processingPower
+                                    }})</label>
                             </div>
 
                             <hr class="mt-3 mb-3" />
