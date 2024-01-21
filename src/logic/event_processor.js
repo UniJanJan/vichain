@@ -1,4 +1,5 @@
 import { EventStatus } from "../model/event/event.js";
+import { WaitingEvent } from "../model/event/waiting_event.js";
 
 export class EventProcessor {
     constructor(timer, eventPool, processingSettings) {
@@ -43,7 +44,7 @@ export class EventProcessor {
     }
 
     enqueueExecution(event) {
-        if (this.maxEventsBufferLength <= this.processableEvents.size && !event.prioritized) {
+        if (this.maxEventsBufferLength <= this.processableEvents.size) {
             return;
         }
 
@@ -98,7 +99,8 @@ export class EventProcessor {
     }
 
     updateEvent(processingEvent, elapsedTime) {
-        processingEvent.progress += elapsedTime * this.processingPower;
+        var processingPower = processingEvent instanceof WaitingEvent ? 1 : this.processingPower;
+        processingEvent.progress += elapsedTime * processingPower;
         if (processingEvent.progress >= processingEvent.duration) {
             processingEvent.status = EventStatus.PROCESSED;
         }

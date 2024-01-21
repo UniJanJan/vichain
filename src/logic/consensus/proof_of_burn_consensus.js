@@ -134,6 +134,9 @@ export class ProofOfBurnConsensus extends Consensus {
         var currentBlock = currentlyLeadingBlock;
         while (!this.areFromDifferentRounds(currentBlock.block.blockBody.creationTimestamp, nextBlockCreationTimestamp)) {
             currentBlock = currentBlock.previousBlock;
+            if (currentBlock === null) {
+                return [];
+            }
         };
         return currentBlock.nextRoundMiners;
     }

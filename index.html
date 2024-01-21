@@ -61,6 +61,20 @@
                                 v-model="selectedNode.node.maxLinks"  />
                                 <label for="maxLinksInput">Maximum links</label>
                             </div>
+
+                            <hr class="mt-2 mb-2" />
+
+                            <div class="form-floating mb-2">
+                                <input id="maxEventsBufferLengthInput" type="number" class="form-control"
+                                v-model="selectedNode.node.processingSettings.maxEventsBufferLength"  />
+                                <label for="maxEventsBufferLengthInput">Maximum events in buffer</label>
+                            </div>
+
+                            <div class="form-floating mb-2">
+                                <input id="processingPowerInput" type="number" class="form-control"
+                                v-model="selectedNode.node.processingSettings.processingPower"  />
+                                <label for="processingPowerInput">Events processing power</label>
+                            </div>
                         </div>
 
                         <div class="tab-pane fade overflow-scroll" style="max-height: fit-content;"
