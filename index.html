@@ -213,7 +213,7 @@
                                             <ul class="list-group"
                                                 v-for="relatedTransaction in account.accountHistory.transactions">
                                                 <li class="list-group-item"
-                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + ((account.accountHistory.isTransactionCommitted(relatedTransaction.transactionHash, selectedNode.leadingBlocks[0].block.blockHash)) ? 'red;' : 'darkgoldenrod;')">
+                                                    :style="'font-size: small; padding: 0; color: white; background-color: ' + getTransactionsStatusColor(account, relatedTransaction, selectedNode.leadingBlocks[0].block)">
                                                     <div v-if="relatedTransaction.transactionBody.sourceAddress">
                                                         [{{ relatedTransaction.transactionBody.id }}]
                                                         {{ relatedTransaction.transactionBody.amount }}
