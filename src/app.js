@@ -48,6 +48,11 @@ const app = createApp({
                 'TransactionsStateMetrics': 'Transactions states',
                 'BlockchainsHeightMetrics': 'Blockchains heights'
             },
+            transactionsStatusColor: {
+                'COMMITTED': 'red',
+                'UNCOMMITTED': 'darkgoldenrod',
+                'EXPIRED': 'grey'
+            },
 
             networkSettings: networkManager.network.settings,
             timer: networkManager.network.timer,
@@ -111,6 +116,15 @@ const app = createApp({
         },
         setToGlobalNodeProcessingSettings() {
             this.selectedNode.node.processingSettings.setToGlobal();
+        },
+        getTransactionsStatusColor(account, relatedTransaction, block) {
+            if (account.accountHistory.isTransactionCommitted(relatedTransaction.transactionHash, block.blockHash)) {
+                return this.transactionsStatusColor['COMMITTED'];
+            } else if (account.accountHistory.isTransactionUncommitted(relatedTransaction.transactionHash, block.blockHash)) {
+                return this.transactionsStatusColor['UNCOMMITTED'];
+            } else {
+                return this.transactionsStatusColor['EXPIRED'];
+            }
         }
     }
 });
