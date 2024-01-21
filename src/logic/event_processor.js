@@ -1,13 +1,25 @@
 import { EventStatus } from "../model/event/event.js";
 
 export class EventProcessor {
-    constructor(timer, maxLoad, eventPool) {
+    constructor(timer, eventPool, processingSettings) {
         this.timer = timer;
 
-        this.maxLoad = maxLoad;
         this.currentLoad = 0;
 
         this.events = eventPool;
+        this.processingSettings = processingSettings;
+    }
+
+    get maxLoad() {
+        return this.processingSettings.maxLoad;
+    }
+
+    get maxEventsBufferLength() {
+        return this.processingSettings.maxEventsBufferLength;
+    }
+
+    get processingPower() {
+        return this.processingSettings.processingPower;
     }
 
     get processableEvents() {
@@ -31,6 +43,10 @@ export class EventProcessor {
     }
 
     enqueueExecution(event) {
+        if (this.maxEventsBufferLength <= this.processableEvents.size && !event.prioritized) {
+            return;
+        }
+
         if (event.status === EventStatus.PROCESSABLE) {
             event.enqueuingTimestamp = this.timer.currentTimestamp;
             if (event.loadSize === 0 || event.prioritized) {
@@ -82,7 +98,7 @@ export class EventProcessor {
     }
 
     updateEvent(processingEvent, elapsedTime) {
-        processingEvent.progress += elapsedTime;
+        processingEvent.progress += elapsedTime * this.processingPower;
         if (processingEvent.progress >= processingEvent.duration) {
             processingEvent.status = EventStatus.PROCESSED;
         }

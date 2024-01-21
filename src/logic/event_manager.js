@@ -40,12 +40,12 @@ export class EventManager {
         this.serviceDispositor = new ServiceDispositor(this.network);
 
         this.eventProcessors = new Map();
-        this.eventProcessors.set(this.network, new EventProcessor(this.timer, 1, this.network.events));
+        this.eventProcessors.set(this.network, new EventProcessor(this.timer, this.network.events, this.network.processingSettings));
         this.network.nodes.forEach(node => {
-            this.eventProcessors.set(node, new EventProcessor(this.timer, 1, node.events));
+            this.eventProcessors.set(node, new EventProcessor(this.timer, node.events, node.processingSettings));
         });
         this.network.links.forEach(link => {
-            this.eventProcessors.set(link, new EventProcessor(this.timer, Infinity, link.events));
+            this.eventProcessors.set(link, new EventProcessor(this.timer, link.events, link.processingSettings));
         });
 
 
@@ -105,11 +105,11 @@ export class EventManager {
             return eventProcessor;
         } else {
             if (processingEntity instanceof Node && this.network.constainsNode(processingEntity)) {
-                var newNodeEventProcessor = new EventProcessor(this.timer, 1, processingEntity.events);
+                var newNodeEventProcessor = new EventProcessor(this.timer, processingEntity.events, processingEntity.processingSettings);
                 this.eventProcessors.set(processingEntity, newNodeEventProcessor);
                 return newNodeEventProcessor;
             } else if (processingEntity instanceof Link && this.network.constainsLink(processingEntity)) {
-                var newLinkEventProcessor = new EventProcessor(this.timer, Infinity, processingEntity.events);
+                var newLinkEventProcessor = new EventProcessor(this.timer, processingEntity.events, processingEntity.processingSettings);
                 this.eventProcessors.set(processingEntity, newLinkEventProcessor);
                 return newLinkEventProcessor;
             } else {

@@ -13,6 +13,11 @@ export class Network {
         this.timer = new Timer();
 
         this.events = new EventPool();
+        this.processingSettings = {
+            maxLoad: 1,
+            maxEventsBufferLength: Infinity,
+            processingPower: 1
+        }
 
         this.walletPool = new WalletPool();
 
