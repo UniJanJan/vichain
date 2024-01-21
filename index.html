@@ -654,28 +654,34 @@
                                 <label for="initTokenAmountPerNodeInput">Initial tokens amount per node</label>
                             </div>
                             <div class="form-floating mb-2">
-                                <input id="roundTime" type="number" class="form-control"
+                                <input id="roundTimeInput" type="number" class="form-control"
                                     v-model="networkManager.network.settings.roundTime"
                                     :disabled="networkManager.network.settings.isBlockchainInstalled" />
                                 <label for="roundTimeInput">Mining round duration (ms)</label>
                             </div>
                             <div class="form-floating mb-2">
-                                <input id="minersPerRound" type="number" class="form-control"
+                                <input id="minersPerRoundInput" type="number" class="form-control"
                                     v-model="networkManager.network.settings.minersPerRound"
                                     :disabled="networkManager.network.settings.isBlockchainInstalled" />
                                 <label for="minersPerRoundInput">Selected miners per round</label>
                             </div>
                             <div class="form-floating mb-2">
-                                <input id="miningAward" type="number" class="form-control"
+                                <input id="miningAwardInput" type="number" class="form-control"
                                     v-model="networkManager.network.settings.miningAward"
                                     :disabled="networkManager.network.settings.isBlockchainInstalled" />
                                 <label for="miningAwardInput">Tokens award for mined block</label>
                             </div>
                             <div class="form-floating mb-2">
-                                <input id="maxTransactionsPerBlock" type="number" class="form-control"
+                                <input id="maxTransactionsPerBlockInput" type="number" class="form-control"
                                     v-model="networkManager.network.settings.maxTransactionsPerBlock"
                                     :disabled="networkManager.network.settings.isBlockchainInstalled" />
                                 <label for="maxTransactionsPerBlockInput">Maximum transactions per block</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input id="transactionValidityDurationInput" type="number" class="form-control"
+                                    v-model="networkManager.network.settings.transactionValidityDuration"
+                                    :disabled="networkManager.network.settings.isBlockchainInstalled" />
+                                <label for="transactionValidityDurationInput">Transaction validity duration (ms)</label>
                             </div>
 
                             <div class="mb-2" v-if="!networkManager.network.settings.isBlockchainInstalled">
