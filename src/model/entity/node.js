@@ -23,6 +23,12 @@ export class Node {
         this.blockchain = new Blockchain();
         this.managedAccounts = new AccountStore();
 
+        this.processingSettings = {
+            maxLoad: 1,
+            maxEventsBufferLength: Infinity,
+            processingPower: 1
+        }
+
         this.x = x;
         this.y = y;
 

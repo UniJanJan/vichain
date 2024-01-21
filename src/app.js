@@ -8,6 +8,7 @@ const app = createApp({
         this.networkManager = networkManager;
 
         networkManager.network.timer = reactive(networkManager.network.timer);
+        networkManager.network.settings = reactive(networkManager.network.settings);
         networkManager.selectedNode = reactive(networkManager.selectedNode);
         networkManager.settings = reactive(networkManager.settings);
 

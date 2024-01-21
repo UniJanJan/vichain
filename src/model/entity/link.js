@@ -21,6 +21,11 @@ export class Link {
         this.node2 = node2;
 
         this.events = new EventPool();
+        this.processingSettings = {
+            maxLoad: Infinity,
+            maxEventsBufferLength: Infinity,
+            processingPower: 1
+        }
 
         this.status = LinkStatus.VIRTUAL;
         this.confirmationsByNode = {};
