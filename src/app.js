@@ -108,6 +108,9 @@ const app = createApp({
         setDefaultEventDurations() {
             this.networkManager.network.settings.eventsDurations = Object.assign({}, this.networkManager.network.settings.defaultEventsDurations);
             this.networkManager.network.settings.eventsDurationMultipliers = Object.assign({}, this.networkManager.network.settings.defaultEventsDurationMultipliers);
+        },
+        setToGlobalNodeProcessingSettings() {
+            this.selectedNode.node.processingSettings.setToGlobal();
         }
     }
 });

@@ -1,14 +1,14 @@
 export class Settings {
 
-    constructor(specificSettings, defaultSettings) {
+    constructor(specificSettings, globalSettings) {
         this.specificSettings = specificSettings;
-        this.defaultSettings = defaultSettings;
+        this.globalSettings = globalSettings;
 
         Object.keys(this.specificSettings).forEach(key => {
 
             Object.defineProperty(this, key, {
                 get: function () {
-                    return this.specificSettings[key] === null ? this.defaultSettings[key] : this.specificSettings[key];
+                    return this.specificSettings[key] === null ? this.globalSettings[key] : this.specificSettings[key];
                 },
                 set: function (value) {
                     this.specificSettings[key] = value;
@@ -16,6 +16,12 @@ export class Settings {
             });
 
         })
+    }
+
+    setToGlobal() {
+        Object.keys(this.specificSettings).forEach(key => {
+            this[key] = null;
+        });
     }
 
 }
