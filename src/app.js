@@ -43,7 +43,7 @@ const app = createApp({
                 'VersionMessage': 'handshake info',
 
                 'LeadingBlocksMetrics': 'Leading blocks',
-                'ProcessingEventsCountMetrics': 'Average processing events count',
+                'ProcessingEventsCountMetrics': 'Average events number in buffers',
                 'BlocksPropagationTimeMetrics': 'Blocks propagation durations',
                 'TransactionsStateMetrics': 'Transactions states',
                 'BlockchainsHeightMetrics': 'Blockchains heights'

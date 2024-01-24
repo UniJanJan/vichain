@@ -14,8 +14,8 @@ export class MetricsManager {
             LeadingBlocksMetrics,
             ProcessingEventsCountMetrics,
             BlocksPropagationTimeMetrics,
-            TransactionsStateMetrics,
-            BlockchainsHeightMetrics
+            BlockchainsHeightMetrics,
+            TransactionsStateMetrics
         ];
 
         this.metrics = new Map(

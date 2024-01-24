@@ -30,34 +30,49 @@ export class BlockchainsHeightMetrics extends Metrics {
         var columnWidth = width / this.nodesIdsByLeadingBlock.size;
         var heightToMaxValue = height / this.maxValue;
 
+        var maxMetrics = 0;
+
         Array.from(this.nodesIdsByLeadingBlock.entries()).forEach((entry, index) => {
             var blockHash = entry[0];
-            var nodesNumber = entry[1].size;
+            var nodesNumber = entry[1].nodesIds.size;
+            var blockchainHeight = entry[1].blockchainHeight;
 
             if (Math.ceil(nodesNumber * 1.1) > this.maxValue) {
                 this.maxValue = Math.ceil(nodesNumber * 1.1);
             }
 
+            if (maxMetrics < nodesNumber) {
+                maxMetrics = nodesNumber;
+            }
+
+            var columnHeight = nodesNumber * heightToMaxValue;
+
             graphics.beginPath();
-            graphics.rect(startX + columnWidth * index, startY + height - nodesNumber * heightToMaxValue, columnWidth, nodesNumber * heightToMaxValue);
+            graphics.rect(startX + columnWidth * index, startY + height - columnHeight, columnWidth, columnHeight);
             graphics.fillStyle = '#' + blockHash.slice(0, 6);
             graphics.fill();
+
+            var fontSize = (columnHeight > 40) ? 20 : (columnHeight / 2)
+
+            graphics.fillStyle = 'white';
+            graphics.font = fontSize + "px arial bold";
+            graphics.fillText(blockchainHeight, startX + columnWidth * index + (columnWidth / 2), startY + height - ((columnHeight - fontSize) / 2));
         });
 
         graphics.beginPath();
-        graphics.moveTo(startX, startY + height / 2);
-        graphics.lineTo(startX + 5, startY + height / 2);
+        graphics.moveTo(startX, startY + height - maxMetrics * heightToMaxValue);
+        graphics.lineTo(startX + 5, startY + height - maxMetrics * heightToMaxValue);
         graphics.strokeStyle = 'blue';
         graphics.stroke();
 
         graphics.fillStyle = 'blue';
         graphics.font = "12px arial";
-        graphics.fillText(Math.ceil(this.maxValue / 2), startX + 10, startY + height / 2 + 3);
+        graphics.fillText(maxMetrics, startX + 10, startY + height - maxMetrics * heightToMaxValue + 3);
 
         graphics.beginPath();
         graphics.setLineDash([3, 6]);
-        graphics.moveTo(startX + 30, startY + height / 2);
-        graphics.lineTo(startX + width, startY + height / 2);
+        graphics.moveTo(startX + 30, startY + height - maxMetrics * heightToMaxValue);
+        graphics.lineTo(startX + width, startY + height - maxMetrics * heightToMaxValue);
         graphics.strokeStyle = 'blue';
         graphics.stroke();
         graphics.setLineDash([]);
@@ -77,10 +92,10 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
         if (baton.createdBlock && baton.isBlockAppended) {
             var leadingBlocksBefore = this.currentlyLeadingBlocksByNodeId.get(processingNode.id) || [];
             leadingBlocksBefore.forEach(leadingBlock => {
-                var nodesIds = this.nodesIdsByLeadingBlock.get(leadingBlock.block.blockHash);
-                if (nodesIds) {
-                    nodesIds.delete(processingNode.id)
-                    if (nodesIds.size === 0) {
+                var nodesIdsObject = this.nodesIdsByLeadingBlock.get(leadingBlock.block.blockHash);
+                if (nodesIdsObject) {
+                    nodesIdsObject.nodesIds.delete(processingNode.id)
+                    if (nodesIdsObject.nodesIds.size === 0) {
                         this.nodesIdsByLeadingBlock.delete(leadingBlock.block.blockHash);
                     }
                 }
@@ -88,12 +103,15 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
             this.currentlyLeadingBlocksByNodeId.set(processingNode.id, processingNode.blockchain.leadingBlocks);
 
 
-            var nodesIds = this.nodesIdsByLeadingBlock.get(baton.createdBlock.blockHash);
-            if (!nodesIds) {
-                nodesIds = new Set();
-                this.nodesIdsByLeadingBlock.set(baton.createdBlock.blockHash, nodesIds);
+            var nodesIdsObject = this.nodesIdsByLeadingBlock.get(baton.createdBlock.blockHash);
+            if (!nodesIdsObject) {
+                nodesIdsObject = {
+                    nodesIds: new Set(),
+                    blockchainHeight: baton.createdBlock.blockBody.height
+                };
+                this.nodesIdsByLeadingBlock.set(baton.createdBlock.blockHash, nodesIdsObject);
             }
-            nodesIds.add(processingNode.id);
+            nodesIdsObject.nodesIds.add(processingNode.id);
         }
     }
 
@@ -111,10 +129,10 @@ class BlockVeryfingMetricsEventHandler extends EventHandler {
         if (baton.verifiedBlock && baton.isBlockAppended) {
             var leadingBlocksBefore = this.currentlyLeadingBlocksByNodeId.get(processingNode.id) || [];
             leadingBlocksBefore.forEach(leadingBlock => {
-                var nodesIds = this.nodesIdsByLeadingBlock.get(leadingBlock.block.blockHash);
-                if (nodesIds) {
-                    nodesIds.delete(processingNode.id)
-                    if (nodesIds.size === 0) {
+                var nodesIdsObject = this.nodesIdsByLeadingBlock.get(leadingBlock.block.blockHash);
+                if (nodesIdsObject) {
+                    nodesIdsObject.nodesIds.delete(processingNode.id)
+                    if (nodesIdsObject.nodesIds.size === 0) {
                         this.nodesIdsByLeadingBlock.delete(leadingBlock.block.blockHash);
                     }
                 }
@@ -122,12 +140,15 @@ class BlockVeryfingMetricsEventHandler extends EventHandler {
             this.currentlyLeadingBlocksByNodeId.set(processingNode.id, processingNode.blockchain.leadingBlocks);
 
 
-            var nodesIds = this.nodesIdsByLeadingBlock.get(baton.verifiedBlock.blockHash);
-            if (!nodesIds) {
-                nodesIds = new Set();
-                this.nodesIdsByLeadingBlock.set(baton.verifiedBlock.blockHash, nodesIds);
+            var nodesIdsObject = this.nodesIdsByLeadingBlock.get(baton.verifiedBlock.blockHash);
+            if (!nodesIdsObject) {
+                nodesIdsObject = {
+                    nodesIds: new Set(),
+                    blockchainHeight: baton.verifiedBlock.blockBody.height
+                };
+                this.nodesIdsByLeadingBlock.set(baton.verifiedBlock.blockHash, nodesIdsObject);
             }
-            nodesIds.add(processingNode.id);
+            nodesIdsObject.nodesIds.add(processingNode.id);
         }
     }
 

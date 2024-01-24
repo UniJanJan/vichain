@@ -19,7 +19,12 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     canAddressConstructNewBlock(currentlyLeadingBlock, potentialyConstructingAddress, timestamp) {
-        return this.getMiners(currentlyLeadingBlock, timestamp).get(timestamp % this.network.settings.roundTime) === potentialyConstructingAddress;
+        var miners = this.getMiners(currentlyLeadingBlock, timestamp)
+        if (miners) {
+            return miners.get(timestamp % this.network.settings.roundTime) === potentialyConstructingAddress;
+        } else {
+            return false;
+        }
     }
 
     isBlockValid(previousBlock, block) {
@@ -135,7 +140,7 @@ export class ProofOfBurnConsensus extends Consensus {
         while (!this.areFromDifferentRounds(currentBlock.block.blockBody.creationTimestamp, nextBlockCreationTimestamp)) {
             currentBlock = currentBlock.previousBlock;
             if (currentBlock === null) {
-                return [];
+                return null;
             }
         };
         return currentBlock.nextRoundMiners;
