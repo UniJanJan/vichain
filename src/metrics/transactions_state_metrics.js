@@ -38,6 +38,9 @@ export class TransactionsStateMetrics extends Metrics {
         var lastTimestamp = currentTimestamp;
         var currentMetricsTotalTime = 0;
         var previousMetricsValue = null;
+
+        var maxCreatedTransactionsNumber = 0;
+
         this.createdTransactionsMetrics.metrics.forEachReversed(element => {
             var shouldStop = false;
             var intervalSize = lastTimestamp - element.timestamp;
@@ -50,6 +53,10 @@ export class TransactionsStateMetrics extends Metrics {
 
             if (Math.ceil(metricsValue * 1.1) > this.maxValue) {
                 this.maxValue = Math.ceil(metricsValue * 1.1);
+            }
+
+            if (maxCreatedTransactionsNumber < metricsValue) {
+                maxCreatedTransactionsNumber = metricsValue;
             }
 
             graphics.beginPath();
@@ -149,23 +156,22 @@ export class TransactionsStateMetrics extends Metrics {
 
 
         graphics.beginPath();
-        graphics.moveTo(startX, startY + height / 2);
-        graphics.lineTo(startX + 5, startY + height / 2);
+        graphics.moveTo(startX, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
+        graphics.lineTo(startX + 5, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
         graphics.strokeStyle = 'blue';
         graphics.stroke();
 
         graphics.fillStyle = 'blue';
         graphics.font = "12px arial";
-        graphics.fillText(Math.ceil(this.maxValue / 2), startX + 10, startY + height / 2 + 3);
+        graphics.fillText(maxCreatedTransactionsNumber, startX + 10, startY + height - maxCreatedTransactionsNumber * heightToMaxValue + 3);
 
         graphics.beginPath();
         graphics.setLineDash([3, 6]);
-        graphics.moveTo(startX + 30, startY + height / 2);
-        graphics.lineTo(startX + width, startY + height / 2);
+        graphics.moveTo(startX + 30, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
+        graphics.lineTo(startX + width, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
         graphics.strokeStyle = 'blue';
         graphics.stroke();
         graphics.setLineDash([]);
-
     }
 
 }
