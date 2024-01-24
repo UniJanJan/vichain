@@ -102,16 +102,17 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
             });
             this.currentlyLeadingBlocksByNodeId.set(processingNode.id, processingNode.blockchain.leadingBlocks);
 
-
-            var nodesIdsObject = this.nodesIdsByLeadingBlock.get(baton.createdBlock.blockHash);
-            if (!nodesIdsObject) {
-                nodesIdsObject = {
-                    nodesIds: new Set(),
-                    blockchainHeight: baton.createdBlock.blockBody.height
-                };
-                this.nodesIdsByLeadingBlock.set(baton.createdBlock.blockHash, nodesIdsObject);
-            }
-            nodesIdsObject.nodesIds.add(processingNode.id);
+            baton.currentlyLeadingBlocks.forEach(leadingBlock => {
+                var nodesIdsObject = this.nodesIdsByLeadingBlock.get(leadingBlock.blockHash);
+                if (!nodesIdsObject) {
+                    nodesIdsObject = {
+                        nodesIds: new Set(),
+                        blockchainHeight: leadingBlock.blockBody.height
+                    };
+                    this.nodesIdsByLeadingBlock.set(leadingBlock.blockHash, nodesIdsObject);
+                }
+                nodesIdsObject.nodesIds.add(processingNode.id);
+            })
         }
     }
 
@@ -139,16 +140,17 @@ class BlockVeryfingMetricsEventHandler extends EventHandler {
             });
             this.currentlyLeadingBlocksByNodeId.set(processingNode.id, processingNode.blockchain.leadingBlocks);
 
-
-            var nodesIdsObject = this.nodesIdsByLeadingBlock.get(baton.verifiedBlock.blockHash);
-            if (!nodesIdsObject) {
-                nodesIdsObject = {
-                    nodesIds: new Set(),
-                    blockchainHeight: baton.verifiedBlock.blockBody.height
-                };
-                this.nodesIdsByLeadingBlock.set(baton.verifiedBlock.blockHash, nodesIdsObject);
-            }
-            nodesIdsObject.nodesIds.add(processingNode.id);
+            baton.currentlyLeadingBlocks.forEach(leadingBlock => {
+                var nodesIdsObject = this.nodesIdsByLeadingBlock.get(leadingBlock.blockHash);
+                if (!nodesIdsObject) {
+                    nodesIdsObject = {
+                        nodesIds: new Set(),
+                        blockchainHeight: leadingBlock.blockBody.height
+                    };
+                    this.nodesIdsByLeadingBlock.set(leadingBlock.blockHash, nodesIdsObject);
+                }
+                nodesIdsObject.nodesIds.add(processingNode.id);
+            });
         }
     }
 
