@@ -114,6 +114,8 @@ class BlockCreatingMetricsEventHandler extends EventHandler {
                 nodesIdsObject.nodesIds.add(processingNode.id);
             })
         }
+
+        baton.nodesIdsByLeadingBlock = this.nodesIdsByLeadingBlock;
     }
 
 }
@@ -152,6 +154,8 @@ class BlockVeryfingMetricsEventHandler extends EventHandler {
                 nodesIdsObject.nodesIds.add(processingNode.id);
             });
         }
+
+        baton.nodesIdsByLeadingBlock = this.nodesIdsByLeadingBlock;
     }
 
 }

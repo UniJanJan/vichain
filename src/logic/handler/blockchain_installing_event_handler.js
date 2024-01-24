@@ -53,5 +53,7 @@ export class BlockchainInstallingEventHandler extends EventHandler {
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.TRANSACTIONS_DISCOVERY, 0),
             this.eventFactory.createWaitingEvent(node, CyclicEventsName.MINERS_SELECTION, timeToNextRound)
         ]));
+
+        baton.genesisBlock = genesisBlock;
     }
 }
