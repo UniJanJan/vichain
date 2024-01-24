@@ -27,6 +27,10 @@ export class BlocksPropagationTimeMetrics extends Metrics {
         var heightToMaxValue = height / this.maxValue;
 
         this.propagatedBlocksMetrics.forEach((currentMetrics, index) => {
+            if (Math.ceil(currentMetrics.propagationTime * 1.1) > this.maxValue) {
+                this.maxValue = Math.ceil(currentMetrics.propagationTime * 1.1);
+            }
+
             graphics.beginPath();
             graphics.moveTo(startX + spaceWidth * (index + 1), startY + height - heightToMaxValue * currentMetrics.propagationTime);
             graphics.arc(startX + spaceWidth * (index + 1), startY + height - heightToMaxValue * currentMetrics.propagationTime, 3, -Math.PI / 2, 3 / 2 * Math.PI, false);
@@ -34,20 +38,28 @@ export class BlocksPropagationTimeMetrics extends Metrics {
             graphics.fill();
         });
 
+        this.drawInterval(graphics, startX, startY, width, height, Math.ceil(this.maxValue / 2));
+        this.drawInterval(graphics, startX, startY, width, height, Math.ceil(this.maxValue / 4));
+        this.drawInterval(graphics, startX, startY, width, height, Math.ceil(3 * this.maxValue / 4));
+    }
+
+    drawInterval(graphics, startX, startY, width, height, value) {
+        var heightToMaxValue = height / this.maxValue;
+        var y = startY + height - value * heightToMaxValue;
         graphics.beginPath();
-        graphics.moveTo(startX, startY + height / 2);
-        graphics.lineTo(startX + 5, startY + height / 2);
+        graphics.moveTo(startX, y);
+        graphics.lineTo(startX + 5, y);
         graphics.strokeStyle = 'blue';
         graphics.stroke();
 
         graphics.fillStyle = 'blue';
         graphics.font = "12px arial";
-        graphics.fillText(Math.ceil(this.maxValue / 2), startX + 10, startY + height / 2 + 3);
+        graphics.fillText(value, startX + 10, y + 3);
 
         graphics.beginPath();
         graphics.setLineDash([3, 6]);
-        graphics.moveTo(startX + 30, startY + height / 2);
-        graphics.lineTo(startX + width, startY + height / 2);
+        graphics.moveTo(startX + 50, y);
+        graphics.lineTo(startX + width, y);
         graphics.strokeStyle = 'blue';
         graphics.stroke();
         graphics.setLineDash([]);
