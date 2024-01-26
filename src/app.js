@@ -46,7 +46,8 @@ const app = createApp({
                 'ProcessingEventsCountMetrics': 'Average events number in buffers',
                 'BlocksPropagationTimeMetrics': 'Blocks propagation durations',
                 'TransactionsStateMetrics': 'Transactions states',
-                'BlockchainsHeightMetrics': 'Blockchains heights'
+                'BlockchainsHeightMetrics': 'Blockchains heights',
+                'NextMinersMetrics': 'Next miners'
             },
             transactionsStatusColor: {
                 'COMMITTED': 'red',

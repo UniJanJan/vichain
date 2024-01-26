@@ -1,6 +1,7 @@
 import { BlockchainsHeightMetrics } from "./blockchains_height_metrics.js";
 import { BlocksPropagationTimeMetrics } from "./blocks_propagation_time_metrics.js";
 import { LeadingBlocksMetrics } from "./leading_blocks_metrics.js";
+import { NextMinersMetrics } from "./next_miners_metrics.js";
 import { ProcessingEventsCountMetrics } from "./processing_events_count_metrics.js";
 import { TransactionsStateMetrics } from "./transactions_state_metrics.js";
 
@@ -15,7 +16,8 @@ export class MetricsManager {
             ProcessingEventsCountMetrics,
             BlocksPropagationTimeMetrics,
             BlockchainsHeightMetrics,
-            TransactionsStateMetrics
+            TransactionsStateMetrics,
+            NextMinersMetrics
         ];
 
         this.metrics = new Map(
@@ -24,9 +26,6 @@ export class MetricsManager {
     }
 
     collectMetrics(elapsedTime) {
-        // this.network.nodes.forEach(node =>
-        //     this.metrics.forEach(metrics => metrics.collectMetrics(elapsedTime, node))
-        // );
         this.metrics.forEach(metrics => metrics.collectMetrics(elapsedTime));
     }
 
