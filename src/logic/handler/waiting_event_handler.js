@@ -100,20 +100,22 @@ export class WaitingEventHandler extends EventHandler {
                 var timeQuantum = roundTime / minersPerRound;
                 var waitTime = timeQuantum - (currentTimestamp % timeQuantum) + 1000;
 
-                var accountService = this.serviceDispositor.getAccountService(processingNode);
-                var managedAddresses = accountService.getManagedAccounts();
+                if (processingNode.transactionGenerationSettings.autoBlockMining) {
+                    var accountService = this.serviceDispositor.getAccountService(processingNode);
+                    var managedAddresses = accountService.getManagedAccounts();
 
-                var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
-                processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
-                    managedAddresses.forEach(managedAddress => {
-                        if (blockchainService.canAddressConstructNewBlock(leadingBlock, managedAddress.wallet.publicKey, currentTimestamp)) {
-                            baton.nextProcessableEvents.push(
-                                this.eventFactory.createBlockCreatingEvent(processingNode, leadingBlock, managedAddress.wallet.publicKey)
-                            );
-                        }
+                    var blockchainService = this.serviceDispositor.getBlockchainService(processingNode);
+                    processingNode.blockchain.leadingBlocks.forEach(leadingBlock => {
+                        managedAddresses.forEach(managedAddress => {
+                            if (blockchainService.canAddressConstructNewBlock(leadingBlock, managedAddress.wallet.publicKey, currentTimestamp)) {
+                                baton.nextProcessableEvents.push(
+                                    this.eventFactory.createBlockCreatingEvent(processingNode, leadingBlock, managedAddress.wallet.publicKey)
+                                );
+                            }
+                        })
+
                     })
-
-                })
+                }
 
                 baton.nextProcessableEvents.push(
                     this.eventFactory.createWaitingEvent(processingNode, CyclicEventsName.MINERS_SELECTION, waitTime)

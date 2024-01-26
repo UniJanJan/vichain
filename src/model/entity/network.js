@@ -26,6 +26,8 @@ export class Network {
             genesisBlock: null,
 
             globalTransactionGenerationSettings: {
+                autoBlockMining: true,
+
                 autoTransactionCreation: true,
                 minTransactionCreationInterval: 20000,
                 avgTransactionCreationInterval: 100000,

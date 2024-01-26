@@ -181,6 +181,15 @@
                                         <hr class="mt-3 mb-3" />
 
                                         <div class="form-check form-switch mb-2">
+                                            <input id="autoBlockMiningSwitch" type="checkbox"
+                                                class="form-check-input"
+                                                v-model="selectedNode.node.transactionGenerationSettings.autoBlockMining" />
+                                            <label class="form-check-label" style="font-size: smaller;"
+                                                for="autoBlockMiningSwitch">Automatic blocks
+                                                mining</label>
+                                        </div>
+
+                                        <div class="form-check form-switch mb-2">
                                             <input id="autoTransactionCreationSwitch" type="checkbox"
                                                 class="form-check-input"
                                                 v-model="selectedNode.node.transactionGenerationSettings.autoTransactionCreation" />
@@ -754,6 +763,13 @@
                             </div>
 
                             <hr class="mt-3 mb-3" />
+
+                            <div class="form-check form-switch mb-2">
+                                <input id="autoBlockMiningSwitch" type="checkbox" class="form-check-input"
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.autoBlockMining" />
+                                <label class="form-check-label" for="autoBlockMiningSwitch">Automatic
+                                    blocks mining</label>
+                            </div>
 
                             <div class="form-check form-switch mb-2">
                                 <input id="autoTransactionCreationSwitch" type="checkbox" class="form-check-input"
