@@ -40,12 +40,16 @@ export class NextMinersMetrics extends Metrics {
             var nextMiners = entry[1];
 
             nextMiners.forEach(miner => {
-                var minerAddress = miner.object;
+                var minerAddressShort = miner.object.slice(0, 6);
 
                 graphics.beginPath();
                 graphics.rect(startX + miner.start * widthToRoundTime, startY + index * rowHeight, miner.size * widthToRoundTime, rowHeight);
-                graphics.fillStyle = '#' + minerAddress.slice(0, 6);
+                graphics.fillStyle = '#' + minerAddressShort;
                 graphics.fill();
+
+                graphics.fillStyle = 'white';
+                graphics.font = "8px arial";
+                graphics.fillText('0x' + minerAddressShort + '...', startX + miner.start * widthToRoundTime + widthToRoundTime / 2 + 6, startY + index * rowHeight + 14);
             })
 
             graphics.beginPath();
@@ -54,6 +58,15 @@ export class NextMinersMetrics extends Metrics {
             graphics.strokeStyle = '#' + blockHash.slice(0, 6);
             graphics.stroke();
         });
+
+        var currentRoundProgress = (this.network.timer.currentTimestamp % this.network.settings.roundTime) * widthToRoundTime;
+
+        graphics.beginPath();
+        graphics.moveTo(startX + currentRoundProgress, startY);
+        graphics.lineTo(startX + currentRoundProgress, startY + height);
+        graphics.lineWidth = 2;
+        graphics.strokeStyle = 'silver';
+        graphics.stroke();
 
     }
 
