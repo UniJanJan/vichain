@@ -183,7 +183,7 @@
                                         <div class="form-check form-switch mb-2">
                                             <input id="autoTransactionCreationSwitch" type="checkbox"
                                                 class="form-check-input"
-                                                v-model="selectedNode.node.autoTransactionCreation" />
+                                                v-model="selectedNode.node.transactionGenerationSettings.autoTransactionCreation" />
                                             <label class="form-check-label" style="font-size: smaller;"
                                                 for="autoTransactionCreationSwitch">Automatic transactions
                                                 creation</label>
@@ -191,18 +191,55 @@
                                         <div class="form-floating mb-2">
                                             <input id="minTransactionCreationIntervalInput" type="number"
                                                 class="form-control"
-                                                v-model="selectedNode.node.minTransactionCreationInterval" />
+                                                v-model="selectedNode.node.transactionGenerationSettings.minTransactionCreationInterval" />
                                             <label for="minTransactionCreationIntervalInput"
-                                                style="font-size: smaller;">Minimal transaction
+                                                style="font-size: smaller;">Minimum transaction
                                                 creation interval (ms)</label>
                                         </div>
                                         <div class="form-floating mb-2">
                                             <input id="avgTransactionCreationIntervalInput" type="number"
                                                 class="form-control"
-                                                v-model="selectedNode.node.avgTransactionCreationInterval" />
+                                                v-model="selectedNode.node.transactionGenerationSettings.avgTransactionCreationInterval" />
                                             <label for="avgTransactionCreationIntervalInput"
                                                 style="font-size: smaller;">Average transaction
                                                 creation interval (ms)</label>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <input type="range" id="burningTransactionProbabilityInput" name="volume" min="0" max="100" step="1"
+                                                v-model="selectedNode.node.transactionGenerationSettings.burningTransactionProbability"
+                                                @input="() => selectedNode.node.transactionGenerationSettings.burningTransactionProbability = Number(selectedNode.node.transactionGenerationSettings.burningTransactionProbability)" />
+                                            <label for="burningTransactionProbabilityInput" style="font-size: small;">Burning transaction probability ({{
+                                                selectedNode.node.transactionGenerationSettings.burningTransactionProbability }}%)</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <input type="range" id="minRegularTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                                v-model="selectedNode.node.transactionGenerationSettings.minRegularTransactionAmount"
+                                                @input="() => selectedNode.node.transactionGenerationSettings.minRegularTransactionAmount = Number(selectedNode.node.transactionGenerationSettings.minRegularTransactionAmount)" />
+                                            <label for="minRegularTransactionAmountInput" style="font-size: small;">Minimum regular transaction amount ({{
+                                                selectedNode.node.transactionGenerationSettings.minRegularTransactionAmount }}%)</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <input type="range" id="maxRegularTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                                v-model="selectedNode.node.transactionGenerationSettings.maxRegularTransactionAmount"
+                                                @input="() => selectedNode.node.transactionGenerationSettings.maxRegularTransactionAmount = Number(selectedNode.node.transactionGenerationSettings.maxRegularTransactionAmount)" />
+                                            <label for="maxRegularTransactionAmountInput" style="font-size: small;">Maximum regular transaction amount ({{
+                                                selectedNode.node.transactionGenerationSettings.maxRegularTransactionAmount }}%)</label>
+                                        </div>
+            
+                                        <div class="mb-3">
+                                            <input type="range" id="minBurningTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                                v-model="selectedNode.node.transactionGenerationSettings.minBurningTransactionAmount"
+                                                @input="() => selectedNode.node.transactionGenerationSettings.minBurningTransactionAmount = Number(selectedNode.node.transactionGenerationSettings.minBurningTransactionAmount)" />
+                                            <label for="minBurningTransactionAmountInput" style="font-size: small;">Minimum burning transaction amount ({{
+                                                selectedNode.node.transactionGenerationSettings.minBurningTransactionAmount }}%)</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <input type="range" id="maxBurningTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                                v-model="selectedNode.node.transactionGenerationSettings.maxBurningTransactionAmount"
+                                                @input="() => selectedNode.node.transactionGenerationSettings.maxBurningTransactionAmount = Number(selectedNode.node.transactionGenerationSettings.maxBurningTransactionAmount)" />
+                                            <label for="maxBurningTransactionAmountInput" style="font-size: small;">Maximum burning transaction amount ({{
+                                                selectedNode.node.transactionGenerationSettings.maxBurningTransactionAmount }}%)</label>
                                         </div>
 
                                         <hr class="mt-3 mb-3" />
@@ -720,21 +757,58 @@
 
                             <div class="form-check form-switch mb-2">
                                 <input id="autoTransactionCreationSwitch" type="checkbox" class="form-check-input"
-                                    v-model="networkManager.network.settings.autoTransactionCreation" />
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.autoTransactionCreation" />
                                 <label class="form-check-label" for="autoTransactionCreationSwitch">Automatic
                                     transactions creation</label>
                             </div>
                             <div class="form-floating mb-2">
                                 <input id="minTransactionCreationIntervalInput" type="number" class="form-control"
-                                    v-model="networkManager.network.settings.minTransactionCreationInterval" />
-                                <label for="minTransactionCreationIntervalInput">Minimal transaction creation interval
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.minTransactionCreationInterval" />
+                                <label for="minTransactionCreationIntervalInput">Minimum transaction creation interval
                                     (ms)</label>
                             </div>
-                            <div class="form-floating mb-2">
+                            <div class="form-floating mb-3">
                                 <input id="avgTransactionCreationIntervalInput" type="number" class="form-control"
-                                    v-model="networkManager.network.settings.avgTransactionCreationInterval" />
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.avgTransactionCreationInterval" />
                                 <label for="avgTransactionCreationIntervalInput">Average transaction creation interval
                                     (ms)</label>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="range" id="burningTransactionProbabilityInput" name="volume" min="0" max="100" step="1"
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.burningTransactionProbability"
+                                    @input="() => networkManager.network.settings.globalTransactionGenerationSettings.burningTransactionProbability = Number(networkManager.network.settings.globalTransactionGenerationSettings.burningTransactionProbability)" />
+                                <label for="burningTransactionProbabilityInput" style="font-size: small;">Burning transaction probability ({{
+                                    networkManager.network.settings.globalTransactionGenerationSettings.burningTransactionProbability }}%)</label>
+                            </div>
+                            <div class="mb-3">
+                                <input type="range" id="minRegularTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.minRegularTransactionAmount"
+                                    @input="() => networkManager.network.settings.globalTransactionGenerationSettings.minRegularTransactionAmount = Number(networkManager.network.settings.globalTransactionGenerationSettings.minRegularTransactionAmount)" />
+                                <label for="minRegularTransactionAmountInput" style="font-size: small;">Minimum regular transaction amount ({{
+                                    networkManager.network.settings.globalTransactionGenerationSettings.minRegularTransactionAmount }}%)</label>
+                            </div>
+                            <div class="mb-3">
+                                <input type="range" id="maxRegularTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.maxRegularTransactionAmount"
+                                    @input="() => networkManager.network.settings.globalTransactionGenerationSettings.maxRegularTransactionAmount = Number(networkManager.network.settings.globalTransactionGenerationSettings.maxRegularTransactionAmount)" />
+                                <label for="maxRegularTransactionAmountInput" style="font-size: small;">Maximum regular transaction amount ({{
+                                    networkManager.network.settings.globalTransactionGenerationSettings.maxRegularTransactionAmount }}%)</label>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="range" id="minBurningTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.minBurningTransactionAmount"
+                                    @input="() => networkManager.network.settings.globalTransactionGenerationSettings.minBurningTransactionAmount = Number(networkManager.network.settings.globalTransactionGenerationSettings.minBurningTransactionAmount)" />
+                                <label for="minBurningTransactionAmountInput" style="font-size: small;">Minimum burning transaction amount ({{
+                                    networkManager.network.settings.globalTransactionGenerationSettings.minBurningTransactionAmount }}%)</label>
+                            </div>
+                            <div class="mb-3">
+                                <input type="range" id="maxBurningTransactionAmountInput" name="volume" min="0" max="100" step="1"
+                                    v-model="networkManager.network.settings.globalTransactionGenerationSettings.maxBurningTransactionAmount"
+                                    @input="() => networkManager.network.settings.globalTransactionGenerationSettings.maxBurningTransactionAmount = Number(networkManager.network.settings.globalTransactionGenerationSettings.maxBurningTransactionAmount)" />
+                                <label for="maxBurningTransactionAmountInput" style="font-size: small;">Maximum burning transaction amount ({{
+                                    networkManager.network.settings.globalTransactionGenerationSettings.maxBurningTransactionAmount }}%)</label>
                             </div>
 
                         </div>

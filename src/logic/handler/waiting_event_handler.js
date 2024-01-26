@@ -61,9 +61,9 @@ export class WaitingEventHandler extends EventHandler {
                 }
                 return;
             case CyclicEventsName.TRANSACTION_GENERATION:
-                var waitTime = this.getTimeInterval(processingNode.minTransactionCreationInterval, processingNode.avgTransactionCreationInterval);
+                var waitTime = this.getTimeInterval(processingNode.transactionGenerationSettings.minTransactionCreationInterval, processingNode.transactionGenerationSettings.avgTransactionCreationInterval);
 
-                if (processingNode.autoTransactionCreation) {
+                if (processingNode.transactionGenerationSettings.autoTransactionCreation) {
                     var accountService = this.serviceDispositor.getAccountService(processingNode);
                     var sourceAccount = accountService.getRandomManagedAccount();
                     var targetAddress = accountService.getRandomNonManagedAddress();

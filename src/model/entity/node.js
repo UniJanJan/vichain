@@ -4,6 +4,7 @@ import { EventPool } from '../event/event_pool.js';
 import { Blockchain } from '../blockchain/blockchain.js';
 import { AccountStore } from '../account/account_store.js';
 import { EventProcessingSettings } from '../settings/event_processing_settings.js';
+import { TransactionGenerationSettings } from '../settings/transaction_generation_settings.js';
 
 
 export class Node {
@@ -25,6 +26,7 @@ export class Node {
         this.managedAccounts = new AccountStore();
 
         this.processingSettings = new EventProcessingSettings(settings.defaultNodeProcessingSettings);
+        this.transactionGenerationSettings = new TransactionGenerationSettings(settings.globalTransactionGenerationSettings);
 
         this.x = x;
         this.y = y;
@@ -34,10 +36,7 @@ export class Node {
 
         this.settings = settings;
 
-        this._radius = null;
-        this._autoTransactionCreation = null;
-        this._minTransactionCreationInterval = null;
-        this._avgTransactionCreationInterval = null;
+        this._radius = null;        
 
         this._minLinks = null;
         this._maxLinks = null;
@@ -52,36 +51,12 @@ export class Node {
         return this._radius || this.settings.defaultNodeRadius;
     }
 
-    get autoTransactionCreation() {
-        return this._autoTransactionCreation === null ? this.settings.autoTransactionCreation : this._autoTransactionCreation;
-    }
-
-    get minTransactionCreationInterval() {
-        return this._minTransactionCreationInterval === null ? this.settings.minTransactionCreationInterval : this._minTransactionCreationInterval;
-    }
-
-    get avgTransactionCreationInterval() {
-        return this._avgTransactionCreationInterval === null ? this.settings.avgTransactionCreationInterval : this._avgTransactionCreationInterval;
-    }
-
     get maxLinks() {
         return this._maxLinks === null ? this.settings.maxLinksPerNode : this._maxLinks;
     }
 
     get minLinks() {
         return this._minLinks === null ? this.settings.minLinksPerNode : this._minLinks;
-    }
-
-    set autoTransactionCreation(value) {
-        this._autoTransactionCreation = value;
-    }
-
-    set minTransactionCreationInterval(value) {
-        this._minTransactionCreationInterval = value;
-    }
-
-    set avgTransactionCreationInterval(value) {
-        this._avgTransactionCreationInterval = value;
     }
 
     set minLinks(value) {

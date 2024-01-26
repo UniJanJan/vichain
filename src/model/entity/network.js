@@ -25,9 +25,17 @@ export class Network {
             isBlockchainInstalled: false,
             genesisBlock: null,
 
-            autoTransactionCreation: true,
-            minTransactionCreationInterval: 20000,
-            avgTransactionCreationInterval: 100000,
+            globalTransactionGenerationSettings: {
+                autoTransactionCreation: true,
+                minTransactionCreationInterval: 20000,
+                avgTransactionCreationInterval: 100000,
+
+                burningTransactionProbability: 5,
+                minRegularTransactionAmount: 0,
+                maxRegularTransactionAmount: 100,
+                minBurningTransactionAmount: 0,
+                maxBurningTransactionAmount: 10
+            },
 
             initTokenAmountPerNode: 100,
             roundTime: 60000,
