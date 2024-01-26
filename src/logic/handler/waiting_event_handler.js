@@ -66,15 +66,25 @@ export class WaitingEventHandler extends EventHandler {
                 if (processingNode.transactionGenerationSettings.autoTransactionCreation) {
                     var accountService = this.serviceDispositor.getAccountService(processingNode);
                     var sourceAccount = accountService.getRandomManagedAccount();
-                    var targetAddress = accountService.getRandomNonManagedAddress();
                     var maxSpendableAmount = accountService.getSafeAvailableBalance(sourceAccount.wallet.publicKey);
 
                     if (maxSpendableAmount > 0) {
-                        var amount = Math.ceil(Math.random() * maxSpendableAmount);
+                        var shouldBeBurn = (Math.random() * 100) < processingNode.transactionGenerationSettings.burningTransactionProbability;
+                        if (shouldBeBurn) {
+                            var targetAddress = this.network.walletPool.getBurnAddress();
+                            var amountPercent = processingNode.transactionGenerationSettings.minBurningTransactionAmount + (Math.random() * (processingNode.transactionGenerationSettings.maxBurningTransactionAmount - processingNode.transactionGenerationSettings.minBurningTransactionAmount))
+                            var amount = Math.ceil(amountPercent * maxSpendableAmount / 100);
+                        } else {
+                            var targetAddress = accountService.getRandomNonManagedAddress();
+                            var amountPercent = processingNode.transactionGenerationSettings.minRegularTransactionAmount + (Math.random() * (processingNode.transactionGenerationSettings.maxRegularTransactionAmount - processingNode.transactionGenerationSettings.minRegularTransactionAmount))
+                            var amount = Math.ceil(amountPercent * maxSpendableAmount / 100);
+                        }
 
-                        baton.nextProcessableEvents.push(
-                            this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount)
-                        )
+                        if (amount > 0) {
+                            baton.nextProcessableEvents.push(
+                                this.eventFactory.createTransactionCreatingEvent(processingNode, sourceAccount.wallet, targetAddress, amount)
+                            )
+                        }
                     }
                 }
 
