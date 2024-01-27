@@ -193,7 +193,7 @@ export class Network {
             graphics.lineWidth = 2;
             graphics.stroke();
 
-            selectedMetrics.draw(graphics, (canvas.width - metricsWindowWidth), (canvas.height - metricsWindowHeight), metricsWindowWidth, metricsWindowHeight);
+            selectedMetrics.draw(graphics, (canvas.width - metricsWindowWidth), (canvas.height - metricsWindowHeight), metricsWindowWidth, metricsWindowHeight, settings);
         }
     }
 

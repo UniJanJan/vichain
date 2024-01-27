@@ -27,46 +27,48 @@ export class NextMinersMetrics extends Metrics {
         }
     }
 
-    draw(graphics, startX, startY, width, height) {
-        if (this.nextMinersByLeadingBlock.size === 0) {
-            return;
-        }
+    draw(graphics, startX, startY, width, height, settings) {
+        if (this.nextMinersByLeadingBlock.size > 0) {
+            var rowHeight = height / this.nextMinersByLeadingBlock.size;
+            var widthToRoundTime = width / this.network.settings.roundTime;
 
-        var rowHeight = height / this.nextMinersByLeadingBlock.size;
-        var widthToRoundTime = width / this.network.settings.roundTime;
+            Array.from(this.nextMinersByLeadingBlock.entries()).forEach((entry, index) => {
+                var blockHash = entry[0];
+                var nextMiners = entry[1];
 
-        Array.from(this.nextMinersByLeadingBlock.entries()).forEach((entry, index) => {
-            var blockHash = entry[0];
-            var nextMiners = entry[1];
+                nextMiners.forEach(miner => {
+                    var minerAddressShort = miner.object.slice(0, 6);
 
-            nextMiners.forEach(miner => {
-                var minerAddressShort = miner.object.slice(0, 6);
+                    graphics.beginPath();
+                    graphics.rect(startX + miner.start * widthToRoundTime, startY + index * rowHeight, miner.size * widthToRoundTime, rowHeight);
+                    graphics.fillStyle = '#' + minerAddressShort;
+                    graphics.fill();
+
+                    graphics.fillStyle = 'white';
+                    graphics.font = "8px arial";
+                    graphics.fillText('0x' + minerAddressShort + '...', startX + miner.start * widthToRoundTime + widthToRoundTime / 2 + 6, startY + index * rowHeight + 14);
+                })
 
                 graphics.beginPath();
-                graphics.rect(startX + miner.start * widthToRoundTime, startY + index * rowHeight, miner.size * widthToRoundTime, rowHeight);
-                graphics.fillStyle = '#' + minerAddressShort;
-                graphics.fill();
+                graphics.rect(startX, startY + index * rowHeight, width, rowHeight);
+                graphics.lineWidth = 8;
+                graphics.strokeStyle = '#' + blockHash.slice(0, 6);
+                graphics.stroke();
+            });
 
-                graphics.fillStyle = 'white';
-                graphics.font = "8px arial";
-                graphics.fillText('0x' + minerAddressShort + '...', startX + miner.start * widthToRoundTime + widthToRoundTime / 2 + 6, startY + index * rowHeight + 14);
-            })
+            var currentRoundProgress = (this.network.timer.currentTimestamp % this.network.settings.roundTime) * widthToRoundTime;
 
             graphics.beginPath();
-            graphics.rect(startX, startY + index * rowHeight, width, rowHeight);
-            graphics.lineWidth = 8;
-            graphics.strokeStyle = '#' + blockHash.slice(0, 6);
+            graphics.moveTo(startX + currentRoundProgress, startY);
+            graphics.lineTo(startX + currentRoundProgress, startY + height);
+            graphics.lineWidth = 2;
+            graphics.strokeStyle = 'silver';
             graphics.stroke();
-        });
+        }
 
-        var currentRoundProgress = (this.network.timer.currentTimestamp % this.network.settings.roundTime) * widthToRoundTime;
-
-        graphics.beginPath();
-        graphics.moveTo(startX + currentRoundProgress, startY);
-        graphics.lineTo(startX + currentRoundProgress, startY + height);
-        graphics.lineWidth = 2;
-        graphics.strokeStyle = 'silver';
-        graphics.stroke();
+        if (settings.showOnlyMetrics) {
+            this.drawAxisNames(graphics, startX, startY, height, "Time", "Leading block")
+        }
 
     }
 

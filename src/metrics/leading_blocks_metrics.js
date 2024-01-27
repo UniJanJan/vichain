@@ -18,7 +18,7 @@ export class LeadingBlocksMetrics extends Metrics {
 
     }
 
-    draw(graphics, startX, startY, width, height) {
+    draw(graphics, startX, startY, width, height, settings) {
         var currentTimestamp = this.network.timer.currentTimestamp;
 
         var nodeMetricsHeight = height / this.leadingBlocksMetrics.size;
@@ -53,6 +53,10 @@ export class LeadingBlocksMetrics extends Metrics {
                 return shouldStop;
             });
         });
+
+        if (settings.showOnlyMetrics) {
+            this.drawAxisNames(graphics, startX, startY, height, "Time", "Node");
+        }
 
     }
 

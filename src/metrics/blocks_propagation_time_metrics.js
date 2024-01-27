@@ -21,7 +21,7 @@ export class BlocksPropagationTimeMetrics extends Metrics {
         // collected by additional handlers above
     }
 
-    draw(graphics, startX, startY, width, height) {
+    draw(graphics, startX, startY, width, height, settings) {
         // var widthToTimeFactor = width / this.metricsRetentionTime;
         var spaceWidth = width / (this.propagatedBlocksMetrics.length + 1);
         var heightToMaxValue = height / this.maxValue;
@@ -41,6 +41,11 @@ export class BlocksPropagationTimeMetrics extends Metrics {
         this.drawInterval(graphics, startX, startY, width, height, Math.ceil(this.maxValue / 2));
         this.drawInterval(graphics, startX, startY, width, height, Math.ceil(this.maxValue / 4));
         this.drawInterval(graphics, startX, startY, width, height, Math.ceil(3 * this.maxValue / 4));
+
+        if (settings.showOnlyMetrics) {
+            this.drawAxisNames(graphics, startX, startY, height, "Block", "Propagation time")
+        }
+
     }
 
     drawInterval(graphics, startX, startY, width, height, value) {

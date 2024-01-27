@@ -21,7 +21,7 @@ export class ProcessingEventsCountMetrics extends Metrics {
         this.processingEventsCountMetrics.push(elapsedTime, averageProcessingEvents);
     }
 
-    draw(graphics, startX, startY, width, height) {
+    draw(graphics, startX, startY, width, height, settings) {
         var widthToTimeFactor = width / this.metricsRetentionTime;
         var heightToMaxValue = height / this.maxValue;
 
@@ -63,6 +63,10 @@ export class ProcessingEventsCountMetrics extends Metrics {
         graphics.strokeStyle = 'blue';
         graphics.stroke();
         graphics.setLineDash([]);
+
+        if (settings.showOnlyMetrics) {
+            this.drawAxisNames(graphics, startX, startY, height, "Time", "Number of events")
+        }
     }
 
 }

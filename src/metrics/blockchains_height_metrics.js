@@ -22,7 +22,7 @@ export class BlockchainsHeightMetrics extends Metrics {
         // collected by additional handlers above
     }
 
-    draw(graphics, startX, startY, width, height) {
+    draw(graphics, startX, startY, width, height, settings) {
         if (this.nodesIdsByLeadingBlock.length === 0) {
             return;
         }
@@ -59,23 +59,29 @@ export class BlockchainsHeightMetrics extends Metrics {
             graphics.fillText(blockchainHeight, startX + columnWidth * index + (columnWidth / 2), startY + height - ((columnHeight - fontSize) / 2));
         });
 
-        graphics.beginPath();
-        graphics.moveTo(startX, startY + height - maxMetrics * heightToMaxValue);
-        graphics.lineTo(startX + 5, startY + height - maxMetrics * heightToMaxValue);
-        graphics.strokeStyle = 'blue';
-        graphics.stroke();
+        if (maxMetrics > 0) {
+            graphics.beginPath();
+            graphics.moveTo(startX, startY + height - maxMetrics * heightToMaxValue);
+            graphics.lineTo(startX + 5, startY + height - maxMetrics * heightToMaxValue);
+            graphics.strokeStyle = 'blue';
+            graphics.stroke();
 
-        graphics.fillStyle = 'blue';
-        graphics.font = "12px arial";
-        graphics.fillText(maxMetrics, startX + 10, startY + height - maxMetrics * heightToMaxValue + 3);
+            graphics.fillStyle = 'blue';
+            graphics.font = "12px arial";
+            graphics.fillText(maxMetrics, startX + 10, startY + height - maxMetrics * heightToMaxValue + 3);
 
-        graphics.beginPath();
-        graphics.setLineDash([3, 6]);
-        graphics.moveTo(startX + 30, startY + height - maxMetrics * heightToMaxValue);
-        graphics.lineTo(startX + width, startY + height - maxMetrics * heightToMaxValue);
-        graphics.strokeStyle = 'blue';
-        graphics.stroke();
-        graphics.setLineDash([]);
+            graphics.beginPath();
+            graphics.setLineDash([3, 6]);
+            graphics.moveTo(startX + 30, startY + height - maxMetrics * heightToMaxValue);
+            graphics.lineTo(startX + width, startY + height - maxMetrics * heightToMaxValue);
+            graphics.strokeStyle = 'blue';
+            graphics.stroke();
+            graphics.setLineDash([]);
+        }
+
+        if (settings.showOnlyMetrics) {
+            this.drawAxisNames(graphics, startX, startY, height, "Leading block", "Number of nodes")
+        }
     }
 
 }

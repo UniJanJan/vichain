@@ -29,7 +29,7 @@ export class TransactionsStateMetrics extends Metrics {
 
     }
 
-    draw(graphics, startX, startY, width, height) {
+    draw(graphics, startX, startY, width, height, settings) {
         var currentTimestamp = this.network.timer.currentTimestamp;
 
         var widthToTimeFactor = width / this.metricsRetentionTime;
@@ -155,23 +155,29 @@ export class TransactionsStateMetrics extends Metrics {
         });
 
 
-        graphics.beginPath();
-        graphics.moveTo(startX, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
-        graphics.lineTo(startX + 5, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
-        graphics.strokeStyle = 'blue';
-        graphics.stroke();
+        if (maxCreatedTransactionsNumber > 0) {
+            graphics.beginPath();
+            graphics.moveTo(startX, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
+            graphics.lineTo(startX + 5, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
+            graphics.strokeStyle = 'blue';
+            graphics.stroke();
 
-        graphics.fillStyle = 'blue';
-        graphics.font = "12px arial";
-        graphics.fillText(maxCreatedTransactionsNumber, startX + 10, startY + height - maxCreatedTransactionsNumber * heightToMaxValue + 3);
+            graphics.fillStyle = 'blue';
+            graphics.font = "12px arial";
+            graphics.fillText(maxCreatedTransactionsNumber, startX + 10, startY + height - maxCreatedTransactionsNumber * heightToMaxValue + 3);
 
-        graphics.beginPath();
-        graphics.setLineDash([3, 6]);
-        graphics.moveTo(startX + 30, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
-        graphics.lineTo(startX + width, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
-        graphics.strokeStyle = 'blue';
-        graphics.stroke();
-        graphics.setLineDash([]);
+            graphics.beginPath();
+            graphics.setLineDash([3, 6]);
+            graphics.moveTo(startX + 30, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
+            graphics.lineTo(startX + width, startY + height - maxCreatedTransactionsNumber * heightToMaxValue);
+            graphics.strokeStyle = 'blue';
+            graphics.stroke();
+            graphics.setLineDash([]);
+        }
+
+        if (settings.showOnlyMetrics) {
+            this.drawAxisNames(graphics, startX, startY, height, "Time", "Number of transactions")
+        }
     }
 
 }
