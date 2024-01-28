@@ -7,6 +7,8 @@ export class ProofOfBurnConsensus extends Consensus {
 
     constructor(network) {
         super(network);
+
+        this.hashCache = new Map();
     }
 
     constructValidLeadingBlock(currentlyLeadingBlock, potentialyNextBlock) {
@@ -124,7 +126,13 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     isTransactionHashValid(transaction) {
-        return CryptoJS.SHA256(JSON.stringify(transaction.transactionBody)).toString() === transaction.transactionHash;
+        var hashableData = JSON.stringify(transaction.transactionBody);
+        var transactionHash = this.hashCache.get(hashableData);
+        if (!transactionHash) {
+            transactionHash = CryptoJS.SHA256(hashableData).toString();
+            this.hashCache.set(hashableData, transactionHash);
+        }
+        return transactionHash === transaction.transactionHash;
     }
 
     isTransactionSignatureValid(transaction, asAwardTransaction) {
