@@ -126,13 +126,17 @@ export class ProofOfBurnConsensus extends Consensus {
     }
 
     isTransactionHashValid(transaction) {
-        var hashableData = JSON.stringify(transaction.transactionBody);
-        var transactionHash = this.hashCache.get(hashableData);
-        if (!transactionHash) {
-            transactionHash = CryptoJS.SHA256(hashableData).toString();
-            this.hashCache.set(hashableData, transactionHash);
+        if (this.network.cacheTransactionHash) {
+            var hashableData = JSON.stringify(transaction.transactionBody);
+            var transactionHash = this.hashCache.get(hashableData);
+            if (!transactionHash) {
+                transactionHash = CryptoJS.SHA256(hashableData).toString();
+                this.hashCache.set(hashableData, transactionHash);
+            }
+            return transactionHash === transaction.transactionHash;
+        } else {
+            return CryptoJS.SHA256(hashableData).toString() === transaction.transactionHash;
         }
-        return transactionHash === transaction.transactionHash;
     }
 
     isTransactionSignatureValid(transaction, asAwardTransaction) {

@@ -80,7 +80,9 @@ export class Network {
                 processingPower: 1
             },
 
-            cacheBlockValidation: false
+            cacheBlockValidation: false,
+            cacheTransactionHash: false,
+            cacheSignatureValidation: false
         }
 
         this.settings.eventsDurations = Object.assign({}, this.settings.defaultEventsDurations);
