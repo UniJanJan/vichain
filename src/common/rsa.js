@@ -1,4 +1,4 @@
-/* file includes code copied from https://github.com/denysdovhan/rsa-labwork/blob/master/index.js (MIT license, Denys Dovhan) [03-12-23] */
+/* file includes modified code copied from https://github.com/denysdovhan/rsa-labwork/blob/master/index.js (MIT license, Denys Dovhan) [03-12-23] */
 
 export class RSA {
     static e = bigInt(65537);
