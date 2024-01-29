@@ -31,9 +31,13 @@ export class BlocksPropagationTimeMetrics extends Metrics {
                 this.maxValue = Math.ceil(currentMetrics.propagationTime * 1.1);
             }
 
+            var pointRadius = settings.showOnlyMetrics ? 5 : 3;
+
             graphics.beginPath();
             graphics.moveTo(startX + spaceWidth * (index + 1), startY + height - heightToMaxValue * currentMetrics.propagationTime);
-            graphics.arc(startX + spaceWidth * (index + 1), startY + height - heightToMaxValue * currentMetrics.propagationTime, 3, -Math.PI / 2, 3 / 2 * Math.PI, false);
+            graphics.arc(startX + spaceWidth * (index + 1), startY + height - heightToMaxValue * currentMetrics.propagationTime, pointRadius, -Math.PI / 2, 3 / 2 * Math.PI, false);
+            graphics.strokeStyle = 'black'
+            graphics.stroke();
             graphics.fillStyle = '#' + currentMetrics.blockHash.slice(0, 6);
             graphics.fill();
         });
@@ -43,7 +47,7 @@ export class BlocksPropagationTimeMetrics extends Metrics {
         this.drawInterval(graphics, startX, startY, width, height, Math.ceil(3 * this.maxValue / 4));
 
         if (settings.showOnlyMetrics) {
-            this.drawAxisNames(graphics, startX, startY, height, "Block", "Propagation time")
+            this.drawAxisNames(graphics, startX, startY, height, "Block", "Propagation time (ms)")
         }
 
     }
